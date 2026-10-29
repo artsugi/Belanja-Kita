@@ -833,7 +833,7 @@
       const rekapSection = computed(() => activeTab.value === 'mingguan' ? state.activeWeek : 'bulanan');
       const reportText = computed(() => buildReport(state.month, state.items, state.budget));
       const mailtoLink = computed(() =>
-        'mailto:sugiyarto784@gmail.com?subject=' + encodeURIComponent('Laporan Belanja Kita ' + monthLabel(state.month)) +
+        'mailto:sugiyarto784@gmail.com,syifaurrohmah077@gmail.com?subject=' + encodeURIComponent('Laporan Belanja Kita ' + monthLabel(state.month)) +
         '&body=' + encodeURIComponent(reportText.value));
       const historyDesc = computed(() => state.history.slice().reverse());
       const greeting = computed(() => {
