@@ -106,18 +106,19 @@
           </p>
         </div>
       </div>
-      <div class="ml-auto flex items-center bg-surface rounded-full h-10 shrink-0 shadow-[0_1px_0_rgb(var(--line))]">
-        <button @click="shiftMonth(-1)" class="w-7 h-full text-muted active:text-ink rounded-l-full" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
-        <button @click="openMonthPicker" class="h-full px-1 text-[13px] font-bold num" aria-label="Pilih bulan">{{ shortMonth(state.month) }}</button>
-        <button @click="shiftMonth(1)" class="w-7 h-full text-muted active:text-ink rounded-r-full" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
-      </div>
-      <button @click="openSettings" class="relative w-10 h-10 rounded-full bg-surface shadow-[0_1px_0_rgb(var(--line))] text-ink/70 shrink-0 grid place-items-center -ml-1" aria-label="Pengaturan">
+      <button @click="openSettings" class="ml-auto relative w-10 h-10 rounded-full bg-surface shadow-[0_1px_0_rgb(var(--line))] text-ink/70 shrink-0 grid place-items-center" aria-label="Pengaturan">
         <span v-if="lock.enabled"><i class="fa-solid fa-lock text-[14px]"></i></span><span v-else><i class="fa-solid fa-gear text-[15px]"></i></span>
       </button>
     </div>
 
-    <!-- Kartu anggaran -->
-    <div class="mt-3 rounded-[28px] bg-coral text-white px-5 pt-4 pb-4 relative overflow-hidden">
+    <!-- Kartu anggaran (ringkas saat scroll) -->
+    <button v-if="compact && !editingBudget" @click="expandHeader" class="mt-2.5 w-full rounded-full bg-coral text-white pl-4 pr-3.5 h-11 flex items-center gap-3 text-left" aria-label="Tampilkan ringkasan anggaran">
+      <span class="text-[12px] font-semibold text-white/85 shrink-0">Sisa</span>
+      <span class="text-[16px] font-black num shrink-0">{{ rp(remaining) }}</span>
+      <span class="flex-1 h-1.5 rounded-full bg-black/15 overflow-hidden"><span class="block h-full bg-white rounded-full" :style="{ width: Math.min(usedPct, 100) + '%' }"></span></span>
+      <span class="text-[11.5px] font-bold num shrink-0">{{ Math.round(usedPct) }}%</span>
+    </button>
+    <div v-else class="mt-3 rounded-[28px] bg-coral text-white px-5 pt-4 pb-4 relative overflow-hidden">
       <div class="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="absolute right-16 -bottom-14 w-28 h-28 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="relative">
@@ -160,7 +161,7 @@
         <button v-for="s in SECTIONS" :key="s.id" @click="state.checklistSection = s.id"
           :class="['acc-' + s.id, state.checklistSection === s.id ? 'bg-acc text-on-acc' : 'bg-acc-soft text-ink']"
           class="shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors">
-          {{ s.label }}
+          <span v-if="s.id === thisWeek" class="inline-block w-1.5 h-1.5 rounded-full bg-current mr-1 align-middle"></span>{{ s.label }}
           <span class="ml-1 font-semibold opacity-70 num">{{ doneIn(s.id) }}/{{ countIn(s.id) }}</span>
         </button>
       </div>
@@ -199,10 +200,10 @@
     <!-- ============ BULANAN & MINGGUAN ============ -->
     <section v-else-if="activeTab === 'bulanan' || activeTab === 'mingguan'">
       <div v-if="activeTab === 'mingguan'" class="grid grid-cols-4 gap-2 mb-3">
-        <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id"
+        <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id; expandedId = null"
           :class="['acc-' + w.id, state.activeWeek === w.id ? 'bg-acc text-on-acc scale-[1.03]' : 'bg-acc-soft text-ink']"
           class="relative h-[60px] rounded-[20px] flex flex-col items-center justify-center transition-all">
-          <span class="text-[11px] font-semibold opacity-75">Minggu</span>
+          <span class="text-[11px] font-semibold opacity-75">{{ w.id === thisWeek ? 'Minggu ini' : 'Minggu' }}</span>
           <span class="text-[20px] font-black leading-none">{{ w.n }}</span>
           <span v-if="warnCount(w.id)" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center border-2 border-paper num">{{ warnCount(w.id) }}</span>
         </button>
@@ -216,7 +217,7 @@
           </div>
           <div class="text-right">
             <p class="text-[12.5px] font-bold num">{{ doneIn(rekapSection) }}/{{ countIn(rekapSection) }} <span class="font-medium text-ink/60">dibeli</span></p>
-            <p v-if="warnCount(rekapSection)" class="text-[12px] text-coral font-bold mt-0.5 num">{{ warnCount(rekapSection) }} belum ada harga</p>
+            <button v-if="warnCount(rekapSection)" @click="goToItem(itemsIn(rekapSection).find(needsPrice))" class="text-[12px] text-coral font-bold mt-0.5 num underline underline-offset-2">{{ warnCount(rekapSection) }} belum ada harga</button>
           </div>
         </div>
 
@@ -230,57 +231,61 @@
             <span class="flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</span>
             <span class="font-bold text-muted num text-[13px]">{{ rp(sum(g.items)) }}</span>
           </h3>
-          <div class="space-y-2">
-            <div v-for="item in g.items" :key="item.id" class="bg-surface rounded-[24px] p-4 border-2 transition-colors"
-              :class="needsPrice(item) ? 'border-coral' : 'border-transparent'">
-              <div class="flex items-start gap-3">
-                <label class="cursor-pointer mt-0.5">
+          <div class="bg-surface rounded-[24px] overflow-hidden">
+            <div v-for="(item, idx) in g.items" :key="item.id" :id="'item-' + item.id" class="transition-colors"
+              :class="[idx ? 'border-t border-line' : '', expandedId === item.id ? 'bg-acc-soft/40' : '']">
+              <div class="flex items-center gap-3 pl-4 pr-3 py-3">
+                <label class="cursor-pointer shrink-0">
                   <input type="checkbox" :checked="item.isChecked" @change="toggleCheck(item, $event.target.checked)" class="peer sr-only" :aria-label="'Centang ' + item.name">
                   <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
                 </label>
-                <div class="flex-1 min-w-0">
-                  <p class="font-bold text-[15px] leading-snug" :class="item.isChecked ? 'line-through text-muted' : ''">{{ item.name }}</p>
-                  <p v-if="needsPrice(item)" class="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">⚠️ Sudah dibeli, harga belum diisi</p>
-                  <p v-else-if="item.custom" class="text-[11.5px] text-muted mt-0.5">{{ item.keep ? 'Barang tambahan' : 'Tambahan, hanya bulan ini' }}</p>
-                </div>
-                <div class="text-right shrink-0">
-                  <p class="font-black num text-[15.5px] leading-tight" :class="item.totalSpent ? '' : 'text-muted/70'">{{ rp(item.totalSpent) }}</p>
-                  <p class="text-[11.5px] text-muted num">{{ item.totalQty }} qty</p>
-                </div>
+                <button @click="toggleExpand(item)" class="flex-1 min-w-0 flex items-center gap-3 text-left" :aria-expanded="expandedId === item.id">
+                  <span class="flex-1 min-w-0">
+                    <span class="block font-bold text-[15px] leading-snug" :class="item.isChecked && !needsPrice(item) ? 'line-through text-muted' : ''">{{ item.name }}</span>
+                    <span v-if="needsPrice(item)" class="block text-[11.5px] font-bold text-coral mt-0.5">⚠️ Sudah dibeli, isi harganya</span>
+                    <span v-else-if="item.custom" class="block text-[11.5px] text-muted mt-0.5">{{ item.keep ? 'Barang tambahan' : 'Tambahan, hanya bulan ini' }}</span>
+                  </span>
+                  <span class="text-right shrink-0">
+                    <span class="block font-black num text-[15px] leading-tight" :class="item.totalSpent ? '' : 'text-muted/50'">{{ item.totalSpent ? rp(item.totalSpent) : '–' }}</span>
+                    <span v-if="item.totalQty" class="block text-[11.5px] text-muted num">{{ item.totalQty }} qty</span>
+                  </span>
+                  <span class="w-8 h-8 rounded-full grid place-items-center shrink-0 transition-colors"
+                    :class="expandedId === item.id ? 'bg-acc text-on-acc' : (needsPrice(item) ? 'bg-coral text-on-coral' : 'bg-paper text-muted')">
+                    <span v-if="expandedId === item.id"><i class="fa-solid fa-chevron-up text-[11px]"></i></span><span v-else><i class="fa-solid fa-plus text-[11px]"></i></span>
+                  </span>
+                </button>
               </div>
 
-              <div class="mt-3.5 flex items-center gap-1.5">
-                <div class="relative flex-1 min-w-0">
-                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-muted pointer-events-none">Rp</span>
-                  <input type="text" inputmode="numeric" autocomplete="off" placeholder="Harga beli"
-                    :value="fmtNum(item.draftPrice)" @input="onPrice(item, $event)" @keyup.enter="submitItem(item)"
-                    class="w-full h-11 pl-9 pr-3 rounded-full bg-paper border-2 border-transparent text-[14.5px] font-bold num outline-none focus:border-acc placeholder:font-medium placeholder:text-muted/70">
+              <div v-if="expandedId === item.id" class="px-4 pb-4">
+                <div class="flex items-center gap-1.5">
+                  <div class="relative flex-1 min-w-0">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-muted pointer-events-none">Rp</span>
+                    <input :id="'price-' + item.id" type="text" inputmode="numeric" autocomplete="off" placeholder="Harga beli"
+                      :value="fmtNum(item.draftPrice)" @input="onPrice(item, $event)" @keyup.enter="submitItem(item)"
+                      class="w-full h-11 pl-9 pr-3 rounded-full bg-surface border-2 border-transparent text-[14.5px] font-bold num outline-none focus:border-acc placeholder:font-medium placeholder:text-muted/70">
+                  </div>
+                  <div class="flex items-center h-11 rounded-full bg-surface shrink-0">
+                    <button @click="item.draftQty = Math.max(1, (item.draftQty || 1) - 1)" class="w-8 h-full text-muted active:text-ink" aria-label="Kurangi qty"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                    <span class="w-5 text-center text-[14.5px] font-black num">{{ item.draftQty }}</span>
+                    <button @click="item.draftQty = (item.draftQty || 1) + 1" class="w-8 h-full text-muted active:text-ink" aria-label="Tambah qty"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                  </div>
+                  <button @click="submitItem(item)" class="h-11 px-4 rounded-full bg-acc text-on-acc font-bold text-[14px] shrink-0 active:scale-95 transition-transform">Simpan</button>
                 </div>
-                <div class="flex items-center h-11 rounded-full bg-paper shrink-0">
-                  <button @click="item.draftQty = Math.max(1, (item.draftQty || 1) - 1)" class="w-8 h-full text-muted active:text-ink" aria-label="Kurangi qty"><i class="fa-solid fa-minus text-[10px]"></i></button>
-                  <span class="w-5 text-center text-[14.5px] font-black num">{{ item.draftQty }}</span>
-                  <button @click="item.draftQty = (item.draftQty || 1) + 1" class="w-8 h-full text-muted active:text-ink" aria-label="Tambah qty"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                <div class="flex items-center justify-between gap-3 mt-2.5 min-h-[20px] px-1">
+                  <p class="text-[12px] text-muted num">
+                    <template v-if="toInt(item.draftPrice)">{{ item.draftQty }} × {{ rp(toInt(item.draftPrice)) }} = <b class="text-ink">+{{ rp(toInt(item.draftPrice) * item.draftQty) }}</b></template>
+                    <template v-else-if="item.totalSpent">Harga baru akan ditambahkan ke total.</template>
+                  </p>
+                  <div class="flex items-center gap-3 shrink-0">
+                    <button v-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[11px]"></i> Reset</button>
+                    <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[11px]"></i> Hapus</button>
+                  </div>
                 </div>
-                <button @click="submitItem(item)" class="w-11 h-11 rounded-full bg-acc text-on-acc shrink-0 active:scale-90 transition-transform" aria-label="Simpan harga"><i class="fa-solid fa-check"></i></button>
-                <button @click="askReset(item)" class="w-11 h-11 rounded-full bg-paper text-muted shrink-0 active:scale-90 transition-transform" aria-label="Reset barang"><i class="fa-solid fa-rotate-left text-[13px]"></i></button>
-              </div>
-
-              <div class="flex items-center justify-between mt-2 min-h-[18px] px-1">
-                <p class="text-[12px] text-muted num">
-                  <template v-if="toInt(item.draftPrice)">{{ item.draftQty }} × {{ rp(toInt(item.draftPrice)) }} = <b class="text-ink">+{{ rp(toInt(item.draftPrice) * item.draftQty) }}</b></template>
-                </p>
-                <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[11px]"></i> Hapus</button>
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="activeTab === 'bulanan'" class="mt-10">
-          <button @click="askCloseBook" class="w-full h-[52px] rounded-full bg-ink text-paper font-extrabold text-[15px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-            <i class="fa-solid fa-book text-[13px]"></i> Tutup Buku Bulan Ini
-          </button>
-          <p class="text-[12.5px] text-muted text-center mt-2.5 leading-relaxed px-4">Data {{ monthLabel(state.month) }} masuk arsip, lalu semua kembali ke nol untuk {{ monthLabel(nextMonth(state.month)) }}.</p>
-        </div>
       </div>
     </section>
 
@@ -295,28 +300,55 @@
       <!-- Bulan ini -->
       <div v-if="state.historyView === 'bulan'" class="mt-5">
         <h2 class="text-[20px] font-black tracking-[-0.03em]">Laporan {{ monthLabel(state.month) }}</h2>
-        <p class="text-[13px] text-muted mt-0.5">Siap dikirim lewat email atau disalin.</p>
+        <p class="text-[13px] text-muted mt-0.5">Periksa, kirim, lalu tutup buku di akhir bulan.</p>
 
-        <div v-if="unpriced.length" class="mt-3 rounded-[22px] bg-coral-soft p-4 text-[13.5px]">
-          <p class="font-bold text-coral">⚠️ {{ unpriced.length }} barang sudah dibeli tapi harganya belum diisi</p>
-          <p class="mt-1 leading-relaxed text-ink/80">{{ unpriced.map(i => i.name + ' (' + sectionLabel(i.tab) + ')').join(', ') }}</p>
+        <div v-if="unpriced.length" class="mt-3 rounded-[22px] bg-coral-soft p-4">
+          <p class="font-bold text-coral text-[13.5px]">⚠️ {{ unpriced.length }} barang sudah dibeli tapi harganya belum diisi</p>
+          <p class="text-[12px] text-ink/70 mt-0.5">Tap barangnya untuk langsung mengisi harga.</p>
+          <div class="mt-2.5 flex flex-wrap gap-1.5">
+            <button v-for="i in unpriced" :key="i.id" @click="goToItem(i)" class="h-8 pl-3 pr-2.5 rounded-full bg-surface text-[12.5px] font-bold flex items-center gap-1.5 active:scale-95 transition-transform">
+              {{ i.name }} <span class="text-muted font-semibold">{{ sectionShort(i.tab) }}</span><i class="fa-solid fa-chevron-right text-[9px] text-coral"></i>
+            </button>
+          </div>
         </div>
 
-        <textarea readonly :value="reportText" rows="14" class="mt-3 w-full rounded-[22px] bg-surface p-4 text-[12.5px] leading-relaxed num outline-none resize-y"></textarea>
+        <div class="mt-3 rounded-[24px] bg-surface p-5">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Budget</p><p class="text-[14px] font-extrabold num">{{ rpShort(state.budget) }}</p></div>
+            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Terpakai</p><p class="text-[14px] font-extrabold num">{{ rpShort(totalSpent) }}</p></div>
+            <div class="rounded-[16px] px-3 py-2.5" :class="remaining < 0 ? 'bg-coral text-on-coral' : 'bg-paper'"><p class="text-[11px]" :class="remaining < 0 ? 'text-white/80' : 'text-muted'">{{ remaining < 0 ? 'Lewat' : 'Sisa' }}</p><p class="text-[14px] font-extrabold num">{{ rpShort(remaining) }}</p></div>
+          </div>
+          <div class="mt-4 space-y-3">
+            <div v-for="s in SECTIONS" :key="s.id" :class="'acc-' + s.id" class="flex items-center gap-3 text-[14px]">
+              <span class="w-2.5 h-2.5 rounded-full bg-acc shrink-0"></span>
+              <span class="flex-1 min-w-0 font-semibold">{{ s.label }}</span>
+              <span class="text-[12px] text-muted num shrink-0">{{ doneIn(s.id) }}/{{ countIn(s.id) }}</span>
+              <span class="w-[108px] text-right font-extrabold num shrink-0" :class="subtotal(s.id) ? '' : 'text-muted/50'">{{ subtotal(s.id) ? rp(subtotal(s.id)) : '–' }}</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-line flex items-center justify-between text-[14.5px]">
+            <span class="font-bold">Total pengeluaran</span><span class="font-black num">{{ rp(totalSpent) }}</span>
+          </div>
+        </div>
 
         <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita ' + monthLabel(state.month), reportText)" :disabled="mail.busy"
-          class="mt-2.5 w-full h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
+          class="mt-3 w-full h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
           <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim ke Email' }}
         </button>
-        <div class="mt-2 grid grid-cols-2 gap-2">
-          <a :href="mailtoLink" target="_blank" rel="noopener" :class="canAutoMail ? 'bg-surface text-ink' : 'bg-coral text-on-coral'" class="h-12 rounded-full font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-            <i class="fa-regular fa-envelope"></i> Buka di Email
-          </a>
-          <button @click="copyText(reportText)" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-            <i class="fa-regular fa-copy"></i> Salin Teks
+        <a v-else :href="mailtoLink" target="_blank" rel="noopener" class="mt-3 w-full h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+          <i class="fa-regular fa-envelope"></i> Buka di Email
+        </a>
+        <button @click="shareText('Laporan Belanja Kita ' + monthLabel(state.month), reportText)" class="mt-2 w-full h-12 rounded-full bg-surface font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+          <i class="fa-solid fa-share-nodes"></i> Bagikan ke WhatsApp dan lainnya
+        </button>
+
+        <div class="mt-8 rounded-[24px] bg-surface p-5">
+          <h3 class="text-[15px] font-extrabold">Sudah akhir bulan?</h3>
+          <p class="mt-1 text-[13px] text-muted leading-relaxed">Tutup buku menyimpan {{ monthLabel(state.month) }} ke arsip<template v-if="canAutoMail">, mengirim laporannya ke email,</template> lalu memulai {{ monthLabel(nextMonth(state.month)) }} dari nol.</p>
+          <button @click="askCloseBook" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-solid fa-book text-[13px]"></i> Tutup Buku Bulan Ini
           </button>
         </div>
-        <p v-if="canAutoMail" class="mt-2.5 text-[12px] text-muted text-center leading-relaxed">“Kirim ke Email” langsung mengirim ke Sugi dan Syifa, tanpa membuka aplikasi email.</p>
       </div>
 
       <!-- Tahunan -->
@@ -408,8 +440,8 @@
             class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
             <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim Email' }}
           </button>
-          <button @click="copyText(buildYearReport(selectedYear))" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-            <i class="fa-regular fa-copy"></i> {{ canAutoMail ? 'Salin' : 'Salin Laporan Tahun ' + selectedYear }}
+          <button @click="shareText('Laporan Belanja Kita Tahun ' + selectedYear, buildYearReport(selectedYear))" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-solid fa-share-nodes"></i> {{ canAutoMail ? 'Bagikan' : 'Bagikan Laporan ' + selectedYear }}
           </button>
         </div>
       </div>
@@ -421,7 +453,7 @@
 
         <div v-if="!state.history.length" class="mt-3 rounded-[24px] bg-surface p-7 text-center">
           <p class="text-[34px]">🗂️</p>
-          <p class="mt-2 text-[14px] text-muted leading-relaxed">Arsip pertama muncul setelah Anda menekan <b class="text-ink">Tutup Buku Bulan Ini</b> di tab Bulanan.</p>
+          <p class="mt-2 text-[14px] text-muted leading-relaxed">Arsip pertama muncul setelah Anda menekan <b class="text-ink">Tutup Buku Bulan Ini</b> di Riwayat, Bulan Ini.</p>
         </div>
 
         <div v-else class="mt-3 space-y-2">
@@ -460,8 +492,8 @@
                   class="h-11 rounded-full bg-coral text-on-coral font-bold text-[13.5px] flex items-center justify-center gap-2 disabled:opacity-60">
                   <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim Email' }}
                 </button>
-                <button @click="copyText(buildReport(h.month, h.items, h.budget))" class="h-11 rounded-full bg-paper font-bold text-[13.5px] flex items-center justify-center gap-2">
-                  <i class="fa-regular fa-copy"></i> {{ canAutoMail ? 'Salin' : 'Salin Laporan ' + monthLabel(h.month) }}
+                <button @click="shareText('Laporan Belanja Kita ' + monthLabel(h.month), buildReport(h.month, h.items, h.budget))" class="h-11 rounded-full bg-paper font-bold text-[13.5px] flex items-center justify-center gap-2">
+                  <i class="fa-solid fa-share-nodes"></i> {{ canAutoMail ? 'Bagikan' : 'Bagikan Laporan ' + monthLabel(h.month) }}
                 </button>
               </div>
             </div>
@@ -703,6 +735,12 @@
               <button v-if="cloud.user" @click="closeModal(); signOut()" class="h-9 px-4 rounded-full bg-surface text-[13px] font-bold shrink-0">Keluar</button>
               <button v-else @click="closeModal(); backToLogin()" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
             </div>
+
+            <button @click="openMonthPicker" class="mt-3 w-full rounded-[20px] bg-paper flex items-center gap-3 px-4 py-3.5 text-left">
+              <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-regular fa-calendar text-[14px]"></i></span>
+              <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Bulan berjalan</span><span class="block text-[12px] text-muted">{{ monthLabel(state.month) }}</span></span>
+              <span class="text-[13px] font-bold text-coral">Ganti</span>
+            </button>
 
             <p v-if="lock.enabled" class="mt-5 text-[12.5px] font-bold text-muted px-1">Keamanan di HP ini</p>
             <div v-if="lock.enabled" class="mt-2 rounded-[20px] bg-paper overflow-hidden">
@@ -1141,6 +1179,48 @@
         item.isChecked = v;
         remote(() => itemRef(item.id).update({ isChecked: v }));
       }
+      // ---------- UX: header ringkas, baris bisa dibuka, minggu ini, bagikan ----------
+      const compact = ref(false);
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY || 0;
+        if (!compact.value && y > 140) compact.value = true;
+        else if (compact.value && y < 24) compact.value = false;
+      }, { passive: true });
+      function expandHeader() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+      const weekOfToday = () => { const d = new Date().getDate(); return d <= 7 ? 'M1' : d <= 14 ? 'M2' : d <= 21 ? 'M3' : 'M4'; };
+      const thisWeek = ref(weekOfToday());
+      state.activeWeek = thisWeek.value;
+      if (WEEK_IDS.includes(state.checklistSection)) state.checklistSection = thisWeek.value;
+
+      const expandedId = ref(null);
+      function focusPrice(id) {
+        setTimeout(() => { const el = document.getElementById('price-' + id); if (el) { try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); } } }, 60);
+      }
+      function toggleExpand(item) {
+        expandedId.value = expandedId.value === item.id ? null : item.id;
+        if (expandedId.value) focusPrice(item.id);
+      }
+      function goToItem(item) {
+        if (!item) return;
+        if (item.tab === 'bulanan') activeTab.value = 'bulanan';
+        else { state.activeWeek = item.tab; activeTab.value = 'mingguan'; }
+        expandedId.value = item.id;
+        nextTick(() => {
+          const el = document.getElementById('item-' + item.id);
+          if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          focusPrice(item.id);
+        });
+      }
+      const sectionShort = id => (SECTIONS.find(x => x.id === id) || { short: id }).short;
+      async function shareText(title, text) {
+        if (navigator.share) {
+          try { await navigator.share({ title, text }); return; }
+          catch (e) { if (e && e.name === 'AbortError') return; }
+        }
+        copyText(text);
+      }
+
       // ---------- Kirim email otomatis (Google Apps Script) ----------
       const mail = reactive({ busy: false });
       const canAutoMail = computed(() => !!MAIL_URL && !!cloud.user);
@@ -1508,6 +1588,7 @@
       }
       function setTab(id) {
         activeTab.value = id;
+        expandedId.value = null;
         window.scrollTo({ top: 0 });
       }
       function openModal(type, extra) {
@@ -1530,6 +1611,7 @@
         item.isChecked = true;
         item.draftPrice = '';
         item.draftQty = 1;
+        expandedId.value = null;
         remote(() => itemRef(item.id).update({ totalSpent: FV().increment(price * qty), totalQty: FV().increment(qty), isChecked: true }));
         showToast(item.name + ' +' + rp(price * qty));
       }
@@ -1636,6 +1718,7 @@
       return {
         NAV, SECTIONS, WEEKS, HISTORY_VIEWS, FAMILY, cloud, login, passwordInput, showLogin, syncLabel, syncDot,
         pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, mail, canAutoMail, sendMail,
+        compact, expandHeader, thisWeek, expandedId, toggleExpand, goToItem, sectionShort, shareText, itemsIn,
         lock, pad, bio, isIOS, bioName, padTitle, padHint, pressKey, backspace, cancelPad, unlockBio, registerBioFromOffer,
         openForgot, closeForgot, resetPinWithPassword, wipeLocal, openSettings, toggleLock, changePin, toggleBio, lockNow, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
         editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
