@@ -84,6 +84,8 @@
   .pop-enter-active { transition: transform .26s cubic-bezier(.2,1.3,.4,1), opacity .2s; }
   .pop-leave-active { transition: transform .15s, opacity .15s; }
   .pop-enter-from, .pop-leave-to { transform: translateY(24px); opacity: 0; }
+  .slide-enter-active, .slide-leave-active { transition: transform .2s ease, opacity .2s ease; }
+  .slide-enter-from, .slide-leave-to { transform: translateY(-100%); opacity: 0; }
   .toast-enter-active, .toast-leave-active { transition: transform .22s cubic-bezier(.2,1.3,.4,1), opacity .2s; }
   .toast-enter-from, .toast-leave-to { transform: translate(-50%, 14px); opacity: 0; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
@@ -93,7 +95,7 @@
 <div id="app" v-cloak class="max-w-md mx-auto min-h-screen">
 
   <!-- ============ HEADER ============ -->
-  <header class="sticky-head z-30 bg-paper/95 backdrop-blur px-4 pt-3 pb-3">
+  <header ref="headerEl" class="relative z-30 px-4 pt-3 pb-3">
     <div class="flex items-center justify-between gap-3">
       <div class="flex items-center gap-2.5 min-w-0">
         <div class="w-10 h-10 rounded-[14px] bg-coral text-on-coral grid place-items-center shrink-0 text-[17px] rotate-[-6deg]"><i class="fa-solid fa-basket-shopping"></i></div>
@@ -111,14 +113,8 @@
       </button>
     </div>
 
-    <!-- Kartu anggaran (ringkas saat scroll) -->
-    <button v-if="compact && !editingBudget" @click="expandHeader" class="mt-2.5 w-full rounded-full bg-coral text-white pl-4 pr-3.5 h-11 flex items-center gap-3 text-left" aria-label="Tampilkan ringkasan anggaran">
-      <span class="text-[12px] font-semibold text-white/85 shrink-0">Sisa</span>
-      <span class="text-[16px] font-black num shrink-0">{{ rp(remaining) }}</span>
-      <span class="flex-1 h-1.5 rounded-full bg-black/15 overflow-hidden"><span class="block h-full bg-white rounded-full" :style="{ width: Math.min(usedPct, 100) + '%' }"></span></span>
-      <span class="text-[11.5px] font-bold num shrink-0">{{ Math.round(usedPct) }}%</span>
-    </button>
-    <div v-else class="mt-3 rounded-[28px] bg-coral text-white px-5 pt-4 pb-4 relative overflow-hidden">
+    <!-- Kartu anggaran -->
+    <div class="mt-3 rounded-[28px] bg-coral text-white px-5 pt-4 pb-4 relative overflow-hidden">
       <div class="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="absolute right-16 -bottom-14 w-28 h-28 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="relative">
@@ -152,6 +148,20 @@
       </div>
     </div>
   </header>
+
+  <!-- Ringkasan anggaran yang muncul saat kartu besar sudah tergulir -->
+  <transition name="slide">
+    <div v-if="compact && !editingBudget" class="fixed left-0 right-0 z-30 px-4 pt-2 pb-2 bg-paper/95 backdrop-blur" :style="{ top: 'env(safe-area-inset-top, 0px)' }">
+      <div class="max-w-md mx-auto">
+    <button @click="expandHeader" class="w-full rounded-full bg-coral text-white pl-4 pr-3.5 h-11 flex items-center gap-3 text-left" aria-label="Tampilkan ringkasan anggaran">
+          <span class="text-[12px] font-semibold text-white/85 shrink-0">Sisa</span>
+          <span class="text-[16px] font-black num shrink-0">{{ rp(remaining) }}</span>
+          <span class="flex-1 h-1.5 rounded-full bg-black/15 overflow-hidden"><span class="block h-full bg-white rounded-full" :style="{ width: Math.min(usedPct, 100) + '%' }"></span></span>
+          <span class="text-[11.5px] font-bold num shrink-0">{{ Math.round(usedPct) }}%</span>
+        </button>
+      </div>
+    </div>
+  </transition>
 
   <main class="px-4 pt-2 pb-36">
 
@@ -279,7 +289,6 @@
           <button @click="openMonthPicker" class="flex-1 min-w-0 h-11 rounded-full bg-surface flex items-center justify-center gap-2 font-extrabold text-[15px]" aria-label="Pilih bulan yang ingin dilihat">
             <span class="truncate">{{ monthLabel(rMonth) }}</span>
             <span v-if="isCurrentR" class="text-[11px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 shrink-0">Bulan ini</span>
-            <i class="fa-solid fa-chevron-down text-[10px] text-muted shrink-0"></i>
           </button>
           <button @click="shiftR(1)" :disabled="isCurrentR" class="w-11 h-11 rounded-full bg-surface grid place-items-center text-muted active:text-ink shrink-0 disabled:opacity-30" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[12px]"></i></button>
         </div>
@@ -319,14 +328,14 @@
 
         <div class="mt-3 rounded-[24px] bg-surface p-5">
           <div class="flex items-center justify-between gap-3">
-            <h3 class="text-[15px] font-extrabold">Semua yang dibeli <span class="text-muted font-bold num">({{ boughtCount }})</span></h3>
+            <h3 class="text-[15px] font-extrabold">Rincian pembelian <span v-if="boughtCount" class="ml-1 text-[12px] font-bold text-muted num">{{ boughtCount }} barang</span></h3>
             <div v-if="boughtCount" class="flex p-0.5 rounded-full bg-paper shrink-0">
               <button @click="boughtSort = 'kategori'" class="h-7 px-3 rounded-full text-[12px] font-bold transition-colors" :class="boughtSort === 'kategori' ? 'bg-ink text-paper' : 'text-muted'">Kategori</button>
               <button @click="boughtSort = 'termahal'" class="h-7 px-3 rounded-full text-[12px] font-bold transition-colors" :class="boughtSort === 'termahal' ? 'bg-ink text-paper' : 'text-muted'">Termahal</button>
             </div>
           </div>
-          <p class="text-[12px] text-muted mt-0.5">Bulanan dan Minggu 1–4 digabung. Barang yang sama dijumlahkan.</p>
-          <p v-if="!boughtCount" class="mt-3 text-[13px] text-muted">{{ isCurrentR ? 'Belum ada barang yang dicentang bulan ini.' : 'Tidak ada catatan belanja di bulan ini.' }}</p>
+          <p class="text-[12px] text-muted mt-0.5">Gabungan kebutuhan bulanan dan belanja mingguan. Barang yang sama dijumlahkan otomatis.</p>
+          <p v-if="!boughtCount" class="mt-3 text-[13px] text-muted">{{ isCurrentR ? 'Belum ada pembelian yang tercatat bulan ini.' : 'Tidak ada pembelian yang tercatat pada bulan ini.' }}</p>
           <div v-for="g in boughtNow" :key="g.key" class="mt-4">
             <p v-if="g.category" class="text-[12.5px] font-bold text-muted flex items-center gap-1.5"><span>{{ catEmoji(g.category) }}</span>{{ g.category }}<span class="ml-auto num">{{ rp(g.total) }}</span></p>
             <div class="divide-y divide-line">
@@ -358,10 +367,6 @@
           <i class="fa-solid fa-share-nodes"></i> Bagikan ke WhatsApp dan lainnya
         </button>
 
-        <div v-if="isCurrentR" class="mt-6 rounded-[20px] border border-line px-4 py-3.5 flex gap-3 text-[12.5px] text-muted leading-relaxed">
-          <span class="text-coral mt-0.5 shrink-0"><i class="fa-regular fa-calendar-check"></i></span>
-          <span>Tidak perlu tutup buku. Pada 1 {{ monthLabel(nextMonth(state.month)) }}, catatan bulan ini tersimpan otomatis di Riwayat<template v-if="canAutoMail"> dan laporannya dikirim ke email</template>, lalu daftar belanja mulai kosong lagi.</span>
-        </div>
       </div>
 
       <!-- Tahunan -->
@@ -1127,11 +1132,14 @@
       }
       // ---------- UX: header ringkas, baris bisa dibuka, minggu ini, bagikan ----------
       const compact = ref(false);
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY || 0;
-        if (!compact.value && y > 140) compact.value = true;
-        else if (compact.value && y < 24) compact.value = false;
-      }, { passive: true });
+      const headerEl = ref(null);
+      // Bar ringkas hanya tampil setelah kartu anggaran besar benar-benar tergulir keluar layar
+      function updateCompact() {
+        const h = headerEl.value ? headerEl.value.offsetHeight : 240;
+        compact.value = (window.scrollY || 0) > h - 12;
+      }
+      window.addEventListener('scroll', updateCompact, { passive: true });
+      window.addEventListener('resize', updateCompact);
       function expandHeader() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
       const weekOfToday = () => { const d = new Date().getDate(); return d <= 7 ? 'M1' : d <= 14 ? 'M2' : d <= 21 ? 'M3' : 'M4'; };
@@ -1762,7 +1770,7 @@
       return {
         NAV, SECTIONS, WEEKS, HISTORY_VIEWS, FAMILY, cloud, login, passwordInput, showLogin, syncLabel, syncDot,
         pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, mail, canAutoMail, sendMail,
-        compact, expandHeader, thisWeek, expandedId, toggleExpand, goToItem, sectionShort, shareText, itemsIn,
+        compact, headerEl, expandHeader, thisWeek, expandedId, toggleExpand, goToItem, sectionShort, shareText, itemsIn,
         showBought, toBuyIn, listGroups, boughtGroups, boughtSort, boughtNow, boughtCount,
         lock, pad, bio, isIOS, bioName, padTitle, padHint, pressKey, backspace, cancelPad, unlockBio, registerBioFromOffer,
         openForgot, closeForgot, resetPinWithPassword, wipeLocal, openSettings, toggleLock, changePin, toggleBio, lockNow, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
