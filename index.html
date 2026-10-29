@@ -188,17 +188,17 @@
           <h3 v-if="g.kind === 'cat'" class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2">
             <span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}
           </h3>
-          <button v-else @click="showBought = !showBought" class="w-full mb-2 px-1 flex items-center justify-between gap-2 text-left" :aria-expanded="showBought">
-            <span class="flex items-center gap-2 text-[14px] font-extrabold">
-              <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[12px]"><i class="fa-solid fa-check"></i></span>
-              Sudah dibeli ({{ g.items.length }})
-              <span v-if="g.items.filter(needsPrice).length" class="text-[11.5px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 num">{{ g.items.filter(needsPrice).length }} belum ada harga</span>
-            </span>
-            <span class="flex items-center gap-2 text-muted text-[13px] font-bold num shrink-0">
-              {{ rp(sum(g.items)) }}
-              <span class="w-7 h-7 rounded-full bg-surface grid place-items-center transition-transform" :class="showBought ? 'rotate-180' : ''"><i class="fa-solid fa-chevron-down text-[10px]"></i></span>
-            </span>
-          </button>
+          <div v-else class="mb-2 px-1 flex items-center justify-between gap-2">
+            <button @click="showBought = !showBought" class="flex-1 min-w-0 flex items-center gap-2 text-left" :aria-expanded="showBought">
+              <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[12px] shrink-0"><i class="fa-solid fa-check"></i></span>
+              <span class="min-w-0">
+                <span class="block text-[14px] font-extrabold leading-tight">Sudah dibeli ({{ g.items.length }})</span>
+                <span class="block text-[12px] font-semibold text-coral leading-tight">Belum ada harga</span>
+              </span>
+              <span class="w-7 h-7 rounded-full bg-surface grid place-items-center transition-transform shrink-0 text-muted" :class="showBought ? 'rotate-180' : ''"><i class="fa-solid fa-chevron-down text-[10px]"></i></span>
+            </button>
+            <button @click="openQuick(rekapSection)" class="h-9 px-3.5 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0 inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi harga</button>
+          </div>
           <div v-if="g.kind === 'cat' || showBought" class="bg-surface rounded-[24px] overflow-hidden">
             <div v-for="(item, idx) in g.items" :key="item.id" :id="'item-' + item.id" class="transition-colors"
               :class="[idx ? 'border-t border-line' : '', expandedId === item.id ? 'bg-acc-soft/40' : '']">
@@ -732,7 +732,7 @@
   const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
-  const APP_VERSION = '2.0';
+  const APP_VERSION = '2.1';
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
@@ -926,7 +926,7 @@
     L.push('Sisa Dana    : ' + rp(budget - spent));
     L.push('');
     L.push('⚠️ Sudah dibeli, belum ada harga:');
-    const unp = items.filter(i => i.isChecked && !(Number(i.totalSpent) > 0));
+    const unp = items.filter(i => i.isChecked && (i.id || !(Number(i.totalSpent) > 0)));
     if (!unp.length) L.push('- Tidak ada');
     unp.forEach(i => L.push('- ' + i.name + ' (' + sectionLabel(i.tab) + ')'));
     L.push('');
@@ -965,7 +965,7 @@
       // ---------- Sinkron keluarga (Firebase) ----------
       const login = reactive({ email: '', password: '', error: '', busy: false, show: false });
       const passwordInput = ref(null);
-      const cloud = reactive({ autoMonth: false, available: false, mode: loadMode(), user: null, authChecked: false, ready: false, pending: false, online: navigator.onLine !== false });
+      const cloud = reactive({ checkModel: false, autoMonth: false, available: false, mode: loadMode(), user: null, authChecked: false, ready: false, pending: false, online: navigator.onLine !== false });
       let db = null, auth = null, unsubs = [];
       const FV = () => firebase.firestore.FieldValue;
       const itemRef = id => db.collection('items').doc(id);
@@ -1019,6 +1019,7 @@
             const d = s.data();
             if (isValidMonth(d.month)) state.month = d.month;
             cloud.autoMonth = !!d.autoMonth;
+            cloud.checkModel = d.checkModel === 2;
             if (Number(d.budget) > 0) state.budget = Number(d.budget);
           }
           mark('cfg');
@@ -1241,7 +1242,7 @@
           r.spent += spent;
           if (!r.tabs.includes(i.tab)) r.tabs.push(i.tab);
           if (i.boughtOn && i.boughtOn > r.lastDate) r.lastDate = i.boughtOn;
-          if (i.isChecked && !(spent > 0) && !r.unpricedRef && i.id) r.unpricedRef = i;
+          if (i.id && i.isChecked && !r.unpricedRef) r.unpricedRef = i;
         });
         return order.map(k => { const r = map[k]; r.tabs.sort((a, b) => REKAP_IDS.indexOf(a) - REKAP_IDS.indexOf(b)); return r; });
       }
@@ -1326,7 +1327,7 @@
       const totalSpent = computed(() => sum(state.items));
       const remaining = computed(() => state.budget - totalSpent.value);
       const usedPct = computed(() => state.budget > 0 ? totalSpent.value / state.budget * 100 : 0);
-      const unpriced = computed(() => state.items.filter(i => i.isChecked && !(i.totalSpent > 0)));
+      const unpriced = computed(() => state.items.filter(i => i.isChecked));
       const rekapSection = computed(() => activeTab.value === 'mingguan' ? state.activeWeek : 'bulanan');
       const reportText = computed(() => buildReport(rMonth.value, rViews.value, rBudget.value));
       const mailtoLink = computed(() =>
@@ -1412,7 +1413,36 @@
         state.month = to;
       }
       let rolling = false;
+      const CHECK_KEY = 'catatanBelanjaKeluarga_check_v2';
+      function migrateChecks() {
+        const stale = () => state.items.filter(i => i.isChecked && Number(i.totalSpent) > 0);
+        if (cloud.user && db) {
+          if (!cloud.ready || cloud.checkModel) return;
+          cloud.checkModel = true;
+          db.runTransaction(async tx => {
+            const snap = await tx.get(cfgRef());
+            if (snap.exists && snap.data().checkModel === 2) return false;
+            tx.set(cfgRef(), { checkModel: 2 }, { merge: true });
+            return true;
+          }).then(won => {
+            if (!won) return;
+            const list = stale();
+            if (!list.length) return;
+            const b = db.batch();
+            list.forEach(i => { i.isChecked = false; b.update(itemRef(i.id), { isChecked: false }); });
+            return b.commit();
+          }).catch(e => { console.error(e); cloud.checkModel = false; });
+          return;
+        }
+        if (cloud.available && cloud.mode !== 'local') return;
+        let done = false;
+        try { done = localStorage.getItem(CHECK_KEY) === '1'; } catch (e) {}
+        if (done) return;
+        stale().forEach(i => { i.isChecked = false; });
+        try { localStorage.setItem(CHECK_KEY, '1'); } catch (e) {}
+      }
       async function checkRollover() {
+        migrateChecks();
         const now = currentMonth();
         thisWeek.value = weekOfToday();
         if (rolling) return;
@@ -1530,9 +1560,9 @@
       // ---------- Helper per daftar ----------
       const itemsIn = tab => state.items.filter(i => i.tab === tab);
       const countIn = tab => itemsIn(tab).length;
-      const doneIn = tab => itemsIn(tab).filter(i => i.isChecked).length;
+      const doneIn = tab => itemsIn(tab).filter(i => i.isChecked || Number(i.totalSpent) > 0).length;
       const subtotal = tab => sum(itemsIn(tab));
-      const needsPrice = i => i.isChecked && !(i.totalSpent > 0);
+      const needsPrice = i => !!i.isChecked; // dicentang = sudah diambil, harga belum dicatat
       const warnCount = tab => itemsIn(tab).filter(needsPrice).length;
       const navWarn = id => id === 'bulanan' ? warnCount('bulanan') : id === 'mingguan' ? WEEK_IDS.reduce((t, w) => t + warnCount(w), 0) : 0;
       const spentItems = (items, tab) => items.filter(i => i.tab === tab && Number(i.totalSpent) > 0);
@@ -1589,13 +1619,18 @@
         if (amt > 0) list.push({ eid: 'legacy-' + item.id, legacy: true, amount: amt, qty: Math.max(1, qty), price: Math.round(amt / Math.max(1, qty)), date: item.boughtOn || '' });
         return list;
       }
-      function pushEntry(item, entry) {
+      function pushEntry(item, entry, keepCheck) {
         item.entries = (item.entries || []).concat([entry]);
         item.totalSpent = (Number(item.totalSpent) || 0) + entry.amount;
         item.totalQty = (Number(item.totalQty) || 0) + entry.qty;
-        item.isChecked = true;
+        if (!keepCheck) item.isChecked = false;
         if (!item.boughtOn || entry.date > item.boughtOn) item.boughtOn = entry.date;
-        remote(() => itemRef(item.id).update({ entries: FV().arrayUnion(clean(entry)), totalSpent: FV().increment(entry.amount), totalQty: FV().increment(entry.qty), isChecked: true, boughtOn: item.boughtOn }));
+        const boughtOn = item.boughtOn;
+        remote(() => {
+          const upd = { entries: FV().arrayUnion(clean(entry)), totalSpent: FV().increment(entry.amount), totalQty: FV().increment(entry.qty), boughtOn };
+          if (!keepCheck) upd.isChecked = false;
+          return itemRef(item.id).update(upd);
+        });
       }
       function dropEntry(item, entry) {
         item.totalSpent = Math.max(0, (Number(item.totalSpent) || 0) - entry.amount);
@@ -1611,7 +1646,7 @@
         const saved = Object.assign({}, entry);
         dropEntry(item, saved);
         if (editing.value && editing.value.entry.eid === saved.eid) cancelEdit(item);
-        showToast('Catatan ' + rp(saved.amount) + ' dihapus', 'ok', { label: 'Batalkan', fn: () => pushEntry(item, saved.legacy ? { eid: uid('e'), price: saved.price, qty: saved.qty, amount: saved.amount, date: saved.date || todayISO() } : saved) });
+        showToast('Catatan ' + rp(saved.amount) + ' dihapus', 'ok', { label: 'Batalkan', fn: () => pushEntry(item, saved.legacy ? { eid: uid('e'), price: saved.price, qty: saved.qty, amount: saved.amount, date: saved.date || todayISO() } : saved, true) });
       }
       function startEdit(item, entry) {
         editing.value = { itemId: item.id, entry: Object.assign({}, entry) };
@@ -1649,18 +1684,19 @@
           const old = ed.entry;
           editing.value = null;
           dropEntry(item, old);
-          pushEntry(item, entry);
-          showToast('Catatan diperbarui', 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); pushEntry(item, old.legacy ? { eid: uid('e'), price: old.price, qty: old.qty, amount: old.amount, date: old.date || todayISO() } : old); } });
+          pushEntry(item, entry, true);
+          showToast('Catatan diperbarui', 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); pushEntry(item, old.legacy ? { eid: uid('e'), price: old.price, qty: old.qty, amount: old.amount, date: old.date || todayISO() } : old, true); } });
           return;
         }
         if (lateWindow.value && entryMonth.value !== state.month) {
           addToPastMonth(item, entry, entryMonth.value);
+          if (item.isChecked) toggleCheck(item, false, true);
           showToast(item.name + ' ' + rp(entry.amount) + ' dicatat untuk ' + monthLabel(entryMonth.value));
           return;
         }
         const wasChecked = item.isChecked;
         pushEntry(item, entry);
-        showToast(item.name + ' +' + rp(entry.amount), 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); if (!wasChecked) toggleCheck(item, false, true); } });
+        showToast(item.name + ' +' + rp(entry.amount), 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); if (wasChecked) toggleCheck(item, true, true); } });
       }
       function askReset(item) { openModal('reset', { item }); }      function askReset(item) { openModal('reset', { item }); }
       function confirmReset() {
