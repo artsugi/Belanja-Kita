@@ -37,6 +37,9 @@
   };
 </script>
 <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root {
     --paper: 246 244 241; --surface: 255 255 255; --stone: 228 222 210;
@@ -94,7 +97,11 @@
         <div class="w-10 h-10 rounded-[14px] bg-coral text-on-coral grid place-items-center shrink-0 text-[17px] rotate-[-6deg]"><i class="fa-solid fa-basket-shopping"></i></div>
         <div class="min-w-0">
           <h1 class="font-black text-[21px] leading-none tracking-[-0.03em] truncate">Belanja Kita</h1>
-          <p class="text-[12px] text-muted leading-tight mt-1">{{ greeting }}</p>
+          <p class="text-[12px] text-muted leading-tight mt-1 flex items-center gap-1.5">
+            <template v-if="cloud.user"><span class="w-2 h-2 rounded-full shrink-0" :class="syncDot"></span>{{ syncLabel }}</template>
+            <template v-else-if="cloud.mode === 'local' && cloud.available"><span class="w-2 h-2 rounded-full bg-stone shrink-0"></span>Mode lokal, tidak tersinkron</template>
+            <template v-else>{{ greeting }}</template>
+          </p>
         </div>
       </div>
       <div class="flex items-center bg-surface rounded-full h-10 shrink-0 shadow-[0_1px_0_rgb(var(--line))]">
@@ -171,7 +178,7 @@
           <h3 class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</h3>
           <div class="bg-surface rounded-[24px] overflow-hidden">
             <label v-for="(item, idx) in g.items" :key="item.id" class="flex items-center gap-3.5 px-4 py-3.5 cursor-pointer select-none active:bg-acc-soft/60 transition-colors" :class="idx ? 'border-t border-line' : ''">
-              <input type="checkbox" v-model="item.isChecked" class="peer sr-only">
+              <input type="checkbox" :checked="item.isChecked" @change="toggleCheck(item, $event.target.checked)" class="peer sr-only">
               <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
               <span class="flex-1 text-[15px] leading-snug transition-colors" :class="item.isChecked ? 'line-through text-muted' : 'font-semibold'">{{ item.name }}</span>
             </label>
@@ -226,7 +233,7 @@
               :class="needsPrice(item) ? 'border-coral' : 'border-transparent'">
               <div class="flex items-start gap-3">
                 <label class="cursor-pointer mt-0.5">
-                  <input type="checkbox" v-model="item.isChecked" class="peer sr-only" :aria-label="'Centang ' + item.name">
+                  <input type="checkbox" :checked="item.isChecked" @change="toggleCheck(item, $event.target.checked)" class="peer sr-only" :aria-label="'Centang ' + item.name">
                   <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
                 </label>
                 <div class="flex-1 min-w-0">
@@ -442,6 +449,16 @@
           </div>
         </div>
       </div>
+
+      <div v-if="cloud.available" class="mt-8 rounded-[24px] bg-surface p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-coral-soft text-coral grid place-items-center shrink-0"><i class="fa-solid fa-user"></i></div>
+        <div class="flex-1 min-w-0">
+          <template v-if="cloud.user"><p class="text-[12px] text-muted">Masuk sebagai</p><p class="text-[14px] font-bold truncate">{{ cloud.user.email }}</p></template>
+          <template v-else><p class="text-[14px] font-bold">Mode lokal</p><p class="text-[12px] text-muted">Data hanya tersimpan di HP ini.</p></template>
+        </div>
+        <button v-if="cloud.user" @click="signOut" class="h-9 px-4 rounded-full bg-paper text-[13px] font-bold shrink-0">Keluar</button>
+        <button v-else @click="backToLogin" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
+      </div>
     </section>
   </main>
 
@@ -458,6 +475,56 @@
       </div>
     </div>
   </nav>
+
+  <!-- ============ LAYAR MASUK ============ -->
+  <transition name="fade">
+    <div v-if="showLogin" class="fixed inset-0 z-[70] bg-paper overflow-y-auto">
+      <div class="max-w-md mx-auto min-h-full px-6 flex flex-col justify-center" :style="{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 40px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }">
+        <div class="w-16 h-16 rounded-[20px] bg-coral text-on-coral grid place-items-center text-[28px] rotate-[-6deg]"><i class="fa-solid fa-basket-shopping"></i></div>
+        <h1 class="mt-6 text-[34px] font-black tracking-[-0.035em] leading-none">Belanja Kita</h1>
+        <p class="mt-2.5 text-[15px] text-muted leading-relaxed">Masuk sekali di HP ini. Setelah itu daftar belanja, harga, dan budget tersambung otomatis dengan keluarga.</p>
+
+        <p class="mt-7 text-[12.5px] font-bold text-muted">Siapa yang memakai HP ini?</p>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <button v-for="p in FAMILY" :key="p.email" @click="pickPerson(p)" class="h-14 rounded-[20px] font-extrabold text-[15px] transition-colors"
+            :class="login.email === p.email ? 'bg-ink text-paper' : 'bg-surface text-ink'">{{ p.name }}</button>
+        </div>
+
+        <label class="block mt-4">
+          <span class="text-[12.5px] font-bold text-muted">Email</span>
+          <input v-model.trim="login.email" type="email" inputmode="email" autocomplete="username" autocapitalize="off"
+            class="mt-1.5 w-full h-12 px-4 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
+        </label>
+        <div class="mt-3">
+          <span class="text-[12.5px] font-bold text-muted">Password</span>
+          <div class="relative mt-1.5">
+            <input ref="passwordInput" v-model="login.password" :type="login.show ? 'text' : 'password'" autocomplete="current-password" @keyup.enter="doLogin" aria-label="Password"
+              class="w-full h-12 pl-4 pr-12 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
+            <button type="button" @click="login.show = !login.show" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-muted" :aria-label="login.show ? 'Sembunyikan password' : 'Tampilkan password'">
+              <span v-if="login.show"><i class="fa-regular fa-eye-slash"></i></span><span v-else><i class="fa-regular fa-eye"></i></span>
+            </button>
+          </div>
+        </div>
+
+        <p v-if="login.error" class="mt-3 text-[13px] font-semibold text-coral bg-coral-soft rounded-[16px] px-4 py-2.5">{{ login.error }}</p>
+
+        <button @click="doLogin" :disabled="login.busy" class="mt-5 h-[52px] rounded-full bg-coral text-on-coral font-extrabold text-[16px] disabled:opacity-60 active:scale-[.98] transition-transform">
+          {{ login.busy ? 'Sedang masuk…' : 'Masuk' }}
+        </button>
+        <button @click="useLocal" class="mt-5 text-[13px] text-muted font-semibold underline underline-offset-4">Pakai di HP ini saja, tanpa sinkron</button>
+      </div>
+    </div>
+  </transition>
+
+  <transition name="fade">
+    <div v-if="cloud.user && !cloud.ready" class="fixed inset-0 z-[65] bg-paper/95 grid place-items-center">
+      <div class="text-center px-6">
+        <div class="w-16 h-16 mx-auto rounded-[20px] bg-coral text-on-coral grid place-items-center text-[28px] rotate-[-6deg] animate-bounce"><i class="fa-solid fa-basket-shopping"></i></div>
+        <p class="mt-5 text-[16px] font-extrabold">Menyambungkan data keluarga…</p>
+        <p class="mt-1 text-[13px] text-muted">Sebentar ya.</p>
+      </div>
+    </div>
+  </transition>
 
   <!-- ============ TOAST ============ -->
   <transition name="toast">
@@ -596,6 +663,20 @@
 (function () {
   const { createApp, reactive, ref, computed, watch, nextTick } = Vue;
 
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
+    authDomain: "belanja-kita-c4c0f.firebaseapp.com",
+    projectId: "belanja-kita-c4c0f",
+    storageBucket: "belanja-kita-c4c0f.firebasestorage.app",
+    messagingSenderId: "484275371025",
+    appId: "1:484275371025:web:19ec02463beb0b511745b0"
+  };
+  const FAMILY = [
+    { name: 'Sugi', email: 'sugiyarto784@gmail.com' },
+    { name: 'Syifa', email: 'syifaurrohmah077@gmail.com' }
+  ];
+  const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
+  function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
@@ -733,6 +814,7 @@
     WEEK_IDS.forEach(w => {
       WEEKLY_DEFAULTS.forEach(([n, c], i) => items.push(makeItem(w + '-' + (i + 1), n, c, w)));
     });
+    items.forEach((it, idx) => { it.order = idx; });
     return items;
   }
   function normalizeItem(i) {
@@ -740,7 +822,7 @@
       id: String(i.id || uid('x')), name: String(i.name || 'Tanpa nama'), category: String(i.category || 'Lain-lain'),
       tab: REKAP_IDS.includes(i.tab) ? i.tab : 'bulanan', isChecked: !!i.isChecked,
       totalQty: Math.max(0, parseInt(i.totalQty, 10) || 0), totalSpent: Math.max(0, Number(i.totalSpent) || 0),
-      custom: !!i.custom, keep: !!i.keep, draftPrice: String(i.draftPrice || '').replace(/\D/g, ''), draftQty: Math.max(1, parseInt(i.draftQty, 10) || 1)
+      custom: !!i.custom, keep: !!i.keep, order: Number(i.order) || 0, draftPrice: String(i.draftPrice || '').replace(/\D/g, ''), draftQty: Math.max(1, parseInt(i.draftQty, 10) || 1)
     };
   }
   function loadState() {
@@ -753,7 +835,7 @@
       return {
         month: isValidMonth(s.month) ? s.month : currentMonth(),
         budget: Number(s.budget) > 0 ? Number(s.budget) : DEFAULT_BUDGET,
-        items: s.items.map(normalizeItem),
+        items: s.items.map((it, idx) => normalizeItem(Object.assign({ order: idx }, it))),
         history: Array.isArray(s.history) ? s.history.filter(h => h && Array.isArray(h.items) && isValidMonth(h.month)) : [],
         checklistSection: REKAP_IDS.includes(s.checklistSection) ? s.checklistSection : 'bulanan',
         activeWeek: WEEK_IDS.includes(s.activeWeek) ? s.activeWeek : 'M1',
@@ -814,6 +896,152 @@
       const toast = reactive({ show: false, message: '', type: 'ok' });
       let toastTimer = null;
 
+      // ---------- Sinkron keluarga (Firebase) ----------
+      const login = reactive({ email: '', password: '', error: '', busy: false, show: false });
+      const passwordInput = ref(null);
+      const cloud = reactive({ available: false, mode: loadMode(), user: null, authChecked: false, ready: false, pending: false, online: navigator.onLine !== false });
+      let db = null, auth = null, unsubs = [];
+      const FV = () => firebase.firestore.FieldValue;
+      const itemRef = id => db.collection('items').doc(id);
+      const cfgRef = () => db.collection('config').doc('main');
+      const itemDoc = i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: !!i.isChecked, totalQty: Number(i.totalQty) || 0,
+        totalSpent: Number(i.totalSpent) || 0, custom: !!i.custom, keep: !!i.keep, order: Number(i.order) || 0 });
+      function saveMode(m) { cloud.mode = m; try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
+      function remote(fn) {
+        if (!(cloud.user && db)) return;
+        try {
+          const p = fn();
+          if (p && p.catch) p.catch(e => {
+            if (e && e.code === 'not-found') return;
+            console.error(e);
+            showToast(e && e.code === 'permission-denied' ? 'Akun ini tidak punya akses' : 'Gagal menyimpan ke cloud', 'error');
+          });
+        } catch (e) { console.error(e); }
+      }
+      function stopSync() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
+      async function seedCloud() {
+        const ops = [b => b.set(cfgRef(), { month: state.month, budget: state.budget, createdAt: new Date().toISOString() })];
+        state.items.forEach(i => ops.push(b => b.set(itemRef(i.id), itemDoc(i))));
+        state.history.forEach(h => {
+          const copy = JSON.parse(JSON.stringify(h));
+          const hid = String(copy.id || uid('h')); delete copy.id;
+          ops.push(b => b.set(db.collection('history').doc(hid), copy));
+        });
+        for (let k = 0; k < ops.length; k += 400) {
+          const b = db.batch();
+          ops.slice(k, k + 400).forEach(f => f(b));
+          await b.commit();
+        }
+      }
+      async function startSync() {
+        stopSync();
+        cloud.ready = false;
+        const got = { cfg: false, items: false, hist: false };
+        const timer = setTimeout(() => { cloud.ready = true; }, 9000);
+        const mark = k => { got[k] = true; if (got.cfg && got.items && got.hist) { cloud.ready = true; clearTimeout(timer); } };
+        try {
+          const snap = await cfgRef().get({ source: 'server' });
+          if (!snap.exists) { await seedCloud(); showToast('Data HP ini sudah diunggah'); }
+        } catch (e) { /* offline: lanjut dengan cache */ }
+        if (!cloud.user) return;
+        const onErr = e => {
+          console.error(e);
+          if (e && e.code === 'permission-denied') { showToast('Akun ini tidak punya akses', 'error'); signOut(); }
+        };
+        unsubs.push(cfgRef().onSnapshot(s => {
+          if (s.exists) {
+            const d = s.data();
+            if (isValidMonth(d.month)) state.month = d.month;
+            if (Number(d.budget) > 0) state.budget = Number(d.budget);
+          }
+          mark('cfg');
+        }, onErr));
+        unsubs.push(db.collection('items').onSnapshot({ includeMetadataChanges: true }, s => {
+          cloud.pending = s.metadata.hasPendingWrites;
+          if (!s.empty) {
+            const byId = {};
+            state.items.forEach(i => { byId[i.id] = i; });
+            state.items = s.docs.map(d => Object.assign({ id: d.id }, d.data()))
+              .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+              .map(r => {
+                const cur = byId[r.id];
+                const fields = normalizeItem(Object.assign({}, r, { draftPrice: cur ? cur.draftPrice : '', draftQty: cur ? cur.draftQty : 1 }));
+                if (cur) { Object.assign(cur, fields); return cur; }
+                return fields;
+              });
+          }
+          mark('items');
+        }, onErr));
+        unsubs.push(db.collection('history').onSnapshot(s => {
+          if (!(s.empty && s.metadata.fromCache)) {
+            state.history = s.docs.map(d => Object.assign({ id: d.id }, d.data()))
+              .filter(h => Array.isArray(h.items) && isValidMonth(h.month))
+              .sort((a, b) => String(a.closedAt || '').localeCompare(String(b.closedAt || '')));
+          }
+          mark('hist');
+        }, onErr));
+      }
+      try {
+        if (window.firebase && firebase.initializeApp) {
+          firebase.initializeApp(FIREBASE_CONFIG);
+          auth = firebase.auth();
+          db = firebase.firestore();
+          const pp = db.enablePersistence({ synchronizeTabs: true });
+          if (pp && pp.catch) pp.catch(() => {});
+          cloud.available = true;
+          auth.onAuthStateChanged(u => {
+            cloud.authChecked = true;
+            if (u) { cloud.user = { email: u.email, uid: u.uid }; saveMode('cloud'); startSync(); }
+            else { cloud.user = null; stopSync(); cloud.ready = false; }
+          });
+        }
+      } catch (e) { console.error(e); cloud.available = false; }
+      if (!cloud.available) cloud.authChecked = true;
+      window.addEventListener('online', () => { cloud.online = true; });
+      window.addEventListener('offline', () => { cloud.online = false; });
+
+      const showLogin = computed(() => cloud.available && cloud.authChecked && !cloud.user && cloud.mode !== 'local');
+      const syncLabel = computed(() => !cloud.online ? 'Offline, nanti sinkron otomatis' : (cloud.pending ? 'Menyimpan…' : 'Tersinkron dengan keluarga'));
+      const syncDot = computed(() => (!cloud.online || cloud.pending) ? 'bg-[#FFB020]' : 'bg-[#16B088]');
+
+      function pickPerson(p) {
+        login.email = p.email; login.error = '';
+        nextTick(() => { passwordInput.value && passwordInput.value.focus(); });
+      }
+      function loginError(code) {
+        if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(code)) return 'Email atau password salah.';
+        if (code === 'auth/invalid-email') return 'Format email belum benar.';
+        if (code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.';
+        if (code === 'auth/network-request-failed') return 'Tidak bisa terhubung. Periksa koneksi internet.';
+        return 'Gagal masuk (' + (code || 'error') + ').';
+      }
+      function doLogin() {
+        if (!auth || login.busy) return;
+        if (!login.email || !login.password) { login.error = 'Isi email dan password dulu.'; return; }
+        login.busy = true; login.error = '';
+        auth.signInWithEmailAndPassword(login.email, login.password)
+          .then(() => { login.password = ''; login.show = false; showToast('Berhasil masuk'); })
+          .catch(e => { login.error = loginError(e && e.code); })
+          .finally(() => { login.busy = false; });
+      }
+      function useLocal() { saveMode('local'); }
+      function backToLogin() { saveMode('cloud'); }
+      function signOut() {
+        stopSync();
+        if (auth) auth.signOut();
+        saveMode('cloud');
+        showToast('Berhasil keluar');
+      }
+      function toggleCheck(item, v) {
+        item.isChecked = v;
+        remote(() => itemRef(item.id).update({ isChecked: v }));
+      }
+      function setMonth(ym) {
+        if (!isValidMonth(ym)) return;
+        state.month = ym;
+        remote(() => cfgRef().set({ month: ym }, { merge: true }));
+      }
+
       // ---------- Auto-save real-time ----------
       function save() {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
@@ -856,7 +1084,11 @@
         if (!editingBudget.value) return;
         const v = toInt(budgetDraft.value);
         editingBudget.value = false;
-        if (v > 0 && v !== state.budget) { state.budget = v; showToast('Budget jadi ' + rp(v)); }
+        if (v > 0 && v !== state.budget) {
+          state.budget = v;
+          remote(() => cfgRef().set({ budget: v }, { merge: true }));
+          showToast('Budget jadi ' + rp(v));
+        }
       }
       function cancelBudgetEdit() { editingBudget.value = false; }
 
@@ -866,11 +1098,11 @@
         m += d;
         if (m > 12) { m = 1; y += 1; }
         if (m < 1) { m = 12; y -= 1; }
-        state.month = y + '-' + pad(m);
+        setMonth(y + '-' + pad(m));
       }
       function openMonthPicker() { openModal('month', { pickYear: Number(state.month.slice(0, 4)) }); }
       function pickMonth(m) {
-        state.month = modal.pickYear + '-' + pad(m);
+        setMonth(modal.pickYear + '-' + pad(m));
         closeModal();
         showToast('Bulan: ' + monthLabel(state.month));
       }
@@ -990,12 +1222,16 @@
         item.isChecked = true;
         item.draftPrice = '';
         item.draftQty = 1;
+        remote(() => itemRef(item.id).update({ totalSpent: FV().increment(price * qty), totalQty: FV().increment(qty), isChecked: true }));
         showToast(item.name + ' +' + rp(price * qty));
       }
       function askReset(item) { openModal('reset', { item }); }
       function confirmReset() {
         const it = modal.item;
-        if (it) Object.assign(it, { totalQty: 0, totalSpent: 0, isChecked: false, draftPrice: '', draftQty: 1 });
+        if (it) {
+          Object.assign(it, { totalQty: 0, totalSpent: 0, isChecked: false, draftPrice: '', draftQty: 1 });
+          remote(() => itemRef(it.id).update({ totalQty: 0, totalSpent: 0, isChecked: false }));
+        }
         closeModal();
         showToast('Barang direset ke 0');
       }
@@ -1003,7 +1239,10 @@
       function confirmDelete() {
         const it = modal.item;
         const idx = state.items.findIndex(i => i.id === (it && it.id));
-        if (idx > -1) state.items.splice(idx, 1);
+        if (idx > -1) {
+          const gone = state.items.splice(idx, 1)[0];
+          remote(() => itemRef(gone.id).delete());
+        }
         closeModal();
         showToast('Barang dihapus');
       }
@@ -1024,7 +1263,10 @@
         const target = modal.form.target;
         if (!name) { modal.error = 'Nama barang wajib diisi.'; return; }
         if (itemsIn(target).some(i => i.name.toLowerCase() === name.toLowerCase())) { modal.error = 'Barang ini sudah ada di daftar ' + sectionLabel(target) + '.'; return; }
-        state.items.push(makeItem(uid('c'), name, modal.form.category || 'Lain-lain', target, true, modal.form.keep));
+        const fresh = makeItem(uid('c'), name, modal.form.category || 'Lain-lain', target, true, modal.form.keep);
+        fresh.order = Date.now();
+        state.items.push(fresh);
+        remote(() => itemRef(fresh.id).set(itemDoc(fresh)));
         closeModal();
         showToast(name + ' masuk ke ' + sectionLabel(target));
       }
@@ -1033,12 +1275,25 @@
       function askCloseBook() { openModal('closeBook'); }
       function confirmCloseBook() {
         const from = state.month;
-        state.history.push({
+        const entry = {
           id: uid('h'), month: from, budget: state.budget, totalSpent: totalSpent.value, closedAt: new Date().toISOString(),
           items: state.items.map(i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: i.isChecked, totalQty: i.totalQty, totalSpent: i.totalSpent }))
-        });
-        state.items = state.items.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, draftPrice: '', draftQty: 1 }));
+        };
+        const oldItems = state.items.slice();
+        state.history.push(entry);
+        state.items = oldItems.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, draftPrice: '', draftQty: 1 }));
         state.month = nextMonth(from);
+        remote(() => {
+          const b = db.batch();
+          const data = JSON.parse(JSON.stringify(entry)); delete data.id;
+          b.set(db.collection('history').doc(entry.id), data);
+          oldItems.forEach(i => {
+            if (i.custom && !i.keep) b.delete(itemRef(i.id));
+            else b.update(itemRef(i.id), { isChecked: false, totalQty: 0, totalSpent: 0 });
+          });
+          b.set(cfgRef(), { month: nextMonth(from) }, { merge: true });
+          return b.commit();
+        });
         closeModal();
         window.scrollTo({ top: 0 });
         showToast(monthLabel(from) + ' diarsipkan');
@@ -1070,7 +1325,8 @@
       window.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.open) closeModal(); });
 
       return {
-        NAV, SECTIONS, WEEKS, HISTORY_VIEWS, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
+        NAV, SECTIONS, WEEKS, HISTORY_VIEWS, FAMILY, cloud, login, passwordInput, showLogin, syncLabel, syncDot,
+        pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
         editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
         BULAN_PENDEK, shiftMonth, openMonthPicker, pickMonth, isPicked, isNow,
         totalSpent, remaining, usedPct, unpriced, rekapSection, reportText, mailtoLink, historyDesc, greeting,
