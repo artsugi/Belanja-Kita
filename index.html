@@ -123,7 +123,9 @@
       <div class="absolute right-16 -bottom-14 w-28 h-28 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="relative">
         <div class="flex items-center justify-between">
-          <p class="text-[12.5px] font-semibold text-white/85">Sisa dana {{ monthLabel(state.month) }}</p>
+          <button @click="openMonthPicker" class="-ml-1.5 pl-1.5 pr-2 py-0.5 rounded-full text-[12.5px] font-semibold text-white/90 flex items-center gap-1.5 active:bg-white/15 transition-colors" aria-label="Ganti bulan">
+            Sisa dana {{ monthLabel(state.month) }} <i class="fa-solid fa-chevron-down text-[9px]"></i>
+          </button>
           <span v-if="remaining < 0" class="text-[11px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Lewat anggaran</span>
           <span v-else class="text-[11px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
         </div>
@@ -155,50 +157,8 @@
 
   <main class="px-4 pt-2 pb-36">
 
-    <!-- ============ DAFTAR BELANJA ============ -->
-    <section v-if="activeTab === 'checklist'">
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-4 px-4 py-1">
-        <button v-for="s in SECTIONS" :key="s.id" @click="state.checklistSection = s.id"
-          :class="['acc-' + s.id, state.checklistSection === s.id ? 'bg-acc text-on-acc' : 'bg-acc-soft text-ink']"
-          class="shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors">
-          <span v-if="s.id === thisWeek" class="inline-block w-1.5 h-1.5 rounded-full bg-current mr-1 align-middle"></span>{{ s.label }}
-          <span class="ml-1 font-semibold opacity-70 num">{{ doneIn(s.id) }}/{{ countIn(s.id) }}</span>
-        </button>
-      </div>
-
-      <div :class="'acc-' + state.checklistSection">
-        <div class="mt-3 flex items-center gap-3">
-          <div class="flex-1 h-2.5 rounded-full bg-acc-soft overflow-hidden">
-            <div class="h-full bg-acc rounded-full transition-all duration-300" :style="{ width: (countIn(state.checklistSection) ? doneIn(state.checklistSection) / countIn(state.checklistSection) * 100 : 0) + '%' }"></div>
-          </div>
-          <p class="text-[12.5px] font-semibold text-muted shrink-0 num">
-            <template v-if="countIn(state.checklistSection) && doneIn(state.checklistSection) === countIn(state.checklistSection)">Semua beres 🎉</template>
-            <template v-else>{{ doneIn(state.checklistSection) }} dari {{ countIn(state.checklistSection) }} dibeli</template>
-          </p>
-        </div>
-
-        <div v-for="g in grouped(state.checklistSection)" :key="g.category" class="mt-5">
-          <h3 class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</h3>
-          <div class="bg-surface rounded-[24px] overflow-hidden">
-            <label v-for="(item, idx) in g.items" :key="item.id" class="flex items-center gap-3.5 px-4 py-3.5 cursor-pointer select-none active:bg-acc-soft/60 transition-colors" :class="idx ? 'border-t border-line' : ''">
-              <input type="checkbox" :checked="item.isChecked" @change="toggleCheck(item, $event.target.checked)" class="peer sr-only">
-              <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
-              <span class="flex-1 text-[15px] leading-snug transition-colors" :class="item.isChecked ? 'line-through text-muted' : 'font-semibold'">{{ item.name }}</span>
-            </label>
-          </div>
-        </div>
-
-        <div v-if="!countIn(state.checklistSection)" class="mt-8 text-center text-muted text-[14px]">Daftar {{ sectionLabel(state.checklistSection) }} masih kosong.</div>
-
-        <button @click="openAdd(state.checklistSection)" class="mt-5 w-full h-12 rounded-full border-2 border-dashed border-acc/50 text-ink font-bold text-[14px] flex items-center justify-center gap-2 active:bg-acc-soft transition-colors">
-          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-plus"></i></span>
-          Tambah ke daftar {{ sectionLabel(state.checklistSection) }}
-        </button>
-      </div>
-    </section>
-
     <!-- ============ BULANAN & MINGGUAN ============ -->
-    <section v-else-if="activeTab === 'bulanan' || activeTab === 'mingguan'">
+    <section v-if="activeTab === 'bulanan' || activeTab === 'mingguan'">
       <div v-if="activeTab === 'mingguan'" class="grid grid-cols-4 gap-2 mb-3">
         <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id; expandedId = null"
           :class="['acc-' + w.id, state.activeWeek === w.id ? 'bg-acc text-on-acc scale-[1.03]' : 'bg-acc-soft text-ink']"
@@ -226,12 +186,28 @@
           Tambah Barang
         </button>
 
-        <div v-for="g in grouped(rekapSection)" :key="g.category" class="mt-6">
-          <h3 class="text-[14px] font-extrabold mb-2 px-1 flex items-center justify-between gap-2">
-            <span class="flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</span>
-            <span class="font-bold text-muted num text-[13px]">{{ rp(sum(g.items)) }}</span>
+        <div v-if="countIn(rekapSection) && !toBuyIn(rekapSection).length" class="mt-6 rounded-[24px] bg-surface px-5 py-6 text-center">
+          <p class="text-[30px]">🎉</p>
+          <p class="mt-1 text-[15px] font-extrabold">Semua sudah dibeli</p>
+          <p class="text-[13px] text-muted mt-0.5">Lihat atau isi harganya di bagian “Sudah dibeli”.</p>
+        </div>
+
+        <div v-for="g in listGroups(rekapSection)" :key="g.key" class="mt-6">
+          <h3 v-if="g.kind === 'cat'" class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2">
+            <span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}
           </h3>
-          <div class="bg-surface rounded-[24px] overflow-hidden">
+          <button v-else @click="showBought = !showBought" class="w-full mb-2 px-1 flex items-center justify-between gap-2 text-left" :aria-expanded="showBought">
+            <span class="flex items-center gap-2 text-[14px] font-extrabold">
+              <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-check"></i></span>
+              Sudah dibeli ({{ g.items.length }})
+              <span v-if="g.items.filter(needsPrice).length" class="text-[11.5px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 num">{{ g.items.filter(needsPrice).length }} belum ada harga</span>
+            </span>
+            <span class="flex items-center gap-2 text-muted text-[13px] font-bold num shrink-0">
+              {{ rp(sum(g.items)) }}
+              <span class="w-7 h-7 rounded-full bg-surface grid place-items-center transition-transform" :class="showBought ? 'rotate-180' : ''"><i class="fa-solid fa-chevron-down text-[10px]"></i></span>
+            </span>
+          </button>
+          <div v-if="g.kind === 'cat' || showBought" class="bg-surface rounded-[24px] overflow-hidden">
             <div v-for="(item, idx) in g.items" :key="item.id" :id="'item-' + item.id" class="transition-colors"
               :class="[idx ? 'border-t border-line' : '', expandedId === item.id ? 'bg-acc-soft/40' : '']">
               <div class="flex items-center gap-3 pl-4 pr-3 py-3">
@@ -507,7 +483,7 @@
   <!-- ============ NAVIGASI BAWAH ============ -->
   <nav class="bottom-nav z-30 px-4 pointer-events-none" aria-label="Navigasi utama">
     <div class="max-w-md mx-auto pointer-events-auto">
-      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-4 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
+      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-3 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
         <button v-for="t in NAV" :key="t.id" @click="setTab(t.id)" class="relative h-[58px] rounded-[20px] flex flex-col items-center justify-center gap-1 transition-colors"
           :class="activeTab === t.id ? 'bg-coral-soft text-coral' : 'text-muted'" :aria-current="activeTab === t.id ? 'page' : null">
           <span class="text-[17px] leading-none"><i :class="['fa-solid', t.icon]"></i></span>
@@ -827,7 +803,6 @@
   const BULAN_PENDEK = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
   const NAV = [
-    { id: 'checklist', label: 'Daftar', icon: 'fa-list-check' },
     { id: 'bulanan', label: 'Bulanan', icon: 'fa-calendar-days' },
     { id: 'mingguan', label: 'Mingguan', icon: 'fa-basket-shopping' },
     { id: 'riwayat', label: 'Riwayat', icon: 'fa-chart-simple' }
@@ -901,11 +876,11 @@
   ];
 
   // ---------- Helper ----------
-  const pad = n => String(n).padStart(2, '0');
+  const pad2 = n => String(n).padStart(2, '0');
   const isValidMonth = v => typeof v === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(v);
   function currentMonth() {
     const d = new Date(); // waktu lokal, bukan UTC
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1);
   }
   // Maju satu bulan murni dari string "YYYY-MM", bebas bug zona waktu
   function nextMonth(ym) {
@@ -913,7 +888,7 @@
     let [y, m] = ym.split('-').map(Number);
     m += 1;
     if (m > 12) { m = 1; y += 1; }
-    return y + '-' + pad(m);
+    return y + '-' + pad2(m);
   }
   function monthLabel(ym) {
     if (!isValidMonth(ym)) return '-';
@@ -991,8 +966,9 @@
       const t = localStorage.getItem(TAB_KEY);
       if (NAV.some(x => x.id === t)) return t;
       if (WEEK_IDS.includes(t)) { state.activeWeek = t; return 'mingguan'; } // versi lama
+      if (t === 'checklist') return state.checklistSection === 'bulanan' ? 'bulanan' : 'mingguan'; // tab Daftar sudah digabung
     } catch (e) {}
-    return 'checklist';
+    return 'mingguan';
   }
 
   function buildReport(month, items, budget) {
@@ -1206,6 +1182,7 @@
         if (item.tab === 'bulanan') activeTab.value = 'bulanan';
         else { state.activeWeek = item.tab; activeTab.value = 'mingguan'; }
         expandedId.value = item.id;
+        if (item.isChecked) showBought.value = true;
         nextTick(() => {
           const el = document.getElementById('item-' + item.id);
           if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1213,6 +1190,19 @@
         });
       }
       const sectionShort = id => (SECTIONS.find(x => x.id === id) || { short: id }).short;
+      const showBought = ref(false);
+      const toBuyIn = tab => state.items.filter(i => i.tab === tab && !i.isChecked);
+      function listGroups(tab) {
+        const order = [], map = {};
+        toBuyIn(tab).forEach(i => {
+          if (!map[i.category]) { map[i.category] = []; order.push(i.category); }
+          map[i.category].push(i);
+        });
+        const groups = order.map(c => ({ key: 'cat-' + c, kind: 'cat', category: c, items: map[c] }));
+        const bought = state.items.filter(i => i.tab === tab && i.isChecked);
+        if (bought.length) groups.push({ key: 'done', kind: 'done', items: bought });
+        return groups;
+      }
       async function shareText(title, text) {
         if (navigator.share) {
           try { await navigator.share({ title, text }); return; }
@@ -1486,16 +1476,16 @@
         m += d;
         if (m > 12) { m = 1; y += 1; }
         if (m < 1) { m = 12; y -= 1; }
-        setMonth(y + '-' + pad(m));
+        setMonth(y + '-' + pad2(m));
       }
       function openMonthPicker() { openModal('month', { pickYear: Number(state.month.slice(0, 4)) }); }
       function pickMonth(m) {
-        setMonth(modal.pickYear + '-' + pad(m));
+        setMonth(modal.pickYear + '-' + pad2(m));
         closeModal();
         showToast('Bulan: ' + monthLabel(state.month));
       }
-      const isPicked = m => state.month === modal.pickYear + '-' + pad(m);
-      const isNow = m => currentMonth() === modal.pickYear + '-' + pad(m);
+      const isPicked = m => state.month === modal.pickYear + '-' + pad2(m);
+      const isNow = m => currentMonth() === modal.pickYear + '-' + pad2(m);
 
       // ---------- Data tahunan (arsip + bulan berjalan) ----------
       const allEntries = computed(() => {
@@ -1719,6 +1709,7 @@
         NAV, SECTIONS, WEEKS, HISTORY_VIEWS, FAMILY, cloud, login, passwordInput, showLogin, syncLabel, syncDot,
         pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, mail, canAutoMail, sendMail,
         compact, expandHeader, thisWeek, expandedId, toggleExpand, goToItem, sectionShort, shareText, itemsIn,
+        showBought, toBuyIn, listGroups,
         lock, pad, bio, isIOS, bioName, padTitle, padHint, pressKey, backspace, cancelPad, unlockBio, registerBioFromOffer,
         openForgot, closeForgot, resetPinWithPassword, wipeLocal, openSettings, toggleLock, changePin, toggleBio, lockNow, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
         editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
