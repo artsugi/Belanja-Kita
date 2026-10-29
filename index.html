@@ -266,10 +266,13 @@
 
     <!-- ============ RIWAYAT ============ -->
     <section v-else-if="activeTab === 'riwayat'">
-      <div class="grid grid-cols-3 p-1 rounded-full bg-surface">
-        <button v-for="v in HISTORY_VIEWS" :key="v.id" @click="state.historyView = v.id"
-          class="h-10 rounded-full text-[13.5px] font-bold transition-colors"
-          :class="state.historyView === v.id ? 'bg-coral text-on-coral' : 'text-muted'">{{ v.label }}</button>
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-[22px] font-black tracking-[-0.03em]">Riwayat</h2>
+        <div class="inline-flex p-1 rounded-full bg-surface shrink-0">
+          <button v-for="v in HISTORY_VIEWS" :key="v.id" @click="state.historyView = v.id"
+            class="h-9 px-4 rounded-full text-[13px] font-bold transition-colors"
+            :class="state.historyView === v.id ? 'bg-coral text-on-coral' : 'text-muted'">{{ v.label }}</button>
+        </div>
       </div>
 
       <!-- Bulan ini -->
