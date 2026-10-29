@@ -120,7 +120,7 @@
       <div class="relative">
         <div class="flex items-center justify-between">
           <p class="text-[12.5px] font-semibold text-white/85">Sisa dana {{ monthLabel(state.month) }}</p>
-          <span v-if="remaining < 0" class="text-[11px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Lewat anggaran</span>
+          <span v-if="remaining < 0" class="text-[11px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Melebihi anggaran</span>
           <span v-else class="text-[11px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
         </div>
         <p class="text-[34px] leading-[1.05] font-black tracking-[-0.035em] num mt-0.5">{{ rp(remaining) }}</p>
@@ -129,15 +129,15 @@
         </div>
         <div class="mt-3 grid grid-cols-2 gap-2">
           <button v-if="!editingBudget" @click="startBudgetEdit" class="rounded-[18px] bg-white/15 active:bg-white/25 px-3.5 py-2 text-left transition-colors">
-            <p class="text-[11px] text-white/80 flex items-center gap-1.5">Budget <i class="fa-solid fa-pen text-[8px]"></i></p>
+            <p class="text-[11px] text-white/80 flex items-center gap-1.5">Anggaran <i class="fa-solid fa-pen text-[8px]"></i></p>
             <p class="text-[14.5px] font-bold num leading-tight">{{ rp(state.budget) }}</p>
           </button>
           <div v-else class="rounded-[18px] bg-white px-3.5 py-2 text-black">
-            <p class="text-[11px] text-black/55">Ubah budget, lalu tekan Enter</p>
+            <p class="text-[11px] text-black/55">Ketik anggaran baru</p>
             <div class="flex items-center gap-1">
               <span class="text-[14.5px] font-bold">Rp</span>
               <input ref="budgetInput" type="text" inputmode="numeric" :value="fmtNum(budgetDraft)" @input="onBudgetInput" @keyup.enter="$event.target.blur()" @keyup.esc="cancelBudgetEdit" @blur="saveBudget"
-                class="w-full min-w-0 bg-transparent text-[14.5px] font-bold num outline-none leading-tight" aria-label="Budget bulanan">
+                class="w-full min-w-0 bg-transparent text-[14.5px] font-bold num outline-none leading-tight" aria-label="Anggaran bulanan">
             </div>
           </div>
           <div class="rounded-[18px] bg-white/15 px-3.5 py-2">
@@ -226,7 +226,7 @@
                 <button @click="toggleExpand(item)" class="flex-1 min-w-0 flex items-center gap-3 text-left" :aria-expanded="expandedId === item.id">
                   <span class="flex-1 min-w-0">
                     <span class="block font-bold text-[15px] leading-snug" :class="item.isChecked && !needsPrice(item) ? 'line-through text-muted' : ''">{{ item.name }}</span>
-                    <span v-if="needsPrice(item)" class="block text-[11.5px] font-bold text-coral mt-0.5">⚠️ Sudah dibeli, isi harganya</span>
+                    <span v-if="needsPrice(item)" class="block text-[11.5px] font-bold text-coral mt-0.5">⚠️ Sudah dibeli, belum ada harga</span>
                     <span v-else-if="item.boughtOn" class="block text-[11.5px] text-muted mt-0.5">Dibeli {{ fmtDay(item.boughtOn) }}<template v-if="item.custom">, tambahan</template></span>
                     <span v-else-if="item.custom" class="block text-[11.5px] text-muted mt-0.5">{{ item.keep ? 'Barang tambahan' : 'Tambahan, hanya bulan ini' }}</span>
                   </span>
@@ -262,7 +262,7 @@
                     <template v-else-if="item.totalSpent">Harga baru akan ditambahkan ke total.</template>
                   </p>
                   <div class="flex items-center gap-3 shrink-0">
-                    <button v-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[11px]"></i> Reset</button>
+                    <button v-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[11px]"></i> Kosongkan</button>
                     <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[11px]"></i> Hapus</button>
                   </div>
                 </div>
@@ -293,13 +293,13 @@
           <button @click="shiftR(1)" :disabled="isCurrentR" class="w-11 h-11 rounded-full bg-surface grid place-items-center text-muted active:text-ink shrink-0 disabled:opacity-30" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[12px]"></i></button>
         </div>
         <div v-if="!isCurrentR" class="mt-3 rounded-[18px] bg-surface px-4 py-2.5 flex items-center justify-between gap-3 text-[12.5px]">
-          <span class="text-muted">Melihat catatan bulan lalu</span>
+          <span class="text-muted flex items-center gap-1.5"><i class="fa-solid fa-box-archive text-[11px]"></i> Arsip, hanya dapat dilihat</span>
           <button @click="rMonth = state.month" class="font-bold text-coral shrink-0">Kembali ke bulan ini</button>
         </div>
 
         <div v-if="isCurrentR && unpriced.length" class="mt-3 rounded-[22px] bg-coral-soft p-4">
-          <p class="font-bold text-coral text-[13.5px]">⚠️ {{ unpriced.length }} barang sudah dibeli tapi harganya belum diisi</p>
-          <p class="text-[12px] text-ink/70 mt-0.5">Tap barangnya untuk langsung mengisi harga.</p>
+          <p class="font-bold text-coral text-[13.5px]">⚠️ {{ unpriced.length }} barang sudah dibeli, belum ada harga</p>
+          <p class="text-[12px] text-ink/70 mt-0.5">Ketuk nama barang untuk mengisi harganya.</p>
           <div class="mt-2.5 flex flex-wrap gap-1.5">
             <button v-for="i in unpriced" :key="i.id" @click="goToItem(i)" class="h-8 pl-3 pr-2.5 rounded-full bg-surface text-[12.5px] font-bold flex items-center gap-1.5 active:scale-95 transition-transform">
               {{ i.name }} <span class="text-muted font-semibold">{{ sectionShort(i.tab) }}</span><i class="fa-solid fa-chevron-right text-[9px] text-coral"></i>
@@ -309,9 +309,9 @@
 
         <div class="mt-3 rounded-[24px] bg-surface p-5">
           <div class="grid grid-cols-3 gap-2">
-            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Budget</p><p class="text-[14px] font-extrabold num">{{ rpShort(rBudget) }}</p></div>
+            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Anggaran</p><p class="text-[14px] font-extrabold num">{{ rpShort(rBudget) }}</p></div>
             <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Terpakai</p><p class="text-[14px] font-extrabold num">{{ rpShort(rSpent) }}</p></div>
-            <div class="rounded-[16px] px-3 py-2.5" :class="rRemaining < 0 ? 'bg-coral text-on-coral' : 'bg-paper'"><p class="text-[11px]" :class="rRemaining < 0 ? 'text-white/80' : 'text-muted'">{{ rRemaining < 0 ? 'Lewat' : 'Sisa' }}</p><p class="text-[14px] font-extrabold num">{{ rpShort(rRemaining) }}</p></div>
+            <div class="rounded-[16px] px-3 py-2.5" :class="rRemaining < 0 ? 'bg-coral text-on-coral' : 'bg-paper'"><p class="text-[11px]" :class="rRemaining < 0 ? 'text-white/80' : 'text-muted'">{{ rRemaining < 0 ? 'Lebih' : 'Sisa' }}</p><p class="text-[14px] font-extrabold num">{{ rpShort(rRemaining) }}</p></div>
           </div>
           <div class="mt-4 space-y-3">
             <div v-for="s in SECTIONS" :key="s.id" :class="'acc-' + s.id" class="flex items-center gap-3 text-[14px]">
@@ -364,7 +364,7 @@
           <i class="fa-regular fa-envelope"></i> Buka di Email
         </a>
         <button @click="shareText('Laporan Belanja Kita ' + monthLabel(rMonth), reportText)" class="mt-2 w-full h-12 rounded-full bg-surface font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-          <i class="fa-solid fa-share-nodes"></i> Bagikan ke WhatsApp dan lainnya
+          <i class="fa-solid fa-share-nodes"></i> Bagikan laporan
         </button>
 
       </div>
@@ -385,13 +385,13 @@
           <p class="text-[32px] font-black tracking-[-0.035em] num leading-tight">{{ rp(yearStats.spent) }}</p>
           <p class="mt-1.5 inline-flex text-[12.5px] font-bold num rounded-full px-2.5 py-1" :class="yearStats.budget - yearStats.spent < 0 ? 'bg-coral text-on-coral' : 'acc-M2 bg-acc-soft text-ink'">
             <template v-if="yearStats.budget - yearStats.spent >= 0">🎉 Hemat {{ rp(yearStats.budget - yearStats.spent) }}</template>
-            <template v-else>Lewat {{ rp(yearStats.spent - yearStats.budget) }} dari anggaran</template>
+            <template v-else>Melebihi anggaran {{ rp(yearStats.spent - yearStats.budget) }}</template>
           </p>
 
           <div class="mt-4 grid grid-cols-3 gap-2">
-            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Rata-rata/bulan</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.avg) }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Rata-rata per bulan</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.avg) }}</p></div>
             <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Anggaran</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.budget) }}</p></div>
-            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Tertinggi</p><p class="text-[13.5px] font-extrabold">{{ yearStats.top ? shortMonthName(yearStats.top.month) : '-' }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Bulan tertinggi</p><p class="text-[13.5px] font-extrabold">{{ yearStats.top ? shortMonthName(yearStats.top.month) : '-' }}</p></div>
           </div>
 
           <div class="mt-6">
@@ -448,7 +448,7 @@
             <div v-for="e in yearEntries" :key="e.month" class="py-2.5 flex items-center gap-3 text-[13.5px]">
               <span class="flex-1 font-semibold">{{ monthLabel(e.month) }} <span v-if="e.current" class="ml-1 text-[11px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">berjalan</span></span>
               <span class="font-extrabold num">{{ rp(e.spent) }}</span>
-              <span class="w-[88px] text-right text-[12px] num" :class="e.budget - e.spent < 0 ? 'text-coral font-bold' : 'text-muted'">{{ e.budget - e.spent < 0 ? 'lewat ' + rpShort(e.spent - e.budget) : 'sisa ' + rpShort(e.budget - e.spent) }}</span>
+              <span class="w-[88px] text-right text-[12px] num" :class="e.budget - e.spent < 0 ? 'text-coral font-bold' : 'text-muted'">{{ e.budget - e.spent < 0 ? 'lebih ' + rpShort(e.spent - e.budget) : 'sisa ' + rpShort(e.budget - e.spent) }}</span>
             </div>
           </div>
         </div>
@@ -456,7 +456,7 @@
         <div class="mt-4 grid gap-2" :class="canAutoMail ? 'grid-cols-2' : 'grid-cols-1'">
           <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita Tahun ' + selectedYear, buildYearReport(selectedYear))" :disabled="mail.busy"
             class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
-            <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim Email' }}
+            <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim ke Email' }}
           </button>
           <button @click="shareText('Laporan Belanja Kita Tahun ' + selectedYear, buildYearReport(selectedYear))" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
             <i class="fa-solid fa-share-nodes"></i> {{ canAutoMail ? 'Bagikan' : 'Bagikan Laporan ' + selectedYear }}
@@ -502,11 +502,11 @@
             class="mt-1.5 w-full h-12 px-4 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
         </label>
         <div class="mt-3">
-          <span class="text-[12.5px] font-bold text-muted">Password</span>
+          <span class="text-[12.5px] font-bold text-muted">Kata sandi</span>
           <div class="relative mt-1.5">
-            <input ref="passwordInput" v-model="login.password" :type="login.show ? 'text' : 'password'" autocomplete="current-password" @keyup.enter="doLogin" aria-label="Password"
+            <input ref="passwordInput" v-model="login.password" :type="login.show ? 'text' : 'password'" autocomplete="current-password" @keyup.enter="doLogin" aria-label="Kata sandi"
               class="w-full h-12 pl-4 pr-12 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
-            <button type="button" @click="login.show = !login.show" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-muted" :aria-label="login.show ? 'Sembunyikan password' : 'Tampilkan password'">
+            <button type="button" @click="login.show = !login.show" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-muted" :aria-label="login.show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
               <span v-if="login.show"><i class="fa-regular fa-eye-slash"></i></span><span v-else><i class="fa-regular fa-eye"></i></span>
             </button>
           </div>
@@ -562,8 +562,8 @@
 
       <div v-else class="max-w-[340px] w-full mx-auto pb-2">
         <template v-if="cloud.user">
-          <p class="text-[14px] text-muted leading-relaxed text-center">Masukkan password Belanja Kita untuk <b class="text-ink">{{ cloud.user.email }}</b>. Setelah itu kunci dimatikan, dan Anda bisa membuat PIN baru di Pengaturan.</p>
-          <input v-model="pad.pw" type="password" autocomplete="current-password" @keyup.enter="resetPinWithPassword" placeholder="Password" aria-label="Password"
+          <p class="text-[14px] text-muted leading-relaxed text-center">Masukkan kata sandi Belanja Kita untuk <b class="text-ink">{{ cloud.user.email }}</b>. Setelah itu kunci dimatikan, dan Anda bisa membuat PIN baru di Pengaturan.</p>
+          <input v-model="pad.pw" type="password" autocomplete="current-password" @keyup.enter="resetPinWithPassword" placeholder="Kata sandi" aria-label="Kata sandi"
             class="mt-4 w-full h-12 px-4 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
           <button @click="resetPinWithPassword" :disabled="pad.busy" class="mt-3 w-full h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ pad.busy ? 'Memeriksa…' : 'Matikan kunci' }}</button>
         </template>
@@ -596,11 +596,11 @@
 
           <template v-if="modal.type === 'reset'">
             <p class="text-[34px]">🔄</p>
-            <h3 class="mt-1 text-[20px] font-black tracking-[-0.03em]">Reset {{ modal.item.name }}?</h3>
-            <p class="mt-2 text-[14px] text-muted leading-relaxed">Total {{ modal.item.totalQty }} qty senilai {{ rp(modal.item.totalSpent) }} akan dihapus dan centangnya dilepas. Langkah ini tidak bisa dibatalkan.</p>
+            <h3 class="mt-1 text-[20px] font-black tracking-[-0.03em]">Kosongkan {{ modal.item.name }}?</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">Catatan pembelian bulan ini ({{ modal.item.totalQty }} qty, {{ rp(modal.item.totalSpent) }}) akan dihapus dan centangnya dilepas. Tindakan ini tidak dapat dibatalkan.</p>
             <div class="mt-6 grid grid-cols-2 gap-2">
               <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
-              <button @click="confirmReset" class="h-12 rounded-full bg-coral text-on-coral font-bold">Ya, Reset</button>
+              <button @click="confirmReset" class="h-12 rounded-full bg-coral text-on-coral font-bold">Ya, kosongkan</button>
             </div>
           </template>
 
@@ -643,8 +643,8 @@
 
             <button @click="modal.form.keep = !modal.form.keep" class="mt-4 w-full flex items-center gap-3 rounded-[20px] bg-paper px-4 py-3 text-left" role="switch" :aria-checked="modal.form.keep">
               <span class="flex-1">
-                <span class="block text-[14px] font-bold">Simpan untuk bulan berikutnya</span>
-                <span class="block text-[12px] text-muted mt-0.5">{{ modal.form.keep ? 'Tetap muncul setelah tutup buku.' : 'Hanya untuk bulan ini, hilang saat tutup buku.' }}</span>
+                <span class="block text-[14px] font-bold">Tetap ada bulan depan</span>
+                <span class="block text-[12px] text-muted mt-0.5">{{ modal.form.keep ? 'Muncul lagi di daftar bulan berikutnya.' : 'Hanya untuk bulan ini.' }}</span>
               </span>
               <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="modal.form.keep ? 'bg-coral' : 'bg-stone'">
                 <span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="modal.form.keep ? 'translate-x-5' : ''"></span>
@@ -671,7 +671,7 @@
                 {{ b }}<span v-if="hasData(idx + 1) && !isPicked(idx + 1)" class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-coral"></span>
               </button>
             </div>
-            <p class="mt-4 text-[12.5px] text-muted leading-relaxed">Pilih bulan untuk melihat belanjaannya. Titik merah berarti ada catatan di bulan itu.</p>
+            <p class="mt-4 text-[12.5px] text-muted leading-relaxed">Titik merah menandai bulan yang memiliki catatan pembelian.</p>
           </template>
 
           <template v-else-if="modal.type === 'settings'">
@@ -690,7 +690,7 @@
             <div v-if="lock.enabled" class="mt-2 rounded-[20px] bg-paper overflow-hidden">
               <button @click="toggleLock" role="switch" :aria-checked="lock.enabled" class="w-full flex items-center gap-3 px-4 py-3.5 text-left">
                 <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-solid fa-lock text-[13px]"></i></span>
-                <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Kunci dengan PIN</span><span class="block text-[12px] text-muted">Minta PIN setiap app dibuka</span></span>
+                <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Kunci dengan PIN</span><span class="block text-[12px] text-muted">Minta PIN setiap aplikasi dibuka</span></span>
                 <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="lock.enabled ? 'bg-coral' : 'bg-stone'"><span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="lock.enabled ? 'translate-x-5' : ''"></span></span>
               </button>
               <template v-if="lock.enabled">
@@ -706,7 +706,7 @@
                 </button>
               </template>
             </div>
-            <p v-if="lock.enabled" class="mt-2 px-1 text-[12px] text-muted leading-relaxed">Terkunci lagi setiap app dibuka ulang, atau setelah 5 menit tidak dipakai. PIN hanya berlaku di HP ini.</p>
+            <p v-if="lock.enabled" class="mt-2 px-1 text-[12px] text-muted leading-relaxed">Terkunci lagi setiap aplikasi dibuka ulang, atau setelah 5 menit tidak dipakai. PIN hanya berlaku di HP ini.</p>
             <button v-if="lock.enabled" @click="lockNow" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-lock text-[13px]"></i> Kunci sekarang</button>
             <button @click="closeModal" class="mt-2 w-full h-12 rounded-full bg-paper font-bold">Tutup</button>
           </template>
@@ -950,11 +950,11 @@
     L.push('LAPORAN BELANJA KITA');
     L.push('Bulan: ' + monthLabel(month));
     L.push('');
-    L.push('Total Budget : ' + rp(budget));
+    L.push('Anggaran     : ' + rp(budget));
     L.push('Terpakai     : ' + rp(spent));
     L.push('Sisa Dana    : ' + rp(budget - spent));
     L.push('');
-    L.push('⚠️ Sudah dibeli tapi harga belum diisi:');
+    L.push('⚠️ Sudah dibeli, belum ada harga:');
     const unp = items.filter(i => i.isChecked && !(Number(i.totalSpent) > 0));
     if (!unp.length) L.push('- Tidak ada');
     unp.forEach(i => L.push('- ' + i.name + ' (' + sectionLabel(i.tab) + ')'));
@@ -1005,7 +1005,7 @@
           if (p && p.catch) p.catch(e => {
             if (e && e.code === 'not-found') return;
             console.error(e);
-            showToast(e && e.code === 'permission-denied' ? 'Akun ini tidak punya akses' : 'Gagal menyimpan ke cloud', 'error');
+            showToast(e && e.code === 'permission-denied' ? 'Akun ini tidak punya akses' : 'Gagal menyimpan. Periksa koneksi internet.', 'error');
           });
         } catch (e) { console.error(e); }
       }
@@ -1032,7 +1032,7 @@
         const mark = k => { got[k] = true; if (got.cfg && got.items && got.hist) { cloud.ready = true; clearTimeout(timer); } };
         try {
           const snap = await cfgRef().get({ source: 'server' });
-          if (!snap.exists) { await seedCloud(); showToast('Data HP ini sudah diunggah'); }
+          if (!snap.exists) { await seedCloud(); showToast('Data di HP ini sudah tersimpan ke akun'); }
         } catch (e) { /* offline: lanjut dengan cache */ }
         if (!cloud.user) return;
         const onErr = e => {
@@ -1093,7 +1093,7 @@
       window.addEventListener('offline', () => { cloud.online = false; });
 
       const showLogin = computed(() => cloud.available && cloud.authChecked && !cloud.user && cloud.mode !== 'local');
-      const syncLabel = computed(() => !cloud.online ? 'Offline, nanti sinkron otomatis' : (cloud.pending ? 'Menyimpan…' : 'Tersinkron dengan keluarga'));
+      const syncLabel = computed(() => !cloud.online ? 'Tidak ada koneksi, sinkron otomatis nanti' : (cloud.pending ? 'Menyimpan…' : 'Tersinkron dengan keluarga'));
       const syncDot = computed(() => (!cloud.online || cloud.pending) ? 'bg-[#FFB020]' : 'bg-[#16B088]');
 
       function pickPerson(p) {
@@ -1101,7 +1101,7 @@
         nextTick(() => { passwordInput.value && passwordInput.value.focus(); });
       }
       function loginError(code) {
-        if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(code)) return 'Email atau password salah.';
+        if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-login-credentials'].includes(code)) return 'Email atau kata sandi salah.';
         if (code === 'auth/invalid-email') return 'Format email belum benar.';
         if (code === 'auth/too-many-requests') return 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.';
         if (code === 'auth/network-request-failed') return 'Tidak bisa terhubung. Periksa koneksi internet.';
@@ -1109,7 +1109,7 @@
       }
       function doLogin() {
         if (!auth || login.busy) return;
-        if (!login.email || !login.password) { login.error = 'Isi email dan password dulu.'; return; }
+        if (!login.email || !login.password) { login.error = 'Isi email dan kata sandi terlebih dahulu.'; return; }
         login.busy = true; login.error = '';
         auth.signInWithEmailAndPassword(login.email, login.password)
           .then(() => { login.password = ''; login.show = false; showToast('Berhasil masuk'); })
@@ -1232,7 +1232,7 @@
           return true;
         } catch (e) {
           console.error(e);
-          showToast(navigator.onLine === false ? 'Offline, email belum terkirim' : 'Email gagal terkirim, coba lagi', 'error');
+          showToast(navigator.onLine === false ? 'Tidak ada koneksi, email belum terkirim' : 'Email gagal terkirim, coba lagi', 'error');
           return false;
         } finally { mail.busy = false; }
       }
@@ -1331,7 +1331,7 @@
           }
           if (pad.mode === 'new1') { Object.assign(pad, { first: pin, mode: 'new2', entry: '', error: '' }); return; }
           if (pad.mode === 'new2') {
-            if (pin !== pad.first) { pad.mode = 'new1'; pad.first = ''; shakePad('PIN tidak sama. Buat ulang ya.'); return; }
+            if (pin !== pad.first) { pad.mode = 'new1'; pad.first = ''; shakePad('PIN tidak sama. Silakan buat ulang.'); return; }
             const salt = Array.from(randBytes(16)).map(x => x.toString(16).padStart(2, '0')).join('');
             const hash = await hashPin(salt, pin);
             const wasEnabled = lock.enabled;
@@ -1377,7 +1377,7 @@
       function closeForgot() { Object.assign(pad, { forgot: false, pw: '', error: '', wipeConfirm: false }); }
       function resetPinWithPassword() {
         if (!auth || !cloud.user || pad.busy) return;
-        if (!pad.pw) { pad.error = 'Isi password dulu.'; return; }
+        if (!pad.pw) { pad.error = 'Isi kata sandi terlebih dahulu.'; return; }
         pad.busy = true; pad.error = '';
         auth.signInWithEmailAndPassword(cloud.user.email, pad.pw)
           .then(() => {
@@ -1464,7 +1464,7 @@
         if (v > 0 && v !== state.budget) {
           state.budget = v;
           remote(() => cfgRef().set({ budget: v }, { merge: true }));
-          showToast('Budget jadi ' + rp(v));
+          showToast('Anggaran diubah menjadi ' + rp(v));
         }
       }
       function cancelBudgetEdit() { editingBudget.value = false; }
@@ -1620,7 +1620,7 @@
         L.push('Total Anggaran   : ' + rp(s.budget) + ' (' + s.count + ' bulan)');
         L.push('Total Terpakai   : ' + rp(s.spent));
         L.push((s.budget - s.spent >= 0 ? 'Total Hemat      : ' : 'Lewat Anggaran   : ') + rp(Math.abs(s.budget - s.spent)));
-        L.push('Rata-rata/bulan  : ' + rp(s.avg));
+        L.push('Rata-rata/bln    : ' + rp(s.avg));
         L.push('');
         L.push('KOMPOSISI');
         s.sections.forEach(x => L.push('- ' + x.label + ': ' + rp(x.spent) + ' (' + pct(x.spent, s.spent) + '%)'));
@@ -1683,7 +1683,7 @@
       function submitItem(item) {
         const price = toInt(item.draftPrice);
         const qty = Math.max(1, parseInt(item.draftQty, 10) || 1);
-        if (!price) { showToast('Isi harga beli terlebih dahulu', 'error'); return; }
+        if (!price) { showToast('Isi harga terlebih dahulu', 'error'); return; }
         item.totalSpent += price * qty;
         item.totalQty += qty;
         item.isChecked = true;
@@ -1702,7 +1702,7 @@
           remote(() => itemRef(it.id).update({ totalQty: 0, totalSpent: 0, isChecked: false, boughtOn: '' }));
         }
         closeModal();
-        showToast('Barang direset ke 0');
+        showToast('Catatan barang dikosongkan');
       }
       function askDelete(item) { openModal('delete', { item }); }
       function confirmDelete() {
@@ -1737,7 +1737,7 @@
         state.items.push(fresh);
         remote(() => itemRef(fresh.id).set(itemDoc(fresh)));
         closeModal();
-        showToast(name + ' masuk ke ' + sectionLabel(target));
+        showToast(name + ' ditambahkan ke ' + sectionLabel(target));
       }
 
       // ---------- Tutup buku ----------
