@@ -71,6 +71,8 @@
   .box { width: 26px; height: 26px; border-radius: 9px; flex-shrink: 0; display: grid; place-items: center; font-size: 13px;
     border: 2px solid rgb(var(--stone)); background: rgb(var(--surface)); transition: background-color .15s, border-color .15s; }
   .box.on { background: rgb(var(--acc)); border-color: rgb(var(--acc)); color: rgb(var(--on-acc)); animation: boing .35s cubic-bezier(.3,1.6,.5,1); }
+  .shake { animation: shake .4s; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-10px); } 40%,80% { transform: translateX(10px); } }
   @keyframes boing { 0% { transform: scale(.7); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
   .peer:focus-visible + .box, button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid rgb(var(--coral)); outline-offset: 2px; }
 
@@ -104,14 +106,14 @@
           </p>
         </div>
       </div>
-      <div class="flex items-center bg-surface rounded-full h-10 shrink-0 shadow-[0_1px_0_rgb(var(--line))]">
-        <button @click="shiftMonth(-1)" class="w-8 h-full text-muted active:text-ink rounded-l-full" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
-        <button @click="openMonthPicker" class="h-full flex items-center gap-1.5 px-1.5" aria-label="Pilih bulan">
-          <i class="fa-regular fa-calendar text-coral text-[12px]"></i>
-          <span class="text-[13px] font-bold num">{{ shortMonth(state.month) }}</span>
-        </button>
-        <button @click="shiftMonth(1)" class="w-8 h-full text-muted active:text-ink rounded-r-full" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+      <div class="ml-auto flex items-center bg-surface rounded-full h-10 shrink-0 shadow-[0_1px_0_rgb(var(--line))]">
+        <button @click="shiftMonth(-1)" class="w-7 h-full text-muted active:text-ink rounded-l-full" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+        <button @click="openMonthPicker" class="h-full px-1 text-[13px] font-bold num" aria-label="Pilih bulan">{{ shortMonth(state.month) }}</button>
+        <button @click="shiftMonth(1)" class="w-7 h-full text-muted active:text-ink rounded-r-full" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
       </div>
+      <button @click="openSettings" class="relative w-10 h-10 rounded-full bg-surface shadow-[0_1px_0_rgb(var(--line))] text-ink/70 shrink-0 grid place-items-center -ml-1" aria-label="Pengaturan">
+        <span v-if="lock.enabled"><i class="fa-solid fa-lock text-[14px]"></i></span><span v-else><i class="fa-solid fa-gear text-[15px]"></i></span>
+      </button>
     </div>
 
     <!-- Kartu anggaran -->
@@ -302,14 +304,19 @@
 
         <textarea readonly :value="reportText" rows="14" class="mt-3 w-full rounded-[22px] bg-surface p-4 text-[12.5px] leading-relaxed num outline-none resize-y"></textarea>
 
-        <div class="mt-2.5 grid grid-cols-2 gap-2">
-          <a :href="mailtoLink" target="_blank" rel="noopener" class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+        <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita ' + monthLabel(state.month), reportText)" :disabled="mail.busy"
+          class="mt-2.5 w-full h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
+          <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim ke Email' }}
+        </button>
+        <div class="mt-2 grid grid-cols-2 gap-2">
+          <a :href="mailtoLink" target="_blank" rel="noopener" :class="canAutoMail ? 'bg-surface text-ink' : 'bg-coral text-on-coral'" class="h-12 rounded-full font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
             <i class="fa-regular fa-envelope"></i> Buka di Email
           </a>
           <button @click="copyText(reportText)" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
             <i class="fa-regular fa-copy"></i> Salin Teks
           </button>
         </div>
+        <p v-if="canAutoMail" class="mt-2.5 text-[12px] text-muted text-center leading-relaxed">“Kirim ke Email” langsung mengirim ke Sugi dan Syifa, tanpa membuka aplikasi email.</p>
       </div>
 
       <!-- Tahunan -->
@@ -396,9 +403,15 @@
           </div>
         </div>
 
-        <button @click="copyText(buildYearReport(selectedYear))" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
-          <i class="fa-regular fa-copy"></i> Salin Laporan Tahun {{ selectedYear }}
-        </button>
+        <div class="mt-4 grid gap-2" :class="canAutoMail ? 'grid-cols-2' : 'grid-cols-1'">
+          <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita Tahun ' + selectedYear, buildYearReport(selectedYear))" :disabled="mail.busy"
+            class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
+            <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim Email' }}
+          </button>
+          <button @click="copyText(buildYearReport(selectedYear))" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-regular fa-copy"></i> {{ canAutoMail ? 'Salin' : 'Salin Laporan Tahun ' + selectedYear }}
+          </button>
+        </div>
       </div>
 
       <!-- Arsip -->
@@ -442,23 +455,20 @@
               </template>
               <p v-if="!h.items.some(i => i.totalSpent > 0)" class="mt-3 text-[13px] text-muted">Tidak ada pengeluaran tercatat di bulan ini.</p>
 
-              <button @click="copyText(buildReport(h.month, h.items, h.budget))" class="mt-4 w-full h-11 rounded-full bg-paper font-bold text-[13.5px] flex items-center justify-center gap-2">
-                <i class="fa-regular fa-copy"></i> Salin Laporan {{ monthLabel(h.month) }}
-              </button>
+              <div class="mt-4 grid gap-2" :class="canAutoMail ? 'grid-cols-2' : 'grid-cols-1'">
+                <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita ' + monthLabel(h.month), buildReport(h.month, h.items, h.budget))" :disabled="mail.busy"
+                  class="h-11 rounded-full bg-coral text-on-coral font-bold text-[13.5px] flex items-center justify-center gap-2 disabled:opacity-60">
+                  <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim Email' }}
+                </button>
+                <button @click="copyText(buildReport(h.month, h.items, h.budget))" class="h-11 rounded-full bg-paper font-bold text-[13.5px] flex items-center justify-center gap-2">
+                  <i class="fa-regular fa-copy"></i> {{ canAutoMail ? 'Salin' : 'Salin Laporan ' + monthLabel(h.month) }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="cloud.available" class="mt-8 rounded-[24px] bg-surface p-4 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-coral-soft text-coral grid place-items-center shrink-0"><i class="fa-solid fa-user"></i></div>
-        <div class="flex-1 min-w-0">
-          <template v-if="cloud.user"><p class="text-[12px] text-muted">Masuk sebagai</p><p class="text-[14px] font-bold truncate">{{ cloud.user.email }}</p></template>
-          <template v-else><p class="text-[14px] font-bold">Mode lokal</p><p class="text-[12px] text-muted">Data hanya tersimpan di HP ini.</p></template>
-        </div>
-        <button v-if="cloud.user" @click="signOut" class="h-9 px-4 rounded-full bg-paper text-[13px] font-bold shrink-0">Keluar</button>
-        <button v-else @click="backToLogin" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
-      </div>
     </section>
   </main>
 
@@ -525,6 +535,50 @@
       </div>
     </div>
   </transition>
+
+  <!-- ============ LAYAR KUNCI PIN ============ -->
+  <div v-if="pad.show" class="fixed inset-0 z-[80] bg-paper flex flex-col" :style="{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }">
+    <div class="max-w-md w-full mx-auto flex-1 flex flex-col px-6">
+      <div class="flex justify-end h-10">
+        <button v-if="pad.mode !== 'unlock'" @click="cancelPad" class="text-[14px] font-bold text-muted px-2">Batal</button>
+      </div>
+      <div class="flex-1 flex flex-col items-center justify-center text-center">
+        <div class="w-16 h-16 rounded-[20px] bg-coral text-on-coral grid place-items-center text-[24px] rotate-[-6deg]"><i class="fa-solid fa-lock"></i></div>
+        <h2 class="mt-5 text-[23px] font-black tracking-[-0.03em]">{{ pad.forgot ? 'Lupa PIN' : padTitle }}</h2>
+        <p class="mt-1.5 text-[14px] min-h-[21px] px-4" :class="pad.error ? 'text-coral font-bold' : 'text-muted'">{{ pad.error || (pad.forgot ? '' : padHint) }}</p>
+        <div v-if="!pad.forgot" class="mt-6 flex gap-4" :class="pad.shake ? 'shake' : ''">
+          <span v-for="n in 4" :key="n" class="w-4 h-4 rounded-full transition-colors duration-150" :class="pad.entry.length >= n ? 'bg-coral' : 'bg-stone'"></span>
+        </div>
+      </div>
+
+      <template v-if="!pad.forgot">
+        <div class="grid grid-cols-3 gap-3 max-w-[300px] w-full mx-auto">
+          <button v-for="d in ['1','2','3','4','5','6','7','8','9']" :key="d" @click="pressKey(d)" class="h-[66px] rounded-[24px] bg-surface text-[26px] font-bold active:bg-stone transition-colors num">{{ d }}</button>
+          <button v-if="pad.mode === 'unlock' && lock.credId" @click="unlockBio(false)" class="h-[66px] rounded-[24px] text-coral text-[28px] grid place-items-center active:bg-coral-soft" :aria-label="'Buka dengan ' + bioName">
+            <span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span>
+          </button>
+          <span v-else></span>
+          <button @click="pressKey('0')" class="h-[66px] rounded-[24px] bg-surface text-[26px] font-bold active:bg-stone transition-colors num">0</button>
+          <button @click="backspace" class="h-[66px] rounded-[24px] text-muted text-[22px] grid place-items-center active:bg-surface" aria-label="Hapus angka"><i class="fa-solid fa-delete-left"></i></button>
+        </div>
+        <button v-if="pad.mode === 'unlock'" @click="openForgot" class="mt-5 mx-auto text-[13.5px] font-semibold text-muted underline underline-offset-4">Lupa PIN?</button>
+      </template>
+
+      <div v-else class="max-w-[340px] w-full mx-auto pb-2">
+        <template v-if="cloud.user">
+          <p class="text-[14px] text-muted leading-relaxed text-center">Masukkan password Belanja Kita untuk <b class="text-ink">{{ cloud.user.email }}</b>. Setelah itu kunci dimatikan, dan Anda bisa membuat PIN baru di Pengaturan.</p>
+          <input v-model="pad.pw" type="password" autocomplete="current-password" @keyup.enter="resetPinWithPassword" placeholder="Password" aria-label="Password"
+            class="mt-4 w-full h-12 px-4 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
+          <button @click="resetPinWithPassword" :disabled="pad.busy" class="mt-3 w-full h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ pad.busy ? 'Memeriksa…' : 'Matikan kunci' }}</button>
+        </template>
+        <template v-else>
+          <p class="text-[14px] text-muted leading-relaxed text-center">Tanpa akun, PIN tidak bisa dipulihkan. Anda bisa menghapus kunci, tapi semua catatan di HP ini ikut terhapus.</p>
+          <button @click="wipeLocal" class="mt-4 w-full h-12 rounded-full bg-coral text-on-coral font-bold">{{ pad.wipeConfirm ? 'Yakin? Tekan sekali lagi' : 'Hapus kunci dan data' }}</button>
+        </template>
+        <button @click="closeForgot" class="mt-2 w-full h-12 rounded-full bg-surface font-bold">Kembali</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ============ TOAST ============ -->
   <transition name="toast">
@@ -616,7 +670,7 @@
               <p class="flex justify-between"><span class="text-muted">Sisa dana</span><b :class="remaining < 0 ? 'text-coral' : ''">{{ rp(remaining) }}</b></p>
             </div>
             <p v-if="unpriced.length" class="mt-3 text-[13px] text-coral font-bold bg-coral-soft rounded-[18px] px-3.5 py-2.5">⚠️ Masih ada {{ unpriced.length }} barang dibeli tanpa harga.</p>
-            <p class="mt-3 text-[13.5px] text-muted leading-relaxed">Data bulan ini masuk arsip. Qty, harga, dan centang kembali ke nol, barang tambahan khusus bulan ini dihapus, dan bulan maju ke <b class="text-ink">{{ monthLabel(nextMonth(state.month)) }}</b>.</p>
+            <p class="mt-3 text-[13.5px] text-muted leading-relaxed">Data bulan ini masuk arsip. Qty, harga, dan centang kembali ke nol, barang tambahan khusus bulan ini dihapus, dan bulan maju ke <b class="text-ink">{{ monthLabel(nextMonth(state.month)) }}</b>.<template v-if="canAutoMail"> Laporannya juga dikirim otomatis ke email kalian berdua.</template></p>
             <div class="mt-6 grid grid-cols-2 gap-2">
               <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
               <button @click="confirmCloseBook" class="h-12 rounded-full bg-ink text-paper font-bold">Tutup Buku</button>
@@ -636,6 +690,55 @@
                 :class="isPicked(idx + 1) ? 'bg-coral text-on-coral' : (isNow(idx + 1) ? 'bg-coral-soft text-coral' : 'bg-paper text-ink')">{{ b }}</button>
             </div>
             <p class="mt-4 text-[12.5px] text-muted leading-relaxed">Ini hanya mengganti label bulan untuk catatan yang sedang berjalan. Untuk mulai bulan baru dengan daftar kosong, pakai Tutup Buku di tab Bulanan.</p>
+          </template>
+
+          <template v-else-if="modal.type === 'settings'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Pengaturan</h3>
+            <div v-if="cloud.available" class="mt-4 rounded-[20px] bg-paper p-4 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-coral-soft text-coral grid place-items-center shrink-0"><i class="fa-solid fa-user"></i></div>
+              <div class="flex-1 min-w-0">
+                <template v-if="cloud.user"><p class="text-[12px] text-muted">Masuk sebagai</p><p class="text-[14px] font-bold truncate">{{ cloud.user.email }}</p></template>
+                <template v-else><p class="text-[14px] font-bold">Mode lokal</p><p class="text-[12px] text-muted">Data hanya tersimpan di HP ini.</p></template>
+              </div>
+              <button v-if="cloud.user" @click="closeModal(); signOut()" class="h-9 px-4 rounded-full bg-surface text-[13px] font-bold shrink-0">Keluar</button>
+              <button v-else @click="closeModal(); backToLogin()" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
+            </div>
+
+            <p v-if="lock.enabled" class="mt-5 text-[12.5px] font-bold text-muted px-1">Keamanan di HP ini</p>
+            <div v-if="lock.enabled" class="mt-2 rounded-[20px] bg-paper overflow-hidden">
+              <button @click="toggleLock" role="switch" :aria-checked="lock.enabled" class="w-full flex items-center gap-3 px-4 py-3.5 text-left">
+                <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-solid fa-lock text-[13px]"></i></span>
+                <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Kunci dengan PIN</span><span class="block text-[12px] text-muted">Minta PIN setiap app dibuka</span></span>
+                <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="lock.enabled ? 'bg-coral' : 'bg-stone'"><span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="lock.enabled ? 'translate-x-5' : ''"></span></span>
+              </button>
+              <template v-if="lock.enabled">
+                <button v-if="bio.available" @click="toggleBio" role="switch" :aria-checked="!!lock.credId" class="w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-line">
+                  <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0 text-[15px]"><span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span></span>
+                  <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Buka dengan {{ bioName }}</span><span class="block text-[12px] text-muted">Lebih cepat dari mengetik PIN</span></span>
+                  <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="lock.credId ? 'bg-coral' : 'bg-stone'"><span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="lock.credId ? 'translate-x-5' : ''"></span></span>
+                </button>
+                <button @click="changePin" class="w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-line">
+                  <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-solid fa-key text-[13px]"></i></span>
+                  <span class="flex-1 text-[14.5px] font-bold">Ganti PIN</span>
+                  <i class="fa-solid fa-chevron-right text-[11px] text-muted"></i>
+                </button>
+              </template>
+            </div>
+            <p v-if="lock.enabled" class="mt-2 px-1 text-[12px] text-muted leading-relaxed">Terkunci lagi setiap app dibuka ulang, atau setelah 5 menit tidak dipakai. PIN hanya berlaku di HP ini.</p>
+            <button v-if="lock.enabled" @click="lockNow" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-lock text-[13px]"></i> Kunci sekarang</button>
+            <button @click="closeModal" class="mt-2 w-full h-12 rounded-full bg-paper font-bold">Tutup</button>
+          </template>
+
+          <template v-else-if="modal.type === 'bioOffer'">
+            <div class="text-center py-1">
+              <div class="w-16 h-16 mx-auto rounded-full bg-coral-soft text-coral grid place-items-center text-[28px]"><span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span></div>
+              <h3 class="mt-4 text-[20px] font-black tracking-[-0.03em]">Pakai {{ bioName }} juga?</h3>
+              <p class="mt-1 text-[14px] text-muted leading-relaxed">Buka Belanja Kita cukup dengan {{ bioName }}. PIN tetap bisa dipakai kapan saja.</p>
+              <div class="mt-6 grid grid-cols-2 gap-2">
+                <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Nanti saja</button>
+                <button @click="registerBioFromOffer" class="h-12 rounded-full bg-coral text-on-coral font-bold">Aktifkan</button>
+              </div>
+            </div>
           </template>
 
           <template v-else-if="modal.type === 'copied'">
@@ -675,6 +778,8 @@
     { name: 'Sugi', email: 'sugiyarto784@gmail.com' },
     { name: 'Syifa', email: 'syifaurrohmah077@gmail.com' }
   ];
+  // Alamat Web App Google Apps Script untuk kirim email otomatis (isi setelah deploy)
+  const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
   const DEFAULT_BUDGET = 6000000;
@@ -1036,6 +1141,209 @@
         item.isChecked = v;
         remote(() => itemRef(item.id).update({ isChecked: v }));
       }
+      // ---------- Kirim email otomatis (Google Apps Script) ----------
+      const mail = reactive({ busy: false });
+      const canAutoMail = computed(() => !!MAIL_URL && !!cloud.user);
+      async function sendMail(subject, body, okMsg) {
+        if (!MAIL_URL || !auth || !auth.currentUser) { showToast('Masuk dulu untuk kirim email', 'error'); return false; }
+        if (mail.busy) return false;
+        mail.busy = true;
+        try {
+          const idToken = await auth.currentUser.getIdToken();
+          const res = await fetch(MAIL_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ idToken, subject, body }) });
+          const out = await res.json();
+          if (!out || !out.ok) throw new Error((out && out.error) || 'gagal');
+          showToast(okMsg || 'Laporan terkirim ke email');
+          return true;
+        } catch (e) {
+          console.error(e);
+          showToast(navigator.onLine === false ? 'Offline, email belum terkirim' : 'Email gagal terkirim, coba lagi', 'error');
+          return false;
+        } finally { mail.busy = false; }
+      }
+
+      // ---------- Kunci PIN & Face ID / sidik jari (per HP) ----------
+      const LOCK_KEY = 'catatanBelanjaKeluarga_lock_v1';
+      const LOCK_AFTER_MS = 5 * 60 * 1000;
+      function loadLock() {
+        try {
+          const l = JSON.parse(localStorage.getItem(LOCK_KEY) || 'null');
+          if (l && l.enabled && l.hash && l.salt) return { enabled: true, hash: l.hash, salt: l.salt, credId: l.credId || null };
+        } catch (e) {}
+        return { enabled: false, hash: '', salt: '', credId: null };
+      }
+      const lock = reactive(loadLock());
+      watch(lock, v => { try { localStorage.setItem(LOCK_KEY, JSON.stringify(v)); } catch (e) {} }, { deep: true });
+      const pad = reactive({ show: lock.enabled, mode: 'unlock', after: '', entry: '', first: '', error: '', shake: false, fails: 0, until: 0, busy: false, forgot: false, pw: '', wipeConfirm: false });
+      const bio = reactive({ available: false });
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const bioName = isIOS ? 'Face ID' : 'sidik jari';
+      const randBytes = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return a; };
+      const toB64 = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      const fromB64 = str => { let t = str.replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; return Uint8Array.from(atob(t), c => c.charCodeAt(0)); };
+      async function hashPin(salt, pin) {
+        const t = salt + ':' + pin;
+        if (window.crypto && crypto.subtle) {
+          try {
+            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+            return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
+          } catch (e) {}
+        }
+        let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0;
+        return 'd' + (h >>> 0).toString(16);
+      }
+      (async () => {
+        try {
+          if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+            bio.available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          }
+        } catch (e) { bio.available = false; }
+      })();
+
+      const padTitle = computed(() => ({ unlock: 'Masukkan PIN', verify: pad.after === 'change' ? 'Masukkan PIN lama' : 'Masukkan PIN', new1: 'Buat PIN baru', new2: 'Ulangi PIN baru' })[pad.mode] || '');
+      const padHint = computed(() => {
+        if (pad.mode === 'unlock') return lock.credId ? 'Atau buka dengan ' + bioName : 'Belanja Kita terkunci';
+        if (pad.mode === 'verify') return pad.after === 'change' ? 'Untuk mengganti PIN' : 'Untuk mematikan kunci';
+        if (pad.mode === 'new1') return '4 angka yang mudah Anda ingat';
+        return 'Ketik sekali lagi';
+      });
+      function openPad(mode, after) {
+        Object.assign(pad, { show: true, mode, after: after || '', entry: '', first: '', error: '', forgot: false, pw: '', wipeConfirm: false });
+      }
+      function openUnlock(autoBio) {
+        if (!lock.enabled) return;
+        openPad('unlock');
+        if (autoBio && lock.credId) setTimeout(() => unlockBio(true), 350);
+      }
+      function cancelPad() { pad.show = false; }
+      function shakePad(msg) {
+        pad.error = msg; pad.entry = ''; pad.shake = false;
+        nextTick(() => { pad.shake = true; setTimeout(() => { pad.shake = false; }, 450); });
+        if (navigator.vibrate) { try { navigator.vibrate(120); } catch (e) {} }
+      }
+      function pressKey(d) {
+        if (pad.busy || pad.forgot) return;
+        if (Date.now() < pad.until) { pad.error = 'Tunggu sebentar sebelum mencoba lagi.'; return; }
+        if (pad.entry.length >= 4) return;
+        pad.entry += d;
+        if (pad.error && pad.entry.length === 1) pad.error = '';
+        if (pad.entry.length === 4) setTimeout(submitPin, 120);
+      }
+      function backspace() { if (!pad.busy) pad.entry = pad.entry.slice(0, -1); }
+      async function submitPin() {
+        const pin = pad.entry;
+        if (pin.length !== 4) return;
+        pad.busy = true;
+        try {
+          if (pad.mode === 'unlock' || pad.mode === 'verify') {
+            const ok = (await hashPin(lock.salt, pin)) === lock.hash;
+            if (!ok) {
+              pad.fails += 1;
+              if (pad.fails >= 5) { pad.until = Date.now() + 30000; pad.fails = 0; shakePad('Terlalu banyak percobaan. Tunggu 30 detik.'); }
+              else shakePad('PIN salah, coba lagi');
+              return;
+            }
+            pad.fails = 0;
+            if (pad.mode === 'unlock') { pad.show = false; return; }
+            if (pad.after === 'disable') {
+              Object.assign(lock, { enabled: false, hash: '', salt: '', credId: null });
+              pad.show = false;
+              showToast('Kunci dimatikan');
+              return;
+            }
+            Object.assign(pad, { mode: 'new1', entry: '', error: '' });
+            return;
+          }
+          if (pad.mode === 'new1') { Object.assign(pad, { first: pin, mode: 'new2', entry: '', error: '' }); return; }
+          if (pad.mode === 'new2') {
+            if (pin !== pad.first) { pad.mode = 'new1'; pad.first = ''; shakePad('PIN tidak sama. Buat ulang ya.'); return; }
+            const salt = Array.from(randBytes(16)).map(x => x.toString(16).padStart(2, '0')).join('');
+            const hash = await hashPin(salt, pin);
+            const wasEnabled = lock.enabled;
+            Object.assign(lock, { enabled: true, salt, hash });
+            pad.show = false;
+            showToast(wasEnabled ? 'PIN diganti' : 'Kunci PIN aktif');
+            if (!wasEnabled && bio.available && !lock.credId) openModal('bioOffer');
+          }
+        } finally { pad.busy = false; }
+      }
+      async function registerBio() {
+        try {
+          const cred = await navigator.credentials.create({ publicKey: {
+            challenge: randBytes(32),
+            rp: { name: 'Belanja Kita' },
+            user: { id: randBytes(16), name: (cloud.user && cloud.user.email) || 'belanja-kita', displayName: 'Belanja Kita' },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+            timeout: 60000, attestation: 'none'
+          } });
+          if (cred) { lock.credId = toB64(cred.rawId); showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' aktif'); }
+        } catch (e) {
+          console.warn(e);
+          if (!(e && e.name === 'NotAllowedError')) showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' belum bisa dipakai di sini', 'error');
+        }
+      }
+      function registerBioFromOffer() { closeModal(); registerBio(); }
+      async function unlockBio(auto) {
+        if (!lock.credId || pad.busy || !pad.show || pad.mode !== 'unlock') return;
+        pad.busy = true;
+        try {
+          const a = await navigator.credentials.get({ publicKey: {
+            challenge: randBytes(32),
+            allowCredentials: [{ type: 'public-key', id: fromB64(lock.credId) }],
+            userVerification: 'required', timeout: 60000
+          } });
+          if (a) { pad.show = false; pad.fails = 0; }
+        } catch (e) {
+          if (!auto && !(e && e.name === 'NotAllowedError')) pad.error = bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' gagal, pakai PIN';
+        } finally { pad.busy = false; }
+      }
+      function openForgot() { Object.assign(pad, { forgot: true, pw: '', error: '', wipeConfirm: false }); }
+      function closeForgot() { Object.assign(pad, { forgot: false, pw: '', error: '', wipeConfirm: false }); }
+      function resetPinWithPassword() {
+        if (!auth || !cloud.user || pad.busy) return;
+        if (!pad.pw) { pad.error = 'Isi password dulu.'; return; }
+        pad.busy = true; pad.error = '';
+        auth.signInWithEmailAndPassword(cloud.user.email, pad.pw)
+          .then(() => {
+            Object.assign(lock, { enabled: false, hash: '', salt: '', credId: null });
+            Object.assign(pad, { show: false, forgot: false, pw: '' });
+            showToast('Kunci dimatikan. Buat PIN baru di Pengaturan');
+          })
+          .catch(e => { pad.error = loginError(e && e.code); })
+          .finally(() => { pad.busy = false; });
+      }
+      function wipeLocal() {
+        if (!pad.wipeConfirm) { pad.wipeConfirm = true; return; }
+        try { [LOCK_KEY, STORAGE_KEY, TAB_KEY, MODE_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
+        location.reload();
+      }
+      function openSettings() { openModal('settings'); }
+      function toggleLock() {
+        closeModal();
+        if (lock.enabled) openPad('verify', 'disable');
+        else openPad('new1');
+      }
+      function changePin() { closeModal(); openPad('verify', 'change'); }
+      function toggleBio() {
+        if (lock.credId) { lock.credId = null; showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' dimatikan'); }
+        else registerBio();
+      }
+      function lockNow() { closeModal(); openUnlock(false); }
+
+      let hiddenAt = 0;
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { hiddenAt = Date.now(); return; }
+        if (lock.enabled && hiddenAt && Date.now() - hiddenAt > LOCK_AFTER_MS && !pad.show) openUnlock(true);
+        hiddenAt = 0;
+      });
+      window.addEventListener('keydown', e => {
+        if (!pad.show || pad.forgot) return;
+        if (/^[0-9]$/.test(e.key)) { e.preventDefault(); pressKey(e.key); }
+        else if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
+      });
+      if (pad.show && lock.credId) setTimeout(() => unlockBio(true), 500);
+
       function setMonth(ym) {
         if (!isValidMonth(ym)) return;
         state.month = ym;
@@ -1283,6 +1591,7 @@
         state.history.push(entry);
         state.items = oldItems.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, draftPrice: '', draftQty: 1 }));
         state.month = nextMonth(from);
+        if (canAutoMail.value) sendMail('Laporan Belanja Kita ' + monthLabel(from), buildReport(from, entry.items, entry.budget), 'Laporan ' + monthLabel(from) + ' terkirim ke email');
         remote(() => {
           const b = db.batch();
           const data = JSON.parse(JSON.stringify(entry)); delete data.id;
@@ -1326,7 +1635,9 @@
 
       return {
         NAV, SECTIONS, WEEKS, HISTORY_VIEWS, FAMILY, cloud, login, passwordInput, showLogin, syncLabel, syncDot,
-        pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
+        pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, mail, canAutoMail, sendMail,
+        lock, pad, bio, isIOS, bioName, padTitle, padHint, pressKey, backspace, cancelPad, unlockBio, registerBioFromOffer,
+        openForgot, closeForgot, resetPinWithPassword, wipeLocal, openSettings, toggleLock, changePin, toggleBio, lockNow, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
         editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
         BULAN_PENDEK, shiftMonth, openMonthPicker, pickMonth, isPicked, isNow,
         totalSpent, remaining, usedPct, unpriced, rekapSection, reportText, mailtoLink, historyDesc, greeting,
