@@ -211,7 +211,7 @@
                   <span class="flex-1 min-w-0">
                     <span class="block font-bold text-[15px] leading-snug" :class="item.isChecked && !needsPrice(item) ? 'line-through text-muted' : ''">{{ item.name }}</span>
                     <span v-if="needsPrice(item)" class="block text-[11.5px] font-bold text-coral mt-0.5">⚠️ Sudah dibeli, belum ada harga</span>
-                    <span v-else-if="item.boughtOn" class="block text-[11.5px] text-muted mt-0.5">Dibeli {{ fmtDay(item.boughtOn) }}<template v-if="item.custom">, tambahan</template></span>
+                    <span v-else-if="item.boughtOn && item.totalSpent > 0" class="block text-[11.5px] text-muted mt-0.5">Dibeli {{ fmtDay(item.boughtOn) }}<template v-if="item.custom">, tambahan</template></span>
                     <span v-else-if="item.custom" class="block text-[11.5px] text-muted mt-0.5">{{ item.keep ? 'Barang tambahan' : 'Tambahan, hanya bulan ini' }}</span>
                   </span>
                   <span class="text-right shrink-0">
@@ -732,7 +732,7 @@
   const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
-  const APP_VERSION = '2.2';
+  const APP_VERSION = '2.3';
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
