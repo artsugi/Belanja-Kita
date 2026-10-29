@@ -19,23 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
 <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/js/all.min.js"></script>
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<script>
-  const tok = (v) => `rgb(var(${v}) / <alpha-value>)`;
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: { sans: ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'] },
-        colors: {
-          paper: tok('--paper'), surface: tok('--surface'), stone: tok('--stone'),
-          ink: tok('--ink'), muted: tok('--muted'), line: tok('--line'),
-          coral: tok('--coral'), 'on-coral': tok('--on-coral'), 'coral-soft': tok('--coral-soft'),
-          acc: tok('--acc'), 'acc-soft': tok('--acc-soft'), 'on-acc': tok('--on-acc')
-        }
-      }
-    }
-  };
-</script>
+<style>*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:Hanken Grotesk,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.pointer-events-none{pointer-events:none}.pointer-events-auto{pointer-events:auto}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0}.-bottom-14{bottom:-3.5rem}.-right-1{right:-.25rem}.-right-10{right:-2.5rem}.-top-1{top:-.25rem}.-top-12{top:-3rem}.bottom-1\.5{bottom:.375rem}.left-0{left:0}.left-1\/2{left:50%}.left-3\.5{left:.875rem}.left-4{left:1rem}.right-0{right:0}.right-1\.5{right:.375rem}.right-16{right:4rem}.right-\[22\%\]{right:22%}.top-1\.5{top:.375rem}.top-1\/2{top:50%}.z-30{z-index:30}.z-50{z-index:50}.z-\[55\]{z-index:55}.z-\[60\]{z-index:60}.z-\[65\]{z-index:65}.z-\[70\]{z-index:70}.mx-auto{margin-left:auto;margin-right:auto}.-mt-2{margin-top:-.5rem}.mb-2{margin-bottom:.5rem}.mb-2\.5{margin-bottom:.625rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.ml-1{margin-left:.25rem}.ml-auto{margin-left:auto}.mr-1{margin-right:.25rem}.mt-0\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-1\.5{margin-top:.375rem}.mt-2{margin-top:.5rem}.mt-2\.5{margin-top:.625rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-5{margin-top:1.25rem}.mt-6{margin-top:1.5rem}.mt-7{margin-top:1.75rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-1{height:.25rem}.h-1\.5{height:.375rem}.h-10{height:2.5rem}.h-11{height:2.75rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-2{height:.5rem}.h-2\.5{height:.625rem}.h-28{height:7rem}.h-3{height:.75rem}.h-36{height:9rem}.h-4{height:1rem}.h-40{height:10rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-7{height:1.75rem}.h-8{height:2rem}.h-9{height:2.25rem}.h-\[17px\]{height:17px}.h-\[52px\]{height:52px}.h-\[58px\]{height:58px}.h-\[60px\]{height:60px}.h-full{height:100%}.max-h-\[88vh\]{max-height:88vh}.min-h-\[20px\]{min-height:20px}.min-h-\[48px\]{min-height:48px}.min-h-full{min-height:100%}.min-h-screen{min-height:100vh}.w-1{width:.25rem}.w-10{width:2.5rem}.w-11{width:2.75rem}.w-12{width:3rem}.w-16{width:4rem}.w-2{width:.5rem}.w-2\.5{width:.625rem}.w-28{width:7rem}.w-3{width:.75rem}.w-40{width:10rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-7{width:1.75rem}.w-8{width:2rem}.w-9{width:2.25rem}.w-\[108px\]{width:108px}.w-\[52px\]{width:52px}.w-\[88px\]{width:88px}.w-\[calc\(100\%-2rem\)\]{width:calc(100% - 2rem)}.w-full{width:100%}.w-max{width:-moz-max-content;width:max-content}.min-w-0{min-width:0}.min-w-\[17px\]{min-width:17px}.min-w-\[36px\]{min-width:36px}.max-w-\[420px\]{max-width:420px}.max-w-\[calc\(100\%-2rem\)\]{max-width:calc(100% - 2rem)}.max-w-md{max-width:28rem}.flex-1{flex:1 1 0%}.flex-shrink{flex-shrink:1}.shrink-0{flex-shrink:0}.-translate-x-1\/2{--tw-translate-x:-50%}.-translate-x-1\/2,.-translate-y-1\/2{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.-translate-y-1\/2{--tw-translate-y:-50%}.translate-x-5{--tw-translate-x:1.25rem}.rotate-180,.translate-x-5{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.rotate-180{--tw-rotate:180deg}.rotate-\[-6deg\]{--tw-rotate:-6deg}.rotate-\[-6deg\],.scale-\[1\.03\]{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.scale-\[1\.03\]{--tw-scale-x:1.03;--tw-scale-y:1.03}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes bounce{0%,to{transform:translateY(-25%);animation-timing-function:cubic-bezier(.8,0,1,1)}50%{transform:none;animation-timing-function:cubic-bezier(0,0,.2,1)}}.animate-bounce{animation:bounce 1s infinite}.cursor-pointer{cursor:pointer}.resize{resize:both}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.grid-cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}.grid-cols-\[1fr_2fr\]{grid-template-columns:1fr 2fr}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.place-items-center{place-items:center}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-3{gap:.75rem}.gap-\[2px\]{gap:2px}.gap-\[5px\]{gap:5px}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.space-y-3>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.75rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.75rem*var(--tw-space-y-reverse))}.divide-y>:not([hidden])~:not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px*(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px*var(--tw-divide-y-reverse))}.divide-line>:not([hidden])~:not([hidden]){--tw-divide-opacity:1;border-color:rgb(var(--line)/var(--tw-divide-opacity,1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded-\[14px\]{border-radius:14px}.rounded-\[16px\]{border-radius:16px}.rounded-\[18px\]{border-radius:18px}.rounded-\[20px\]{border-radius:20px}.rounded-\[22px\]{border-radius:22px}.rounded-\[24px\]{border-radius:24px}.rounded-\[26px\]{border-radius:26px}.rounded-\[28px\]{border-radius:28px}.rounded-\[30px\]{border-radius:30px}.rounded-\[8px\]{border-radius:8px}.rounded-full{border-radius:9999px}.border{border-width:1px}.border-2{border-width:2px}.border-t{border-top-width:1px}.border-t-2{border-top-width:2px}.border-dashed{border-style:dashed}.border-acc\/50{border-color:rgb(var(--acc)/.5)}.border-coral{--tw-border-opacity:1;border-color:rgb(var(--coral)/var(--tw-border-opacity,1))}.border-ink\/25{border-color:rgb(var(--ink)/.25)}.border-ink\/40{border-color:rgb(var(--ink)/.4)}.border-line{--tw-border-opacity:1;border-color:rgb(var(--line)/var(--tw-border-opacity,1))}.border-paper{--tw-border-opacity:1;border-color:rgb(var(--paper)/var(--tw-border-opacity,1))}.border-transparent{border-color:transparent}.bg-\[\#16B088\]{--tw-bg-opacity:1;background-color:rgb(22 176 136/var(--tw-bg-opacity,1))}.bg-\[\#FFB020\]{--tw-bg-opacity:1;background-color:rgb(255 176 32/var(--tw-bg-opacity,1))}.bg-acc{--tw-bg-opacity:1;background-color:rgb(var(--acc)/var(--tw-bg-opacity,1))}.bg-acc-soft{--tw-bg-opacity:1;background-color:rgb(var(--acc-soft)/var(--tw-bg-opacity,1))}.bg-acc-soft\/40{background-color:rgb(var(--acc-soft)/.4)}.bg-acc-soft\/50{background-color:rgb(var(--acc-soft)/.5)}.bg-black\/15{background-color:rgba(0,0,0,.15)}.bg-black\/45{background-color:rgba(0,0,0,.45)}.bg-black\/80{background-color:rgba(0,0,0,.8)}.bg-coral{--tw-bg-opacity:1;background-color:rgb(var(--coral)/var(--tw-bg-opacity,1))}.bg-coral-soft{--tw-bg-opacity:1;background-color:rgb(var(--coral-soft)/var(--tw-bg-opacity,1))}.bg-coral\/45{background-color:rgb(var(--coral)/.45)}.bg-ink{--tw-bg-opacity:1;background-color:rgb(var(--ink)/var(--tw-bg-opacity,1))}.bg-paper{--tw-bg-opacity:1;background-color:rgb(var(--paper)/var(--tw-bg-opacity,1))}.bg-paper\/20{background-color:rgb(var(--paper)/.2)}.bg-paper\/95{background-color:rgb(var(--paper)/.95)}.bg-stone{--tw-bg-opacity:1;background-color:rgb(var(--stone)/var(--tw-bg-opacity,1))}.bg-stone\/60{background-color:rgb(var(--stone)/.6)}.bg-surface{--tw-bg-opacity:1;background-color:rgb(var(--surface)/var(--tw-bg-opacity,1))}.bg-transparent{background-color:transparent}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity,1))}.bg-white\/10{background-color:hsla(0,0%,100%,.1)}.bg-white\/15{background-color:hsla(0,0%,100%,.15)}.bg-white\/20{background-color:hsla(0,0%,100%,.2)}.p-0\.5{padding:.125rem}.p-1{padding:.25rem}.p-1\.5{padding:.375rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:.25rem;padding-right:.25rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-2\.5{padding-left:.625rem;padding-right:.625rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-3\.5{padding-left:.875rem;padding-right:.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-2\.5{padding-top:.625rem;padding-bottom:.625rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-\[1px\]{padding-top:1px;padding-bottom:1px}.pb-2{padding-bottom:.5rem}.pb-3{padding-bottom:.75rem}.pb-36{padding-bottom:9rem}.pb-4{padding-bottom:1rem}.pl-11{padding-left:2.75rem}.pl-3{padding-left:.75rem}.pl-4{padding-left:1rem}.pl-9{padding-left:2.25rem}.pr-1{padding-right:.25rem}.pr-12{padding-right:3rem}.pr-2{padding-right:.5rem}.pr-2\.5{padding-right:.625rem}.pr-3{padding-right:.75rem}.pr-3\.5{padding-right:.875rem}.pr-4{padding-right:1rem}.pt-2{padding-top:.5rem}.pt-3{padding-top:.75rem}.pt-4{padding-top:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11\.5px\]{font-size:11.5px}.text-\[11px\]{font-size:11px}.text-\[12\.5px\]{font-size:12.5px}.text-\[12px\]{font-size:12px}.text-\[13\.5px\]{font-size:13.5px}.text-\[13px\]{font-size:13px}.text-\[14\.5px\]{font-size:14.5px}.text-\[14px\]{font-size:14px}.text-\[15px\]{font-size:15px}.text-\[16px\]{font-size:16px}.text-\[17px\]{font-size:17px}.text-\[18px\]{font-size:18px}.text-\[20px\]{font-size:20px}.text-\[21px\]{font-size:21px}.text-\[23px\]{font-size:23px}.text-\[26px\]{font-size:26px}.text-\[28px\]{font-size:28px}.text-\[30px\]{font-size:30px}.text-\[32px\]{font-size:32px}.text-\[34px\]{font-size:34px}.text-\[8px\]{font-size:8px}.text-\[9px\]{font-size:9px}.font-black{font-weight:900}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-\[1\.05\]{line-height:1.05}.leading-none{line-height:1}.leading-relaxed{line-height:1.625}.leading-snug{line-height:1.375}.leading-tight{line-height:1.25}.tracking-\[-0\.02em\]{letter-spacing:-.02em}.tracking-\[-0\.035em\]{letter-spacing:-.035em}.tracking-\[-0\.03em\]{letter-spacing:-.03em}.text-black{--tw-text-opacity:1;color:rgb(0 0 0/var(--tw-text-opacity,1))}.text-black\/55{color:rgba(0,0,0,.55)}.text-coral{--tw-text-opacity:1;color:rgb(var(--coral)/var(--tw-text-opacity,1))}.text-ink{--tw-text-opacity:1;color:rgb(var(--ink)/var(--tw-text-opacity,1))}.text-ink\/60{color:rgb(var(--ink)/.6)}.text-ink\/65{color:rgb(var(--ink)/.65)}.text-ink\/70{color:rgb(var(--ink)/.7)}.text-muted{--tw-text-opacity:1;color:rgb(var(--muted)/var(--tw-text-opacity,1))}.text-muted\/50{color:rgb(var(--muted)/.5)}.text-on-acc{--tw-text-opacity:1;color:rgb(var(--on-acc)/var(--tw-text-opacity,1))}.text-on-coral{--tw-text-opacity:1;color:rgb(var(--on-coral)/var(--tw-text-opacity,1))}.text-paper{--tw-text-opacity:1;color:rgb(var(--paper)/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.text-white\/80{color:hsla(0,0%,100%,.8)}.text-white\/85{color:hsla(0,0%,100%,.85)}.underline{text-decoration-line:underline}.line-through{text-decoration-line:line-through}.underline-offset-2{text-underline-offset:2px}.underline-offset-4{text-underline-offset:4px}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-75{opacity:.75}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color)}.shadow,.shadow-2xl{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgba(0,0,0,.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color)}.shadow-\[0_10px_30px_-8px_rgba\(0\2c 0\2c 0\2c \.25\)\]{--tw-shadow:0 10px 30px -8px rgba(0,0,0,.25);--tw-shadow-colored:0 10px 30px -8px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-\[0_1px_0_rgb\(var\(--line\)\)\]{--tw-shadow:0 1px 0 rgb(var(--line));--tw-shadow-colored:0 1px 0 var(--tw-shadow-color)}.shadow-\[0_1px_0_rgb\(var\(--line\)\)\],.shadow-lg{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color),0 4px 6px -4px var(--tw-shadow-color)}.outline-none{outline:2px solid transparent;outline-offset:2px}.outline{outline-style:solid}.blur{--tw-blur:blur(8px)}.blur,.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur{--tw-backdrop-blur:blur(8px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.transition-transform{transition-property:transform;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-300{transition-duration:.3s}.duration-500{transition-duration:.5s}.placeholder\:font-medium::-moz-placeholder{font-weight:500}.placeholder\:font-medium::placeholder{font-weight:500}.placeholder\:font-semibold::-moz-placeholder{font-weight:600}.placeholder\:font-semibold::placeholder{font-weight:600}.placeholder\:text-muted\/60::-moz-placeholder{color:rgb(var(--muted)/.6)}.placeholder\:text-muted\/60::placeholder{color:rgb(var(--muted)/.6)}.placeholder\:text-muted\/70::-moz-placeholder{color:rgb(var(--muted)/.7)}.placeholder\:text-muted\/70::placeholder{color:rgb(var(--muted)/.7)}.focus\:border-acc:focus{--tw-border-opacity:1;border-color:rgb(var(--acc)/var(--tw-border-opacity,1))}.focus\:border-coral:focus{--tw-border-opacity:1;border-color:rgb(var(--coral)/var(--tw-border-opacity,1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95}.active\:scale-95:active,.active\:scale-\[\.98\]:active{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.active\:scale-\[\.98\]:active{--tw-scale-x:.98;--tw-scale-y:.98}.active\:bg-acc-soft:active{--tw-bg-opacity:1;background-color:rgb(var(--acc-soft)/var(--tw-bg-opacity,1))}.active\:bg-paper:active{--tw-bg-opacity:1;background-color:rgb(var(--paper)/var(--tw-bg-opacity,1))}.active\:bg-white\/25:active{background-color:hsla(0,0%,100%,.25)}.active\:text-ink:active{--tw-text-opacity:1;color:rgb(var(--ink)/var(--tw-text-opacity,1))}.disabled\:opacity-30:disabled{opacity:.3}.disabled\:opacity-60:disabled{opacity:.6}</style>
 <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
@@ -43,7 +27,7 @@
 <style>
   :root {
     --paper: 246 244 241; --surface: 255 255 255; --stone: 228 222 210;
-    --ink: 0 0 0; --muted: 118 110 100; --line: 236 231 222;
+    --ink: 0 0 0; --muted: 92 85 76; --line: 236 231 222;
     --coral: 249 92 75; --on-coral: 255 255 255; --coral-soft: 255 227 223;
     --acc: 249 92 75; --acc-soft: 255 227 223; --on-acc: 255 255 255;
     color-scheme: light;
@@ -109,7 +93,7 @@
         </div>
       </div>
       <button @click="openSettings" class="ml-auto relative w-10 h-10 rounded-full bg-surface shadow-[0_1px_0_rgb(var(--line))] text-ink/70 shrink-0 grid place-items-center" aria-label="Pengaturan">
-        <span v-if="lock.enabled"><i class="fa-solid fa-lock text-[14px]"></i></span><span v-else><i class="fa-solid fa-gear text-[15px]"></i></span>
+        <i class="fa-solid fa-gear text-[15px]"></i>
       </button>
     </div>
 
@@ -120,8 +104,8 @@
       <div class="relative">
         <div class="flex items-center justify-between">
           <p class="text-[12.5px] font-semibold text-white/85">Sisa dana {{ monthLabel(state.month) }}</p>
-          <span v-if="remaining < 0" class="text-[11px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Melebihi anggaran</span>
-          <span v-else class="text-[11px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
+          <span v-if="remaining < 0" class="text-[12px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Melebihi anggaran</span>
+          <span v-else class="text-[12px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
         </div>
         <p class="text-[34px] leading-[1.05] font-black tracking-[-0.035em] num mt-0.5">{{ rp(remaining) }}</p>
         <div class="mt-3 h-2 rounded-full bg-black/15 overflow-hidden" role="progressbar" :aria-valuenow="Math.round(usedPct)" aria-valuemin="0" aria-valuemax="100">
@@ -129,11 +113,11 @@
         </div>
         <div class="mt-3 grid grid-cols-2 gap-2">
           <button v-if="!editingBudget" @click="startBudgetEdit" class="rounded-[18px] bg-white/15 active:bg-white/25 px-3.5 py-2 text-left transition-colors">
-            <p class="text-[11px] text-white/80 flex items-center gap-1.5">Anggaran <i class="fa-solid fa-pen text-[8px]"></i></p>
+            <p class="text-[12px] text-white/80 flex items-center gap-1.5">Anggaran <i class="fa-solid fa-pen text-[8px]"></i></p>
             <p class="text-[14.5px] font-bold num leading-tight">{{ rp(state.budget) }}</p>
           </button>
           <div v-else class="rounded-[18px] bg-white px-3.5 py-2 text-black">
-            <p class="text-[11px] text-black/55">Ketik anggaran baru</p>
+            <p class="text-[12px] text-black/55">Ketik anggaran baru</p>
             <div class="flex items-center gap-1">
               <span class="text-[14.5px] font-bold">Rp</span>
               <input ref="budgetInput" type="text" inputmode="numeric" :value="fmtNum(budgetDraft)" @input="onBudgetInput" @keyup.enter="$event.target.blur()" @keyup.esc="cancelBudgetEdit" @blur="saveBudget"
@@ -141,7 +125,7 @@
             </div>
           </div>
           <div class="rounded-[18px] bg-white/15 px-3.5 py-2">
-            <p class="text-[11px] text-white/80">Terpakai</p>
+            <p class="text-[12px] text-white/80">Terpakai</p>
             <p class="text-[14.5px] font-bold num leading-tight">{{ rp(totalSpent) }}</p>
           </div>
         </div>
@@ -171,7 +155,7 @@
         <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id; expandedId = null"
           :class="['acc-' + w.id, state.activeWeek === w.id ? 'bg-acc text-on-acc scale-[1.03]' : 'bg-acc-soft text-ink']"
           class="relative h-[60px] rounded-[20px] flex flex-col items-center justify-center transition-all">
-          <span class="text-[11px] font-semibold opacity-75">{{ w.id === thisWeek ? 'Minggu ini' : 'Minggu' }}</span>
+          <span class="text-[12px] font-semibold opacity-75">{{ w.id === thisWeek ? 'Minggu ini' : 'Minggu' }}</span>
           <span class="text-[20px] font-black leading-none">{{ w.n }}</span>
           <span v-if="warnCount(w.id)" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center border-2 border-paper num">{{ warnCount(w.id) }}</span>
         </button>
@@ -185,12 +169,12 @@
           </div>
           <div class="text-right">
             <p class="text-[12.5px] font-bold num">{{ doneIn(rekapSection) }}/{{ countIn(rekapSection) }} <span class="font-medium text-ink/60">dibeli</span></p>
-            <button v-if="warnCount(rekapSection)" @click="goToItem(itemsIn(rekapSection).find(needsPrice))" class="text-[12px] text-coral font-bold mt-0.5 num underline underline-offset-2">{{ warnCount(rekapSection) }} belum ada harga</button>
+            <button v-if="warnCount(rekapSection)" @click="openQuick(rekapSection)" class="mt-1.5 h-8 px-3 rounded-full bg-coral text-on-coral text-[12.5px] font-bold num inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi {{ warnCount(rekapSection) }} harga</button>
           </div>
         </div>
 
         <button @click="openAdd(rekapSection)" class="mt-3 w-full h-12 rounded-full border-2 border-dashed border-acc/50 text-ink font-bold text-[14px] flex items-center justify-center gap-2 active:bg-acc-soft transition-colors">
-          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-plus"></i></span>
+          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[12px]"><i class="fa-solid fa-plus"></i></span>
           Tambah Barang
         </button>
 
@@ -206,7 +190,7 @@
           </h3>
           <button v-else @click="showBought = !showBought" class="w-full mb-2 px-1 flex items-center justify-between gap-2 text-left" :aria-expanded="showBought">
             <span class="flex items-center gap-2 text-[14px] font-extrabold">
-              <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-check"></i></span>
+              <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[12px]"><i class="fa-solid fa-check"></i></span>
               Sudah dibeli ({{ g.items.length }})
               <span v-if="g.items.filter(needsPrice).length" class="text-[11.5px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 num">{{ g.items.filter(needsPrice).length }} belum ada harga</span>
             </span>
@@ -234,14 +218,27 @@
                     <span class="block font-black num text-[15px] leading-tight" :class="item.totalSpent ? '' : 'text-muted/50'">{{ item.totalSpent ? rp(item.totalSpent) : '–' }}</span>
                     <span v-if="item.totalQty" class="block text-[11.5px] text-muted num">{{ item.totalQty }} qty</span>
                   </span>
-                  <span class="w-8 h-8 rounded-full grid place-items-center shrink-0 transition-colors"
+                  <span class="min-w-[36px] h-8 px-2 rounded-full grid place-items-center shrink-0 transition-colors"
                     :class="expandedId === item.id ? 'bg-acc text-on-acc' : (needsPrice(item) ? 'bg-coral text-on-coral' : 'bg-paper text-muted')">
-                    <span v-if="expandedId === item.id"><i class="fa-solid fa-chevron-up text-[11px]"></i></span><span v-else><i class="fa-solid fa-plus text-[11px]"></i></span>
+                    <span v-if="expandedId === item.id"><i class="fa-solid fa-chevron-up text-[12px]"></i></span><span v-else class="text-[12px] font-extrabold">Rp</span>
                   </span>
                 </button>
               </div>
 
               <div v-if="expandedId === item.id" class="px-4 pb-4">
+                <div v-if="entriesOf(item).length" class="mb-3 rounded-[16px] bg-surface overflow-hidden">
+                  <div v-for="(e, ei) in entriesOf(item)" :key="e.eid" class="flex items-center gap-2 pl-3 pr-1 py-1 text-[13px]" :class="[ei ? 'border-t border-line' : '', editing && editing.entry.eid === e.eid ? 'bg-acc-soft/50' : '']">
+                    <span class="w-[52px] shrink-0 text-muted font-semibold">{{ e.legacy ? 'Lama' : fmtDay(e.date) }}</span>
+                    <span class="flex-1 min-w-0 truncate num text-muted">{{ e.qty }} × {{ rp(e.price) }}</span>
+                    <span class="font-extrabold num shrink-0">{{ rp(e.amount) }}</span>
+                    <button @click="startEdit(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Ubah catatan ini"><i class="fa-solid fa-pen text-[12px]"></i></button>
+                    <button @click="removeEntry(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Hapus catatan ini"><i class="fa-regular fa-trash-can text-[13px]"></i></button>
+                  </div>
+                </div>
+                <div v-if="lateWindow && !editing" class="mb-2.5 flex items-center gap-1.5 text-[12.5px]">
+                  <span class="text-muted font-semibold mr-1">Catat untuk</span>
+                  <button v-for="m in [prevMonth, state.month]" :key="m" @click="entryMonth = m" class="h-8 px-3.5 rounded-full font-bold transition-colors" :class="entryMonth === m ? 'bg-ink text-paper' : 'bg-surface text-muted'">{{ shortMonthName(m) }}</button>
+                </div>
                 <div class="flex items-center gap-1.5">
                   <div class="relative flex-1 min-w-0">
                     <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-muted pointer-events-none">Rp</span>
@@ -254,16 +251,17 @@
                     <span class="w-5 text-center text-[14.5px] font-black num">{{ item.draftQty }}</span>
                     <button @click="item.draftQty = (item.draftQty || 1) + 1" class="w-8 h-full text-muted active:text-ink" aria-label="Tambah qty"><i class="fa-solid fa-plus text-[10px]"></i></button>
                   </div>
-                  <button @click="submitItem(item)" class="h-11 px-4 rounded-full bg-acc text-on-acc font-bold text-[14px] shrink-0 active:scale-95 transition-transform">Simpan</button>
+                  <button @click="submitItem(item)" class="h-11 px-4 rounded-full bg-acc text-on-acc font-bold text-[14px] shrink-0 active:scale-95 transition-transform">{{ editing && editing.itemId === item.id ? 'Perbarui' : 'Simpan' }}</button>
                 </div>
                 <div class="flex items-center justify-between gap-3 mt-2.5 min-h-[20px] px-1">
                   <p class="text-[12px] text-muted num">
                     <template v-if="toInt(item.draftPrice)">{{ item.draftQty }} × {{ rp(toInt(item.draftPrice)) }} = <b class="text-ink">+{{ rp(toInt(item.draftPrice) * item.draftQty) }}</b></template>
-                    <template v-else-if="item.totalSpent">Harga baru akan ditambahkan ke total.</template>
+                    <template v-else-if="lastPriceOf(item)">Harga terakhir {{ rp(lastPriceOf(item).price) }} ({{ fmtDay(lastPriceOf(item).date) }})</template>
                   </p>
                   <div class="flex items-center gap-3 shrink-0">
-                    <button v-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[11px]"></i> Kosongkan</button>
-                    <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[11px]"></i> Hapus</button>
+                    <button v-if="editing && editing.itemId === item.id" @click="cancelEdit(item)" class="text-[12px] text-coral font-bold">Batal ubah</button>
+                    <button v-else-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[12px]"></i> Kosongkan</button>
+                    <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[12px]"></i> Hapus</button>
                   </div>
                 </div>
               </div>
@@ -288,18 +286,19 @@
           <button @click="shiftR(-1)" class="w-11 h-11 rounded-full bg-surface grid place-items-center text-muted active:text-ink shrink-0" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left text-[12px]"></i></button>
           <button @click="openMonthPicker" class="flex-1 min-w-0 h-11 rounded-full bg-surface flex items-center justify-center gap-2 font-extrabold text-[15px]" aria-label="Pilih bulan yang ingin dilihat">
             <span class="truncate">{{ monthLabel(rMonth) }}</span>
-            <span v-if="isCurrentR" class="text-[11px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 shrink-0">Bulan ini</span>
+            <span v-if="isCurrentR" class="text-[12px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5 shrink-0">Bulan ini</span>
           </button>
           <button @click="shiftR(1)" :disabled="isCurrentR" class="w-11 h-11 rounded-full bg-surface grid place-items-center text-muted active:text-ink shrink-0 disabled:opacity-30" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[12px]"></i></button>
         </div>
         <div v-if="!isCurrentR" class="mt-3 rounded-[18px] bg-surface px-4 py-2.5 flex items-center justify-between gap-3 text-[12.5px]">
-          <span class="text-muted flex items-center gap-1.5"><i class="fa-solid fa-box-archive text-[11px]"></i> Arsip, hanya dapat dilihat</span>
+          <span class="text-muted flex items-center gap-1.5"><i class="fa-solid fa-box-archive text-[12px]"></i> Arsip, hanya dapat dilihat</span>
           <button @click="rMonth = state.month" class="font-bold text-coral shrink-0">Kembali ke bulan ini</button>
         </div>
 
-        <div v-if="isCurrentR && unpriced.length" class="mt-3 rounded-[22px] bg-coral-soft p-4">
-          <p class="font-bold text-coral text-[13.5px]">⚠️ {{ unpriced.length }} barang sudah dibeli, belum ada harga</p>
-          <p class="text-[12px] text-ink/70 mt-0.5">Ketuk nama barang untuk mengisi harganya.</p>
+        <div v-if="isCurrentR && quickCount" class="mt-3 rounded-[22px] bg-coral-soft p-4">
+          <p class="font-bold text-coral text-[13.5px]">⚠️ {{ quickCount }} barang sudah dibeli, belum ada harga</p>
+          <p class="text-[12px] text-ink/70 mt-0.5">Isi satu per satu dengan cepat, atau ketuk nama barangnya.<template v-if="prevUnpriced.length"> Termasuk {{ prevUnpriced.length }} barang dari {{ monthLabel(prevMonth) }}.</template></p>
+          <button @click="openQuick(null)" class="mt-3 w-full h-11 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2"><i class="fa-solid fa-bolt text-[12px]"></i> Isi semua harga</button>
           <div class="mt-2.5 flex flex-wrap gap-1.5">
             <button v-for="i in unpriced" :key="i.id" @click="goToItem(i)" class="h-8 pl-3 pr-2.5 rounded-full bg-surface text-[12.5px] font-bold flex items-center gap-1.5 active:scale-95 transition-transform">
               {{ i.name }} <span class="text-muted font-semibold">{{ sectionShort(i.tab) }}</span><i class="fa-solid fa-chevron-right text-[9px] text-coral"></i>
@@ -309,9 +308,9 @@
 
         <div class="mt-3 rounded-[24px] bg-surface p-5">
           <div class="grid grid-cols-3 gap-2">
-            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Anggaran</p><p class="text-[14px] font-extrabold num">{{ rpShort(rBudget) }}</p></div>
-            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Terpakai</p><p class="text-[14px] font-extrabold num">{{ rpShort(rSpent) }}</p></div>
-            <div class="rounded-[16px] px-3 py-2.5" :class="rRemaining < 0 ? 'bg-coral text-on-coral' : 'bg-paper'"><p class="text-[11px]" :class="rRemaining < 0 ? 'text-white/80' : 'text-muted'">{{ rRemaining < 0 ? 'Lebih' : 'Sisa' }}</p><p class="text-[14px] font-extrabold num">{{ rpShort(rRemaining) }}</p></div>
+            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Anggaran</p><p class="text-[14px] font-extrabold num">{{ rpShort(rBudget) }}</p></div>
+            <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Terpakai</p><p class="text-[14px] font-extrabold num">{{ rpShort(rSpent) }}</p></div>
+            <div class="rounded-[16px] px-3 py-2.5" :class="rRemaining < 0 ? 'bg-coral text-on-coral' : 'bg-paper'"><p class="text-[12px]" :class="rRemaining < 0 ? 'text-white/80' : 'text-muted'">{{ rRemaining < 0 ? 'Lebih' : 'Sisa' }}</p><p class="text-[14px] font-extrabold num">{{ rpShort(rRemaining) }}</p></div>
           </div>
           <div class="mt-4 space-y-3">
             <div v-for="s in SECTIONS" :key="s.id" :class="'acc-' + s.id" class="flex items-center gap-3 text-[14px]">
@@ -343,8 +342,8 @@
                   <div class="flex-1 min-w-0">
                     <p class="text-[14px] font-semibold leading-snug">{{ r.name }}</p>
                     <div class="mt-1 flex flex-wrap gap-1">
-                      <span v-for="t in r.tabs" :key="t" :class="'acc-' + t" class="text-[10.5px] font-bold rounded-full px-2 py-[1px] bg-acc-soft text-ink">{{ sectionShort(t) }}</span>
-                      <span v-if="r.lastDate" class="text-[10.5px] font-semibold text-muted py-[1px]">{{ fmtDay(r.lastDate) }}</span>
+                      <span v-for="t in r.tabs" :key="t" :class="'acc-' + t" class="text-[11.5px] font-bold rounded-full px-2 py-[1px] bg-acc-soft text-ink">{{ sectionShort(t) }}</span>
+                      <span v-if="r.lastDate" class="text-[11.5px] font-semibold text-muted py-[1px]">{{ fmtDay(r.lastDate) }}</span>
                     </div>
                   </div>
                   <div class="text-right shrink-0">
@@ -389,9 +388,9 @@
           </p>
 
           <div class="mt-4 grid grid-cols-3 gap-2">
-            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Rata-rata per bulan</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.avg) }}</p></div>
-            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Anggaran</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.budget) }}</p></div>
-            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Bulan tertinggi</p><p class="text-[13.5px] font-extrabold">{{ yearStats.top ? shortMonthName(yearStats.top.month) : '-' }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Rata-rata per bulan</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.avg) }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Anggaran</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.budget) }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Bulan tertinggi</p><p class="text-[13.5px] font-extrabold">{{ yearStats.top ? shortMonthName(yearStats.top.month) : '-' }}</p></div>
           </div>
 
           <div class="mt-6">
@@ -446,7 +445,7 @@
           <h3 class="text-[15px] font-extrabold">Rincian per bulan</h3>
           <div class="mt-2 divide-y divide-line">
             <div v-for="e in yearEntries" :key="e.month" class="py-2.5 flex items-center gap-3 text-[13.5px]">
-              <span class="flex-1 font-semibold">{{ monthLabel(e.month) }} <span v-if="e.current" class="ml-1 text-[11px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">berjalan</span></span>
+              <span class="flex-1 font-semibold">{{ monthLabel(e.month) }} <span v-if="e.current" class="ml-1 text-[12px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">berjalan</span></span>
               <span class="font-extrabold num">{{ rp(e.spent) }}</span>
               <span class="w-[88px] text-right text-[12px] num" :class="e.budget - e.spent < 0 ? 'text-coral font-bold' : 'text-muted'">{{ e.budget - e.spent < 0 ? 'lebih ' + rpShort(e.spent - e.budget) : 'sisa ' + rpShort(e.budget - e.spent) }}</span>
             </div>
@@ -475,7 +474,7 @@
         <button v-for="t in NAV" :key="t.id" @click="setTab(t.id)" class="relative h-[58px] rounded-[20px] flex flex-col items-center justify-center gap-1 transition-colors"
           :class="activeTab === t.id ? 'bg-coral-soft text-coral' : 'text-muted'" :aria-current="activeTab === t.id ? 'page' : null">
           <span class="text-[17px] leading-none"><i :class="['fa-solid', t.icon]"></i></span>
-          <span class="text-[11px] font-bold">{{ t.label }}</span>
+          <span class="text-[12px] font-bold">{{ t.label }}</span>
           <span v-if="navWarn(t.id)" class="absolute top-1.5 right-[22%] min-w-[17px] h-[17px] px-1 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center num">{{ navWarn(t.id) }}</span>
         </button>
       </div>
@@ -532,58 +531,24 @@
     </div>
   </transition>
 
-  <!-- ============ LAYAR KUNCI PIN ============ -->
-  <div v-if="pad.show" class="fixed inset-0 z-[80] bg-paper flex flex-col" :style="{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 16px)', paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 20px)' }">
-    <div class="max-w-md w-full mx-auto flex-1 flex flex-col px-6">
-      <div class="flex justify-end h-10">
-        <button v-if="pad.mode !== 'unlock'" @click="cancelPad" class="text-[14px] font-bold text-muted px-2">Batal</button>
-      </div>
-      <div class="flex-1 flex flex-col items-center justify-center text-center">
-        <div class="w-16 h-16 rounded-[20px] bg-coral text-on-coral grid place-items-center text-[24px] rotate-[-6deg]"><i class="fa-solid fa-lock"></i></div>
-        <h2 class="mt-5 text-[23px] font-black tracking-[-0.03em]">{{ pad.forgot ? 'Lupa PIN' : padTitle }}</h2>
-        <p class="mt-1.5 text-[14px] min-h-[21px] px-4" :class="pad.error ? 'text-coral font-bold' : 'text-muted'">{{ pad.error || (pad.forgot ? '' : padHint) }}</p>
-        <div v-if="!pad.forgot" class="mt-6 flex gap-4" :class="pad.shake ? 'shake' : ''">
-          <span v-for="n in 4" :key="n" class="w-4 h-4 rounded-full transition-colors duration-150" :class="pad.entry.length >= n ? 'bg-coral' : 'bg-stone'"></span>
-        </div>
-      </div>
-
-      <template v-if="!pad.forgot">
-        <div class="grid grid-cols-3 gap-3 max-w-[300px] w-full mx-auto">
-          <button v-for="d in ['1','2','3','4','5','6','7','8','9']" :key="d" @click="pressKey(d)" class="h-[66px] rounded-[24px] bg-surface text-[26px] font-bold active:bg-stone transition-colors num">{{ d }}</button>
-          <button v-if="pad.mode === 'unlock' && lock.credId" @click="unlockBio(false)" class="h-[66px] rounded-[24px] text-coral text-[28px] grid place-items-center active:bg-coral-soft" :aria-label="'Buka dengan ' + bioName">
-            <span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span>
-          </button>
-          <span v-else></span>
-          <button @click="pressKey('0')" class="h-[66px] rounded-[24px] bg-surface text-[26px] font-bold active:bg-stone transition-colors num">0</button>
-          <button @click="backspace" class="h-[66px] rounded-[24px] text-muted text-[22px] grid place-items-center active:bg-surface" aria-label="Hapus angka"><i class="fa-solid fa-delete-left"></i></button>
-        </div>
-        <button v-if="pad.mode === 'unlock'" @click="openForgot" class="mt-5 mx-auto text-[13.5px] font-semibold text-muted underline underline-offset-4">Lupa PIN?</button>
-      </template>
-
-      <div v-else class="max-w-[340px] w-full mx-auto pb-2">
-        <template v-if="cloud.user">
-          <p class="text-[14px] text-muted leading-relaxed text-center">Masukkan kata sandi Belanja Kita untuk <b class="text-ink">{{ cloud.user.email }}</b>. Setelah itu kunci dimatikan, dan Anda bisa membuat PIN baru di Pengaturan.</p>
-          <input v-model="pad.pw" type="password" autocomplete="current-password" @keyup.enter="resetPinWithPassword" placeholder="Kata sandi" aria-label="Kata sandi"
-            class="mt-4 w-full h-12 px-4 rounded-full bg-surface border-2 border-transparent outline-none focus:border-coral text-[15px] font-semibold">
-          <button @click="resetPinWithPassword" :disabled="pad.busy" class="mt-3 w-full h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ pad.busy ? 'Memeriksa…' : 'Matikan kunci' }}</button>
-        </template>
-        <template v-else>
-          <p class="text-[14px] text-muted leading-relaxed text-center">Tanpa akun, PIN tidak bisa dipulihkan. Anda bisa menghapus kunci, tapi semua catatan di HP ini ikut terhapus.</p>
-          <button @click="wipeLocal" class="mt-4 w-full h-12 rounded-full bg-coral text-on-coral font-bold">{{ pad.wipeConfirm ? 'Yakin? Tekan sekali lagi' : 'Hapus kunci dan data' }}</button>
-        </template>
-        <button @click="closeForgot" class="mt-2 w-full h-12 rounded-full bg-surface font-bold">Kembali</button>
-      </div>
+  <!-- ============ VERSI BARU ============ -->
+  <transition name="toast">
+    <div v-if="updateReady" class="fixed left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-2rem)] max-w-[420px] pl-4 pr-2 py-2 rounded-full bg-ink text-paper shadow-lg flex items-center gap-2 text-[13.5px] font-bold"
+      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }">
+      <span class="flex-1">Versi baru Belanja Kita tersedia</span>
+      <button @click="reloadApp" class="h-8 px-3.5 rounded-full bg-coral text-on-coral font-extrabold shrink-0">Muat ulang</button>
     </div>
-  </div>
+  </transition>
 
   <!-- ============ TOAST ============ -->
   <transition name="toast">
-    <div v-if="toast.show" class="fixed left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100%-2rem)] w-max px-4 py-3 rounded-full shadow-lg text-[13.5px] font-bold flex items-center gap-2"
+    <div v-if="toast.show" class="fixed left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100%-2rem)] w-max pl-4 pr-2 py-2 min-h-[48px] rounded-full shadow-lg text-[13.5px] font-bold flex items-center gap-2"
       :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }"
       :class="toast.type === 'error' ? 'bg-coral text-on-coral' : 'bg-ink text-paper'">
       <span v-if="toast.type === 'error'"><i class="fa-solid fa-circle-exclamation"></i></span>
       <span v-else><i class="fa-solid fa-circle-check"></i></span>
-      {{ toast.message }}
+      <span class="min-w-0">{{ toast.message }}</span>
+      <button v-if="toast.action" @click="runToastAction" class="ml-1 shrink-0 h-8 px-3 rounded-full bg-paper/20 font-extrabold underline-offset-2">{{ toast.action.label }}</button>
     </div>
   </transition>
 
@@ -660,9 +625,9 @@
           <template v-else-if="modal.type === 'month'">
             <h3 class="text-[20px] font-black tracking-[-0.03em]">Lihat bulan</h3>
             <div class="mt-4 flex items-center justify-between bg-paper rounded-full p-1">
-              <button @click="modal.pickYear--" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun sebelumnya"><i class="fa-solid fa-chevron-left text-[11px]"></i></button>
+              <button @click="modal.pickYear--" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun sebelumnya"><i class="fa-solid fa-chevron-left text-[12px]"></i></button>
               <span class="text-[18px] font-black num">{{ modal.pickYear }}</span>
-              <button @click="modal.pickYear++" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun berikutnya"><i class="fa-solid fa-chevron-right text-[11px]"></i></button>
+              <button @click="modal.pickYear++" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun berikutnya"><i class="fa-solid fa-chevron-right text-[12px]"></i></button>
             </div>
             <div class="mt-3 grid grid-cols-3 gap-2">
               <button v-for="(b, idx) in BULAN_PENDEK" :key="b" @click="pickMonth(idx + 1)" :disabled="isFuture(idx + 1)"
@@ -686,41 +651,44 @@
               <button v-else @click="closeModal(); backToLogin()" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
             </div>
 
-            <p v-if="lock.enabled" class="mt-5 text-[12.5px] font-bold text-muted px-1">Keamanan di HP ini</p>
-            <div v-if="lock.enabled" class="mt-2 rounded-[20px] bg-paper overflow-hidden">
-              <button @click="toggleLock" role="switch" :aria-checked="lock.enabled" class="w-full flex items-center gap-3 px-4 py-3.5 text-left">
-                <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-solid fa-lock text-[13px]"></i></span>
-                <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Kunci dengan PIN</span><span class="block text-[12px] text-muted">Minta PIN setiap aplikasi dibuka</span></span>
-                <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="lock.enabled ? 'bg-coral' : 'bg-stone'"><span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="lock.enabled ? 'translate-x-5' : ''"></span></span>
-              </button>
-              <template v-if="lock.enabled">
-                <button v-if="bio.available" @click="toggleBio" role="switch" :aria-checked="!!lock.credId" class="w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-line">
-                  <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0 text-[15px]"><span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span></span>
-                  <span class="flex-1 min-w-0"><span class="block text-[14.5px] font-bold">Buka dengan {{ bioName }}</span><span class="block text-[12px] text-muted">Lebih cepat dari mengetik PIN</span></span>
-                  <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="lock.credId ? 'bg-coral' : 'bg-stone'"><span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="lock.credId ? 'translate-x-5' : ''"></span></span>
-                </button>
-                <button @click="changePin" class="w-full flex items-center gap-3 px-4 py-3.5 text-left border-t border-line">
-                  <span class="w-9 h-9 rounded-full bg-surface text-coral grid place-items-center shrink-0"><i class="fa-solid fa-key text-[13px]"></i></span>
-                  <span class="flex-1 text-[14.5px] font-bold">Ganti PIN</span>
-                  <i class="fa-solid fa-chevron-right text-[11px] text-muted"></i>
-                </button>
-              </template>
-            </div>
-            <p v-if="lock.enabled" class="mt-2 px-1 text-[12px] text-muted leading-relaxed">Terkunci lagi setiap aplikasi dibuka ulang, atau setelah 5 menit tidak dipakai. PIN hanya berlaku di HP ini.</p>
-            <button v-if="lock.enabled" @click="lockNow" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold flex items-center justify-center gap-2"><i class="fa-solid fa-lock text-[13px]"></i> Kunci sekarang</button>
+            <p class="mt-4 px-1 text-[12px] text-muted">Belanja Kita versi {{ APP_VERSION }}</p>
             <button @click="closeModal" class="mt-2 w-full h-12 rounded-full bg-paper font-bold">Tutup</button>
           </template>
 
-          <template v-else-if="modal.type === 'bioOffer'">
-            <div class="text-center py-1">
-              <div class="w-16 h-16 mx-auto rounded-full bg-coral-soft text-coral grid place-items-center text-[28px]"><span v-if="isIOS"><i class="fa-regular fa-face-smile"></i></span><span v-else><i class="fa-solid fa-fingerprint"></i></span></div>
-              <h3 class="mt-4 text-[20px] font-black tracking-[-0.03em]">Pakai {{ bioName }} juga?</h3>
-              <p class="mt-1 text-[14px] text-muted leading-relaxed">Buka Belanja Kita cukup dengan {{ bioName }}. PIN tetap bisa dipakai kapan saja.</p>
-              <div class="mt-6 grid grid-cols-2 gap-2">
-                <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Nanti saja</button>
-                <button @click="registerBioFromOffer" class="h-12 rounded-full bg-coral text-on-coral font-bold">Aktifkan</button>
-              </div>
+          <template v-else-if="modal.type === 'quick'">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-[20px] font-black tracking-[-0.03em]">Isi harga belanjaan</h3>
+              <span class="text-[13px] font-bold text-muted num shrink-0">{{ Math.min(modal.qi + 1, modal.queue.length) }} dari {{ modal.queue.length }}</span>
             </div>
+            <div class="mt-3 h-1.5 rounded-full bg-stone overflow-hidden"><div class="h-full bg-coral rounded-full transition-all duration-300" :style="{ width: (modal.qi / Math.max(1, modal.queue.length) * 100) + '%' }"></div></div>
+            <template v-if="quickCur">
+              <div class="mt-5" :class="'acc-' + quickCur.item.tab">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[12px] font-bold rounded-full px-2.5 py-0.5 bg-acc-soft">{{ sectionLabel(quickCur.item.tab) }}</span>
+                  <span v-if="quickCur.month !== state.month" class="text-[12px] font-bold rounded-full px-2.5 py-0.5 bg-coral-soft text-coral">Dicatat untuk {{ monthLabel(quickCur.month) }}</span>
+                </div>
+                <p class="mt-2 text-[23px] font-black tracking-[-0.02em] leading-tight">{{ quickCur.item.name }}</p>
+                <p class="mt-1 text-[13px] text-muted min-h-[20px]"><template v-if="quickLast">Harga terakhir {{ rp(quickLast.price) }} ({{ fmtDay(quickLast.date) }}), sudah diisikan</template></p>
+              </div>
+              <div class="mt-3 flex items-center gap-2">
+                <div class="relative flex-1 min-w-0">
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[14px] font-bold text-muted pointer-events-none">Rp</span>
+                  <input id="quick-price" type="text" inputmode="numeric" autocomplete="off" placeholder="Harga" :value="fmtNum(modal.qPrice)" @input="onQuickPrice" @keyup.enter="quickSave" aria-label="Harga"
+                    class="w-full h-14 pl-11 pr-4 rounded-[20px] bg-paper border-2 border-transparent text-[20px] font-black num outline-none focus:border-coral placeholder:font-semibold placeholder:text-muted/60">
+                </div>
+                <div class="flex items-center h-14 rounded-[20px] bg-paper shrink-0">
+                  <button @click="modal.qQty = Math.max(1, modal.qQty - 1)" class="w-9 h-full text-muted" aria-label="Kurangi qty"><i class="fa-solid fa-minus text-[11px]"></i></button>
+                  <span class="w-6 text-center text-[17px] font-black num">{{ modal.qQty }}</span>
+                  <button @click="modal.qQty = modal.qQty + 1" class="w-9 h-full text-muted" aria-label="Tambah qty"><i class="fa-solid fa-plus text-[11px]"></i></button>
+                </div>
+              </div>
+              <p class="mt-2 text-[13px] text-muted num min-h-[20px]"><template v-if="toInt(modal.qPrice) && modal.qQty > 1">{{ modal.qQty }} × {{ rp(toInt(modal.qPrice)) }} = <b class="text-ink">{{ rp(toInt(modal.qPrice) * modal.qQty) }}</b></template></p>
+              <div class="mt-4 grid grid-cols-[1fr_2fr] gap-2">
+                <button @click="quickNext" class="h-12 rounded-full bg-paper font-bold">Lewati</button>
+                <button @click="quickSave" class="h-12 rounded-full bg-coral text-on-coral font-bold">{{ modal.qi + 1 < modal.queue.length ? 'Simpan & lanjut' : 'Simpan & selesai' }}</button>
+              </div>
+              <button @click="closeModal" class="mt-3 w-full h-10 text-[13px] font-semibold text-muted">Lanjutkan nanti</button>
+            </template>
           </template>
 
           <template v-else-if="modal.type === 'copied'">
@@ -764,6 +732,7 @@
   const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
+  const APP_VERSION = '2.0';
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
@@ -897,7 +866,7 @@
   const uid = p => p + '-' + Date.now().toString(36) + '-' + (idSeq++).toString(36) + Math.random().toString(36).slice(2, 6);
 
   function makeItem(id, name, category, tab, custom, keep) {
-    return { id, name, category, tab, isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', custom: !!custom, keep: !!keep, draftPrice: '', draftQty: 1 };
+    return { id, name, category, tab, isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', entries: [], custom: !!custom, keep: !!keep, draftPrice: '', draftQty: 1 };
   }
   function defaultItems() {
     const items = MONTHLY_DEFAULTS.map(([n, c], i) => makeItem('bln-' + (i + 1), n, c, 'bulanan'));
@@ -907,11 +876,13 @@
     items.forEach((it, idx) => { it.order = idx; });
     return items;
   }
+  const normEntry = e => ({ eid: String(e.eid), price: Math.max(0, Number(e.price) || 0), qty: Math.max(1, parseInt(e.qty, 10) || 1), amount: Math.max(0, Number(e.amount) || 0), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date || '') ? e.date : '' });
+  const normEntries = arr => Array.isArray(arr) ? arr.filter(e => e && e.eid).map(normEntry) : [];
   function normalizeItem(i) {
     return {
       id: String(i.id || uid('x')), name: String(i.name || 'Tanpa nama'), category: String(i.category || 'Lain-lain'),
       tab: REKAP_IDS.includes(i.tab) ? i.tab : 'bulanan', isChecked: !!i.isChecked,
-      totalQty: Math.max(0, parseInt(i.totalQty, 10) || 0), totalSpent: Math.max(0, Number(i.totalSpent) || 0), boughtOn: /^\d{4}-\d{2}-\d{2}$/.test(i.boughtOn || '') ? i.boughtOn : '',
+      totalQty: Math.max(0, parseInt(i.totalQty, 10) || 0), totalSpent: Math.max(0, Number(i.totalSpent) || 0), boughtOn: /^\d{4}-\d{2}-\d{2}$/.test(i.boughtOn || '') ? i.boughtOn : '', entries: normEntries(i.entries),
       custom: !!i.custom, keep: !!i.keep, order: Number(i.order) || 0, draftPrice: String(i.draftPrice || '').replace(/\D/g, ''), draftQty: Math.max(1, parseInt(i.draftQty, 10) || 1)
     };
   }
@@ -973,6 +944,10 @@
     return L.join('\n');
   }
 
+  if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.(ai|site)|claudeusercontent/.test(location.hostname)) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+  }
+
   createApp({
     setup() {
       const state = reactive(loadState());
@@ -984,7 +959,7 @@
       const editingBudget = ref(false);
       const budgetDraft = ref('');
       const modal = reactive({ open: false, type: '', item: null, text: '', form: { name: '', category: '', target: 'bulanan', keep: true }, error: '' });
-      const toast = reactive({ show: false, message: '', type: 'ok' });
+      const toast = reactive({ show: false, message: '', type: 'ok', action: null });
       let toastTimer = null;
 
       // ---------- Sinkron keluarga (Firebase) ----------
@@ -996,7 +971,7 @@
       const itemRef = id => db.collection('items').doc(id);
       const cfgRef = () => db.collection('config').doc('main');
       const itemDoc = i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: !!i.isChecked, totalQty: Number(i.totalQty) || 0,
-        totalSpent: Number(i.totalSpent) || 0, boughtOn: i.boughtOn || '', custom: !!i.custom, keep: !!i.keep, order: Number(i.order) || 0 });
+        totalSpent: Number(i.totalSpent) || 0, boughtOn: i.boughtOn || '', entries: normEntries(i.entries), custom: !!i.custom, keep: !!i.keep, order: Number(i.order) || 0 });
       function saveMode(m) { cloud.mode = m; try { localStorage.setItem(MODE_KEY, m); } catch (e) {} }
       function remote(fn) {
         if (!(cloud.user && db)) return;
@@ -1124,7 +1099,8 @@
         saveMode('cloud');
         showToast('Berhasil keluar');
       }
-      function toggleCheck(item, v) {
+      function toggleCheck(item, v, silent) {
+        if (v && !silent) showToast(item.name + ' sudah dibeli', 'ok', { label: 'Batalkan', fn: () => toggleCheck(item, false, true) });
         item.isChecked = v;
         const upd = { isChecked: v };
         if (v && !item.boughtOn) { item.boughtOn = todayISO(); upd.boughtOn = item.boughtOn; }
@@ -1153,7 +1129,90 @@
       }
       function toggleExpand(item) {
         expandedId.value = expandedId.value === item.id ? null : item.id;
-        if (expandedId.value) focusPrice(item.id);
+        editing.value = null;
+        entryMonth.value = state.month;
+        if (expandedId.value) {
+          const last = lastPriceOf(item);
+          if (!item.draftPrice && last) item.draftPrice = String(last.price);
+          focusPrice(item.id);
+        }
+      }
+      // Harga terakhir per nama barang, dari bulan ini dan riwayat
+      const keyOf = name => String(name || '').trim().toLowerCase();
+      const lastPrices = computed(() => {
+        const map = {};
+        const put = (name, price, date) => {
+          price = Math.round(Number(price) || 0);
+          if (!(price > 0)) return;
+          const k = keyOf(name);
+          if (!map[k] || (date || '') >= map[k].date) map[k] = { price, date: date || '' };
+        };
+        const fromItem = (i, fallbackDate) => {
+          const es = normEntries(i.entries);
+          if (es.length) es.forEach(e => put(i.name, e.price, e.date || fallbackDate));
+          else if (Number(i.totalSpent) > 0) put(i.name, Number(i.totalSpent) / Math.max(1, Number(i.totalQty) || 1), i.boughtOn || fallbackDate);
+        };
+        state.history.slice().sort((a, b) => String(a.month).localeCompare(String(b.month))).forEach(h => (h.items || []).forEach(i => fromItem(i, h.month + '-28')));
+        state.items.forEach(i => fromItem(i, todayISO()));
+        return map;
+      });
+      const lastPriceOf = item => lastPrices.value[keyOf(item && item.name)] || null;
+
+      // Jendela catat terlambat: 7 hari pertama bulan baru
+      const prevMonth = computed(() => {
+        let [y, m] = state.month.split('-').map(Number);
+        m -= 1; if (m < 1) { m = 12; y -= 1; }
+        return y + '-' + pad2(m);
+      });
+      const lateWindow = computed(() => state.month === currentMonth() && new Date().getDate() <= 7);
+      const prevUnpriced = computed(() => {
+        if (!lateWindow.value) return [];
+        const out = [];
+        state.history.filter(h => h.month === prevMonth.value).forEach(h => (h.items || []).forEach(i => { if (i.isChecked && !(Number(i.totalSpent) > 0)) out.push(i); }));
+        return out;
+      });
+      const quickCount = computed(() => state.items.filter(needsPrice).length + prevUnpriced.value.length);
+
+      // Mode isi harga cepat
+      const quickCur = computed(() => modal.type === 'quick' ? (modal.queue || [])[modal.qi] || null : null);
+      const quickLast = computed(() => quickCur.value ? lastPriceOf(quickCur.value.item) : null);
+      function quickPrefill() {
+        const c = quickCur.value;
+        const last = c ? lastPriceOf(c.item) : null;
+        modal.qPrice = last ? String(last.price) : '';
+        modal.qQty = 1;
+        setTimeout(() => { const el = document.getElementById('quick-price'); if (el) { try { el.focus({ preventScroll: true }); el.select(); } catch (e) {} } }, 80);
+      }
+      function openQuick(tab) {
+        const queue = state.items.filter(i => needsPrice(i) && (!tab || i.tab === tab)).map(item => ({ item, month: state.month }));
+        if (!tab) prevUnpriced.value.forEach(item => queue.push({ item, month: prevMonth.value }));
+        if (!queue.length) { showToast('Semua harga sudah diisi'); return; }
+        openModal('quick', { queue, qi: 0, qPrice: '', qQty: 1, qSaved: 0 });
+        quickPrefill();
+      }
+      function onQuickPrice(e) {
+        const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
+        modal.qPrice = digits;
+        e.target.value = fmtNum(digits);
+      }
+      function quickNext() {
+        if (modal.qi + 1 >= modal.queue.length) {
+          closeModal();
+          showToast(modal.qSaved ? modal.qSaved + ' harga tersimpan' : 'Selesai');
+          return;
+        }
+        modal.qi += 1;
+        quickPrefill();
+      }
+      function quickSave() {
+        const c = quickCur.value; if (!c) return;
+        const price = toInt(modal.qPrice), qty = Math.max(1, modal.qQty || 1);
+        if (!price) { showToast('Isi harga atau pilih Lewati', 'error'); return; }
+        const entry = { eid: uid('e'), price, qty, amount: price * qty, date: todayISO() };
+        if (c.month === state.month && state.items.includes(c.item)) pushEntry(c.item, entry);
+        else addToPastMonth(c.item, entry, c.month, c.item);
+        modal.qSaved = (modal.qSaved || 0) + 1;
+        quickNext();
       }
       function goToItem(item) {
         if (!item) return;
@@ -1216,6 +1275,21 @@
         copyText(text);
       }
 
+      // ---------- Versi aplikasi & pembaruan ----------
+      const updateReady = ref(false);
+      async function checkUpdate() {
+        if (!/^https?:$/.test(location.protocol)) return;
+        try {
+          const res = await fetch('./index.html', { cache: 'no-store' });
+          if (!res.ok) return;
+          const m = (await res.text()).match(/const APP_VERSION = '([^']+)'/);
+          if (m && m[1] !== APP_VERSION) updateReady.value = true;
+        } catch (e) { /* offline */ }
+      }
+      function reloadApp() { location.reload(); }
+      setTimeout(checkUpdate, 4000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
+
       // ---------- Kirim email otomatis (Google Apps Script) ----------
       const mail = reactive({ busy: false });
       const canAutoMail = computed(() => !!MAIL_URL && !!cloud.user);
@@ -1236,188 +1310,6 @@
           return false;
         } finally { mail.busy = false; }
       }
-
-      // ---------- Kunci PIN & Face ID / sidik jari (per HP) ----------
-      const LOCK_KEY = 'catatanBelanjaKeluarga_lock_v1';
-      const LOCK_AFTER_MS = 5 * 60 * 1000;
-      function loadLock() {
-        try {
-          const l = JSON.parse(localStorage.getItem(LOCK_KEY) || 'null');
-          if (l && l.enabled && l.hash && l.salt) return { enabled: true, hash: l.hash, salt: l.salt, credId: l.credId || null };
-        } catch (e) {}
-        return { enabled: false, hash: '', salt: '', credId: null };
-      }
-      const lock = reactive(loadLock());
-      watch(lock, v => { try { localStorage.setItem(LOCK_KEY, JSON.stringify(v)); } catch (e) {} }, { deep: true });
-      const pad = reactive({ show: lock.enabled, mode: 'unlock', after: '', entry: '', first: '', error: '', shake: false, fails: 0, until: 0, busy: false, forgot: false, pw: '', wipeConfirm: false });
-      const bio = reactive({ available: false });
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      const bioName = isIOS ? 'Face ID' : 'sidik jari';
-      const randBytes = n => { const a = new Uint8Array(n); crypto.getRandomValues(a); return a; };
-      const toB64 = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      const fromB64 = str => { let t = str.replace(/-/g, '+').replace(/_/g, '/'); while (t.length % 4) t += '='; return Uint8Array.from(atob(t), c => c.charCodeAt(0)); };
-      async function hashPin(salt, pin) {
-        const t = salt + ':' + pin;
-        if (window.crypto && crypto.subtle) {
-          try {
-            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
-            return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
-          } catch (e) {}
-        }
-        let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0;
-        return 'd' + (h >>> 0).toString(16);
-      }
-      (async () => {
-        try {
-          if (window.PublicKeyCredential && PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
-            bio.available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-          }
-        } catch (e) { bio.available = false; }
-      })();
-
-      const padTitle = computed(() => ({ unlock: 'Masukkan PIN', verify: pad.after === 'change' ? 'Masukkan PIN lama' : 'Masukkan PIN', new1: 'Buat PIN baru', new2: 'Ulangi PIN baru' })[pad.mode] || '');
-      const padHint = computed(() => {
-        if (pad.mode === 'unlock') return lock.credId ? 'Atau buka dengan ' + bioName : 'Belanja Kita terkunci';
-        if (pad.mode === 'verify') return pad.after === 'change' ? 'Untuk mengganti PIN' : 'Untuk mematikan kunci';
-        if (pad.mode === 'new1') return '4 angka yang mudah Anda ingat';
-        return 'Ketik sekali lagi';
-      });
-      function openPad(mode, after) {
-        Object.assign(pad, { show: true, mode, after: after || '', entry: '', first: '', error: '', forgot: false, pw: '', wipeConfirm: false });
-      }
-      function openUnlock(autoBio) {
-        if (!lock.enabled) return;
-        openPad('unlock');
-        if (autoBio && lock.credId) setTimeout(() => unlockBio(true), 350);
-      }
-      function cancelPad() { pad.show = false; }
-      function shakePad(msg) {
-        pad.error = msg; pad.entry = ''; pad.shake = false;
-        nextTick(() => { pad.shake = true; setTimeout(() => { pad.shake = false; }, 450); });
-        if (navigator.vibrate) { try { navigator.vibrate(120); } catch (e) {} }
-      }
-      function pressKey(d) {
-        if (pad.busy || pad.forgot) return;
-        if (Date.now() < pad.until) { pad.error = 'Tunggu sebentar sebelum mencoba lagi.'; return; }
-        if (pad.entry.length >= 4) return;
-        pad.entry += d;
-        if (pad.error && pad.entry.length === 1) pad.error = '';
-        if (pad.entry.length === 4) setTimeout(submitPin, 120);
-      }
-      function backspace() { if (!pad.busy) pad.entry = pad.entry.slice(0, -1); }
-      async function submitPin() {
-        const pin = pad.entry;
-        if (pin.length !== 4) return;
-        pad.busy = true;
-        try {
-          if (pad.mode === 'unlock' || pad.mode === 'verify') {
-            const ok = (await hashPin(lock.salt, pin)) === lock.hash;
-            if (!ok) {
-              pad.fails += 1;
-              if (pad.fails >= 5) { pad.until = Date.now() + 30000; pad.fails = 0; shakePad('Terlalu banyak percobaan. Tunggu 30 detik.'); }
-              else shakePad('PIN salah, coba lagi');
-              return;
-            }
-            pad.fails = 0;
-            if (pad.mode === 'unlock') { pad.show = false; return; }
-            if (pad.after === 'disable') {
-              Object.assign(lock, { enabled: false, hash: '', salt: '', credId: null });
-              pad.show = false;
-              showToast('Kunci dimatikan');
-              return;
-            }
-            Object.assign(pad, { mode: 'new1', entry: '', error: '' });
-            return;
-          }
-          if (pad.mode === 'new1') { Object.assign(pad, { first: pin, mode: 'new2', entry: '', error: '' }); return; }
-          if (pad.mode === 'new2') {
-            if (pin !== pad.first) { pad.mode = 'new1'; pad.first = ''; shakePad('PIN tidak sama. Silakan buat ulang.'); return; }
-            const salt = Array.from(randBytes(16)).map(x => x.toString(16).padStart(2, '0')).join('');
-            const hash = await hashPin(salt, pin);
-            const wasEnabled = lock.enabled;
-            Object.assign(lock, { enabled: true, salt, hash });
-            pad.show = false;
-            showToast(wasEnabled ? 'PIN diganti' : 'Kunci PIN aktif');
-            if (!wasEnabled && bio.available && !lock.credId) openModal('bioOffer');
-          }
-        } finally { pad.busy = false; }
-      }
-      async function registerBio() {
-        try {
-          const cred = await navigator.credentials.create({ publicKey: {
-            challenge: randBytes(32),
-            rp: { name: 'Belanja Kita' },
-            user: { id: randBytes(16), name: (cloud.user && cloud.user.email) || 'belanja-kita', displayName: 'Belanja Kita' },
-            pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
-            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
-            timeout: 60000, attestation: 'none'
-          } });
-          if (cred) { lock.credId = toB64(cred.rawId); showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' aktif'); }
-        } catch (e) {
-          console.warn(e);
-          if (!(e && e.name === 'NotAllowedError')) showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' belum bisa dipakai di sini', 'error');
-        }
-      }
-      function registerBioFromOffer() { closeModal(); registerBio(); }
-      async function unlockBio(auto) {
-        if (!lock.credId || pad.busy || !pad.show || pad.mode !== 'unlock') return;
-        pad.busy = true;
-        try {
-          const a = await navigator.credentials.get({ publicKey: {
-            challenge: randBytes(32),
-            allowCredentials: [{ type: 'public-key', id: fromB64(lock.credId) }],
-            userVerification: 'required', timeout: 60000
-          } });
-          if (a) { pad.show = false; pad.fails = 0; }
-        } catch (e) {
-          if (!auto && !(e && e.name === 'NotAllowedError')) pad.error = bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' gagal, pakai PIN';
-        } finally { pad.busy = false; }
-      }
-      function openForgot() { Object.assign(pad, { forgot: true, pw: '', error: '', wipeConfirm: false }); }
-      function closeForgot() { Object.assign(pad, { forgot: false, pw: '', error: '', wipeConfirm: false }); }
-      function resetPinWithPassword() {
-        if (!auth || !cloud.user || pad.busy) return;
-        if (!pad.pw) { pad.error = 'Isi kata sandi terlebih dahulu.'; return; }
-        pad.busy = true; pad.error = '';
-        auth.signInWithEmailAndPassword(cloud.user.email, pad.pw)
-          .then(() => {
-            Object.assign(lock, { enabled: false, hash: '', salt: '', credId: null });
-            Object.assign(pad, { show: false, forgot: false, pw: '' });
-            showToast('Kunci dimatikan. Buat PIN baru di Pengaturan');
-          })
-          .catch(e => { pad.error = loginError(e && e.code); })
-          .finally(() => { pad.busy = false; });
-      }
-      function wipeLocal() {
-        if (!pad.wipeConfirm) { pad.wipeConfirm = true; return; }
-        try { [LOCK_KEY, STORAGE_KEY, TAB_KEY, MODE_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
-        location.reload();
-      }
-      function openSettings() { openModal('settings'); }
-      function toggleLock() {
-        closeModal();
-        if (lock.enabled) openPad('verify', 'disable');
-        else openPad('new1');
-      }
-      function changePin() { closeModal(); openPad('verify', 'change'); }
-      function toggleBio() {
-        if (lock.credId) { lock.credId = null; showToast(bioName.charAt(0).toUpperCase() + bioName.slice(1) + ' dimatikan'); }
-        else registerBio();
-      }
-      function lockNow() { closeModal(); openUnlock(false); }
-
-      let hiddenAt = 0;
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { hiddenAt = Date.now(); return; }
-        if (lock.enabled && hiddenAt && Date.now() - hiddenAt > LOCK_AFTER_MS && !pad.show) openUnlock(true);
-        hiddenAt = 0;
-      });
-      window.addEventListener('keydown', e => {
-        if (!pad.show || pad.forgot) return;
-        if (/^[0-9]$/.test(e.key)) { e.preventDefault(); pressKey(e.key); }
-        else if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
-      });
-      if (pad.show && lock.credId) setTimeout(() => unlockBio(true), 500);
 
       // ---------- Auto-save real-time ----------
       function save() {
@@ -1511,12 +1403,12 @@
       function archiveEntry(from) {
         return {
           id: uid('h'), month: from, budget: state.budget, totalSpent: sum(state.items), closedAt: new Date().toISOString(), auto: true,
-          items: state.items.map(i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: i.isChecked, totalQty: i.totalQty, totalSpent: i.totalSpent, boughtOn: i.boughtOn || '' }))
+          items: state.items.map(i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: i.isChecked, totalQty: i.totalQty, totalSpent: i.totalSpent, boughtOn: i.boughtOn || '', entries: normEntries(i.entries) }))
         };
       }
       function applyLocalRollover(entry, to) {
         state.history.push(entry);
-        state.items = state.items.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', draftPrice: '', draftQty: 1 }));
+        state.items = state.items.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', entries: [], draftPrice: '', draftQty: 1 }));
         state.month = to;
       }
       let rolling = false;
@@ -1549,7 +1441,7 @@
             b.set(db.collection('history').doc(entry.id), data);
             oldItems.forEach(i => {
               if (i.custom && !i.keep) b.delete(itemRef(i.id));
-              else b.update(itemRef(i.id), { isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '' });
+              else b.update(itemRef(i.id), { isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', entries: [] });
             });
             await b.commit();
             applyLocalRollover(entry, now);
@@ -1659,10 +1551,15 @@
       }
 
       // ---------- UI ----------
-      function showToast(message, type = 'ok') {
-        toast.message = message; toast.type = type; toast.show = true;
+      function showToast(message, type = 'ok', action = null) {
+        toast.message = message; toast.type = type; toast.action = action; toast.show = true;
         clearTimeout(toastTimer);
-        toastTimer = setTimeout(() => { toast.show = false; }, 2200);
+        toastTimer = setTimeout(() => { toast.show = false; toast.action = null; }, action ? 5000 : 2200);
+      }
+      function runToastAction() {
+        const a = toast.action;
+        toast.show = false; toast.action = null; clearTimeout(toastTimer);
+        if (a && a.fn) a.fn();
       }
       function setTab(id) {
         activeTab.value = id;
@@ -1673,6 +1570,7 @@
         Object.assign(modal, { open: true, type, item: null, text: '', error: '' }, extra || {});
       }
       function closeModal() { modal.open = false; }
+      function openSettings() { openModal('settings'); }
 
       // ---------- Aksi barang ----------
       function onPrice(item, e) {
@@ -1680,29 +1578,105 @@
         item.draftPrice = digits;
         e.target.value = fmtNum(digits);
       }
+      // ---------- Catatan per pembelian ----------
+      const editing = ref(null);
+      const entryMonth = ref(state.month);
+      const clean = e => ({ eid: e.eid, price: e.price, qty: e.qty, amount: e.amount, date: e.date });
+      function entriesOf(item) {
+        const list = (item.entries || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        const amt = (Number(item.totalSpent) || 0) - list.reduce((t, e) => t + e.amount, 0);
+        const qty = (Number(item.totalQty) || 0) - list.reduce((t, e) => t + e.qty, 0);
+        if (amt > 0) list.push({ eid: 'legacy-' + item.id, legacy: true, amount: amt, qty: Math.max(1, qty), price: Math.round(amt / Math.max(1, qty)), date: item.boughtOn || '' });
+        return list;
+      }
+      function pushEntry(item, entry) {
+        item.entries = (item.entries || []).concat([entry]);
+        item.totalSpent = (Number(item.totalSpent) || 0) + entry.amount;
+        item.totalQty = (Number(item.totalQty) || 0) + entry.qty;
+        item.isChecked = true;
+        if (!item.boughtOn || entry.date > item.boughtOn) item.boughtOn = entry.date;
+        remote(() => itemRef(item.id).update({ entries: FV().arrayUnion(clean(entry)), totalSpent: FV().increment(entry.amount), totalQty: FV().increment(entry.qty), isChecked: true, boughtOn: item.boughtOn }));
+      }
+      function dropEntry(item, entry) {
+        item.totalSpent = Math.max(0, (Number(item.totalSpent) || 0) - entry.amount);
+        item.totalQty = Math.max(0, (Number(item.totalQty) || 0) - entry.qty);
+        if (entry.legacy) {
+          remote(() => itemRef(item.id).update({ totalSpent: FV().increment(-entry.amount), totalQty: FV().increment(-entry.qty) }));
+        } else {
+          item.entries = (item.entries || []).filter(e => e.eid !== entry.eid);
+          remote(() => itemRef(item.id).update({ entries: FV().arrayRemove(clean(entry)), totalSpent: FV().increment(-entry.amount), totalQty: FV().increment(-entry.qty) }));
+        }
+      }
+      function removeEntry(item, entry) {
+        const saved = Object.assign({}, entry);
+        dropEntry(item, saved);
+        if (editing.value && editing.value.entry.eid === saved.eid) cancelEdit(item);
+        showToast('Catatan ' + rp(saved.amount) + ' dihapus', 'ok', { label: 'Batalkan', fn: () => pushEntry(item, saved.legacy ? { eid: uid('e'), price: saved.price, qty: saved.qty, amount: saved.amount, date: saved.date || todayISO() } : saved) });
+      }
+      function startEdit(item, entry) {
+        editing.value = { itemId: item.id, entry: Object.assign({}, entry) };
+        item.draftPrice = String(entry.price);
+        item.draftQty = entry.qty;
+        focusPrice(item.id);
+      }
+      function cancelEdit(item) {
+        editing.value = null;
+        if (item) { item.draftPrice = ''; item.draftQty = 1; }
+      }
+      // Catat ke bulan lalu (untuk harga yang baru diisi di awal bulan)
+      function addToPastMonth(item, entry, month, histItem) {
+        let h = state.history.filter(x => x.month === month).slice(-1)[0];
+        if (!h) { state.history.push({ id: uid('h'), month, budget: state.budget, totalSpent: 0, closedAt: new Date().toISOString(), auto: true, items: [] }); h = state.history[state.history.length - 1]; }
+        let it = histItem && h.items.includes(histItem) ? histItem : h.items.find(x => x.name === item.name && x.tab === item.tab);
+        if (!it) { h.items.push({ name: item.name, category: item.category, tab: item.tab, isChecked: true, totalQty: 0, totalSpent: 0, boughtOn: '', entries: [] }); it = h.items[h.items.length - 1]; }
+        it.totalQty = (Number(it.totalQty) || 0) + entry.qty;
+        it.totalSpent = (Number(it.totalSpent) || 0) + entry.amount;
+        it.isChecked = true;
+        it.entries = normEntries(it.entries).concat([entry]);
+        if (!it.boughtOn || entry.date > it.boughtOn) it.boughtOn = entry.date;
+        h.totalSpent = sum(h.items);
+        remote(() => { const d = JSON.parse(JSON.stringify(h)); const hid = String(d.id); delete d.id; return db.collection('history').doc(hid).set(d); });
+      }
       function submitItem(item) {
         const price = toInt(item.draftPrice);
         const qty = Math.max(1, parseInt(item.draftQty, 10) || 1);
         if (!price) { showToast('Isi harga terlebih dahulu', 'error'); return; }
-        item.totalSpent += price * qty;
-        item.totalQty += qty;
-        item.isChecked = true;
-        item.boughtOn = todayISO();
-        item.draftPrice = '';
-        item.draftQty = 1;
+        const ed = editing.value && editing.value.itemId === item.id ? editing.value : null;
+        const entry = { eid: uid('e'), price, qty, amount: price * qty, date: ed ? (ed.entry.date || todayISO()) : todayISO() };
+        item.draftPrice = ''; item.draftQty = 1;
         expandedId.value = null;
-        remote(() => itemRef(item.id).update({ totalSpent: FV().increment(price * qty), totalQty: FV().increment(qty), isChecked: true, boughtOn: item.boughtOn }));
-        showToast(item.name + ' +' + rp(price * qty));
+        if (ed) {
+          const old = ed.entry;
+          editing.value = null;
+          dropEntry(item, old);
+          pushEntry(item, entry);
+          showToast('Catatan diperbarui', 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); pushEntry(item, old.legacy ? { eid: uid('e'), price: old.price, qty: old.qty, amount: old.amount, date: old.date || todayISO() } : old); } });
+          return;
+        }
+        if (lateWindow.value && entryMonth.value !== state.month) {
+          addToPastMonth(item, entry, entryMonth.value);
+          showToast(item.name + ' ' + rp(entry.amount) + ' dicatat untuk ' + monthLabel(entryMonth.value));
+          return;
+        }
+        const wasChecked = item.isChecked;
+        pushEntry(item, entry);
+        showToast(item.name + ' +' + rp(entry.amount), 'ok', { label: 'Batalkan', fn: () => { dropEntry(item, entry); if (!wasChecked) toggleCheck(item, false, true); } });
       }
-      function askReset(item) { openModal('reset', { item }); }
+      function askReset(item) { openModal('reset', { item }); }      function askReset(item) { openModal('reset', { item }); }
       function confirmReset() {
         const it = modal.item;
         if (it) {
-          Object.assign(it, { totalQty: 0, totalSpent: 0, isChecked: false, boughtOn: '', draftPrice: '', draftQty: 1 });
-          remote(() => itemRef(it.id).update({ totalQty: 0, totalSpent: 0, isChecked: false, boughtOn: '' }));
+          const saved = { totalQty: it.totalQty, totalSpent: it.totalSpent, isChecked: it.isChecked, boughtOn: it.boughtOn || '', entries: normEntries(it.entries) };
+          Object.assign(it, { totalQty: 0, totalSpent: 0, isChecked: false, boughtOn: '', entries: [], draftPrice: '', draftQty: 1 });
+          remote(() => itemRef(it.id).update({ totalQty: 0, totalSpent: 0, isChecked: false, boughtOn: '', entries: [] }));
+          closeModal();
+          showToast('Catatan barang dikosongkan', 'ok', { label: 'Batalkan', fn: () => {
+            Object.assign(it, saved);
+            remote(() => itemRef(it.id).update({ totalQty: saved.totalQty, totalSpent: saved.totalSpent, isChecked: saved.isChecked, boughtOn: saved.boughtOn, entries: saved.entries.map(clean) }));
+          } });
+          return;
         }
         closeModal();
-        showToast('Catatan barang dikosongkan');
       }
       function askDelete(item) { openModal('delete', { item }); }
       function confirmDelete() {
@@ -1711,9 +1685,14 @@
         if (idx > -1) {
           const gone = state.items.splice(idx, 1)[0];
           remote(() => itemRef(gone.id).delete());
+          closeModal();
+          showToast(gone.name + ' dihapus', 'ok', { label: 'Batalkan', fn: () => {
+            state.items.splice(Math.min(idx, state.items.length), 0, gone);
+            remote(() => itemRef(gone.id).set(itemDoc(gone)));
+          } });
+          return;
         }
         closeModal();
-        showToast('Barang dihapus');
       }
       function openAdd(target) {
         const cats = categoriesFor(target);
@@ -1772,8 +1751,9 @@
         pickPerson, doLogin, useLocal, backToLogin, signOut, toggleCheck, mail, canAutoMail, sendMail,
         compact, headerEl, expandHeader, thisWeek, expandedId, toggleExpand, goToItem, sectionShort, shareText, itemsIn,
         showBought, toBuyIn, listGroups, boughtGroups, boughtSort, boughtNow, boughtCount,
-        lock, pad, bio, isIOS, bioName, padTitle, padHint, pressKey, backspace, cancelPad, unlockBio, registerBioFromOffer,
-        openForgot, closeForgot, resetPinWithPassword, wipeLocal, openSettings, toggleLock, changePin, toggleBio, lockNow, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
+        openSettings, state, APP_VERSION, updateReady, reloadApp, runToastAction,
+        editing, entryMonth, entriesOf, removeEntry, startEdit, cancelEdit, lastPriceOf, prevMonth, lateWindow, prevUnpriced, quickCount,
+        quickCur, quickLast, openQuick, onQuickPrice, quickNext, quickSave, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
         editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
         BULAN_PENDEK, openMonthPicker, pickMonth, isPicked, isNow, isFuture, hasData, fmtDay,
         rMonth, isCurrentR, rViews, rBudget, rSpent, rRemaining, rCount, rDone, rSub, shiftR,
