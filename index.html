@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<title>Belanja Kita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>window.FontAwesomeConfig = { autoReplaceSvg: 'nest' };</script>
+<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/js/all.min.js"></script>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  const tok = (v) => `rgb(var(${v}) / <alpha-value>)`;
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'] },
+        colors: {
+          paper: tok('--paper'), surface: tok('--surface'), stone: tok('--stone'),
+          ink: tok('--ink'), muted: tok('--muted'), line: tok('--line'),
+          coral: tok('--coral'), 'on-coral': tok('--on-coral'), 'coral-soft': tok('--coral-soft'),
+          acc: tok('--acc'), 'acc-soft': tok('--acc-soft'), 'on-acc': tok('--on-acc')
+        }
+      }
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+<style>
+  :root {
+    --paper: 246 244 241; --surface: 255 255 255; --stone: 228 222 210;
+    --ink: 0 0 0; --muted: 118 110 100; --line: 236 231 222;
+    --coral: 249 92 75; --on-coral: 255 255 255; --coral-soft: 255 227 223;
+    --acc: 249 92 75; --acc-soft: 255 227 223; --on-acc: 255 255 255;
+    color-scheme: light;
+  }
+  .acc-bulanan { --acc: 249 92 75;  --acc-soft: 255 227 223; --on-acc: 255 255 255; }
+  .acc-M1      { --acc: 255 176 32; --acc-soft: 255 240 204; --on-acc: 46 30 0; }
+  .acc-M2      { --acc: 22 176 136; --acc-soft: 212 244 233; --on-acc: 255 255 255; }
+  .acc-M3      { --acc: 64 128 255; --acc-soft: 221 233 255; --on-acc: 255 255 255; }
+  .acc-M4      { --acc: 146 96 250; --acc-soft: 236 226 255; --on-acc: 255 255 255; }
+
+  /* Selalu mode terang */
+  :root, :root[data-theme="dark"] { color-scheme: only light; }
+
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); -webkit-tap-highlight-color: transparent; }
+  body { background: rgb(var(--paper)); color: rgb(var(--ink)); font-family: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: rgb(var(--paper)); }
+  .sticky-head { position: sticky; top: env(safe-area-inset-top, 0px); }
+  .bottom-nav { position: fixed; left: 0; right: 0; bottom: 0; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+  [v-cloak] { display: none; }
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .num { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+  .box { width: 26px; height: 26px; border-radius: 9px; flex-shrink: 0; display: grid; place-items: center; font-size: 13px;
+    border: 2px solid rgb(var(--stone)); background: rgb(var(--surface)); transition: background-color .15s, border-color .15s; }
+  .box.on { background: rgb(var(--acc)); border-color: rgb(var(--acc)); color: rgb(var(--on-acc)); animation: boing .35s cubic-bezier(.3,1.6,.5,1); }
+  @keyframes boing { 0% { transform: scale(.7); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+  .peer:focus-visible + .box, button:focus-visible, input:focus-visible, a:focus-visible, textarea:focus-visible { outline: 2px solid rgb(var(--coral)); outline-offset: 2px; }
+
+  input[type="month"]::-webkit-calendar-picker-indicator { display: none; }
+  input[type="month"] { -webkit-appearance: none; appearance: none; }
+
+  .fade-enter-active, .fade-leave-active { transition: opacity .18s ease; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; }
+  .pop-enter-active { transition: transform .26s cubic-bezier(.2,1.3,.4,1), opacity .2s; }
+  .pop-leave-active { transition: transform .15s, opacity .15s; }
+  .pop-enter-from, .pop-leave-to { transform: translateY(24px); opacity: 0; }
+  .toast-enter-active, .toast-leave-active { transition: transform .22s cubic-bezier(.2,1.3,.4,1), opacity .2s; }
+  .toast-enter-from, .toast-leave-to { transform: translate(-50%, 14px); opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="app" v-cloak class="max-w-md mx-auto min-h-screen">
+
+  <!-- ============ HEADER ============ -->
+  <header class="sticky-head z-30 bg-paper/95 backdrop-blur px-4 pt-3 pb-3">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-[14px] bg-coral text-on-coral grid place-items-center shrink-0 text-[17px] rotate-[-6deg]"><i class="fa-solid fa-basket-shopping"></i></div>
+        <div class="min-w-0">
+          <h1 class="font-black text-[21px] leading-none tracking-[-0.03em] truncate">Belanja Kita</h1>
+          <p class="text-[12px] text-muted leading-tight mt-1">{{ greeting }}</p>
+        </div>
+      </div>
+      <div class="flex items-center bg-surface rounded-full h-10 shrink-0 shadow-[0_1px_0_rgb(var(--line))]">
+        <button @click="shiftMonth(-1)" class="w-8 h-full text-muted active:text-ink rounded-l-full" aria-label="Bulan sebelumnya"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+        <button @click="openMonthPicker" class="h-full flex items-center gap-1.5 px-1.5" aria-label="Pilih bulan">
+          <i class="fa-regular fa-calendar text-coral text-[12px]"></i>
+          <span class="text-[13px] font-bold num">{{ shortMonth(state.month) }}</span>
+        </button>
+        <button @click="shiftMonth(1)" class="w-8 h-full text-muted active:text-ink rounded-r-full" aria-label="Bulan berikutnya"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+      </div>
+    </div>
+
+    <!-- Kartu anggaran -->
+    <div class="mt-3 rounded-[28px] bg-coral text-white px-5 pt-4 pb-4 relative overflow-hidden">
+      <div class="absolute -right-10 -top-12 w-40 h-40 rounded-full bg-white/10 pointer-events-none"></div>
+      <div class="absolute right-16 -bottom-14 w-28 h-28 rounded-full bg-white/10 pointer-events-none"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between">
+          <p class="text-[12.5px] font-semibold text-white/85">Sisa dana {{ monthLabel(state.month) }}</p>
+          <span v-if="remaining < 0" class="text-[11px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Lewat anggaran</span>
+          <span v-else class="text-[11px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
+        </div>
+        <p class="text-[34px] leading-[1.05] font-black tracking-[-0.035em] num mt-0.5">{{ rp(remaining) }}</p>
+        <div class="mt-3 h-2 rounded-full bg-black/15 overflow-hidden" role="progressbar" :aria-valuenow="Math.round(usedPct)" aria-valuemin="0" aria-valuemax="100">
+          <div class="h-full rounded-full bg-white transition-all duration-500" :style="{ width: Math.min(usedPct, 100) + '%' }"></div>
+        </div>
+        <div class="mt-3 grid grid-cols-2 gap-2">
+          <button v-if="!editingBudget" @click="startBudgetEdit" class="rounded-[18px] bg-white/15 active:bg-white/25 px-3.5 py-2 text-left transition-colors">
+            <p class="text-[11px] text-white/80 flex items-center gap-1.5">Budget <i class="fa-solid fa-pen text-[8px]"></i></p>
+            <p class="text-[14.5px] font-bold num leading-tight">{{ rp(state.budget) }}</p>
+          </button>
+          <div v-else class="rounded-[18px] bg-white px-3.5 py-2 text-black">
+            <p class="text-[11px] text-black/55">Ubah budget, lalu tekan Enter</p>
+            <div class="flex items-center gap-1">
+              <span class="text-[14.5px] font-bold">Rp</span>
+              <input ref="budgetInput" type="text" inputmode="numeric" :value="fmtNum(budgetDraft)" @input="onBudgetInput" @keyup.enter="$event.target.blur()" @keyup.esc="cancelBudgetEdit" @blur="saveBudget"
+                class="w-full min-w-0 bg-transparent text-[14.5px] font-bold num outline-none leading-tight" aria-label="Budget bulanan">
+            </div>
+          </div>
+          <div class="rounded-[18px] bg-white/15 px-3.5 py-2">
+            <p class="text-[11px] text-white/80">Terpakai</p>
+            <p class="text-[14.5px] font-bold num leading-tight">{{ rp(totalSpent) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="px-4 pt-2 pb-36">
+
+    <!-- ============ DAFTAR BELANJA ============ -->
+    <section v-if="activeTab === 'checklist'">
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar -mx-4 px-4 py-1">
+        <button v-for="s in SECTIONS" :key="s.id" @click="state.checklistSection = s.id"
+          :class="['acc-' + s.id, state.checklistSection === s.id ? 'bg-acc text-on-acc' : 'bg-acc-soft text-ink']"
+          class="shrink-0 h-9 px-3.5 rounded-full text-[13px] font-bold transition-colors">
+          {{ s.label }}
+          <span class="ml-1 font-semibold opacity-70 num">{{ doneIn(s.id) }}/{{ countIn(s.id) }}</span>
+        </button>
+      </div>
+
+      <div :class="'acc-' + state.checklistSection">
+        <div class="mt-3 flex items-center gap-3">
+          <div class="flex-1 h-2.5 rounded-full bg-acc-soft overflow-hidden">
+            <div class="h-full bg-acc rounded-full transition-all duration-300" :style="{ width: (countIn(state.checklistSection) ? doneIn(state.checklistSection) / countIn(state.checklistSection) * 100 : 0) + '%' }"></div>
+          </div>
+          <p class="text-[12.5px] font-semibold text-muted shrink-0 num">
+            <template v-if="countIn(state.checklistSection) && doneIn(state.checklistSection) === countIn(state.checklistSection)">Semua beres 🎉</template>
+            <template v-else>{{ doneIn(state.checklistSection) }} dari {{ countIn(state.checklistSection) }} dibeli</template>
+          </p>
+        </div>
+
+        <div v-for="g in grouped(state.checklistSection)" :key="g.category" class="mt-5">
+          <h3 class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</h3>
+          <div class="bg-surface rounded-[24px] overflow-hidden">
+            <label v-for="(item, idx) in g.items" :key="item.id" class="flex items-center gap-3.5 px-4 py-3.5 cursor-pointer select-none active:bg-acc-soft/60 transition-colors" :class="idx ? 'border-t border-line' : ''">
+              <input type="checkbox" v-model="item.isChecked" class="peer sr-only">
+              <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
+              <span class="flex-1 text-[15px] leading-snug transition-colors" :class="item.isChecked ? 'line-through text-muted' : 'font-semibold'">{{ item.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div v-if="!countIn(state.checklistSection)" class="mt-8 text-center text-muted text-[14px]">Daftar {{ sectionLabel(state.checklistSection) }} masih kosong.</div>
+
+        <button @click="openAdd(state.checklistSection)" class="mt-5 w-full h-12 rounded-full border-2 border-dashed border-acc/50 text-ink font-bold text-[14px] flex items-center justify-center gap-2 active:bg-acc-soft transition-colors">
+          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-plus"></i></span>
+          Tambah ke daftar {{ sectionLabel(state.checklistSection) }}
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ BULANAN & MINGGUAN ============ -->
+    <section v-else-if="activeTab === 'bulanan' || activeTab === 'mingguan'">
+      <div v-if="activeTab === 'mingguan'" class="grid grid-cols-4 gap-2 mb-3">
+        <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id"
+          :class="['acc-' + w.id, state.activeWeek === w.id ? 'bg-acc text-on-acc scale-[1.03]' : 'bg-acc-soft text-ink']"
+          class="relative h-[60px] rounded-[20px] flex flex-col items-center justify-center transition-all">
+          <span class="text-[11px] font-semibold opacity-75">Minggu</span>
+          <span class="text-[20px] font-black leading-none">{{ w.n }}</span>
+          <span v-if="warnCount(w.id)" class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center border-2 border-paper num">{{ warnCount(w.id) }}</span>
+        </button>
+      </div>
+
+      <div :class="'acc-' + rekapSection">
+        <div class="rounded-[24px] bg-acc-soft px-5 py-4 flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[12.5px] font-semibold text-ink/65">Pengeluaran {{ sectionLabel(rekapSection).toLowerCase() }}</p>
+            <p class="text-[26px] font-black tracking-[-0.03em] num leading-tight">{{ rp(subtotal(rekapSection)) }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[12.5px] font-bold num">{{ doneIn(rekapSection) }}/{{ countIn(rekapSection) }} <span class="font-medium text-ink/60">dibeli</span></p>
+            <p v-if="warnCount(rekapSection)" class="text-[12px] text-coral font-bold mt-0.5 num">{{ warnCount(rekapSection) }} belum ada harga</p>
+          </div>
+        </div>
+
+        <button @click="openAdd(rekapSection)" class="mt-3 w-full h-12 rounded-full border-2 border-dashed border-acc/50 text-ink font-bold text-[14px] flex items-center justify-center gap-2 active:bg-acc-soft transition-colors">
+          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[11px]"><i class="fa-solid fa-plus"></i></span>
+          Tambah Barang
+        </button>
+
+        <div v-for="g in grouped(rekapSection)" :key="g.category" class="mt-6">
+          <h3 class="text-[14px] font-extrabold mb-2 px-1 flex items-center justify-between gap-2">
+            <span class="flex items-center gap-2"><span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}</span>
+            <span class="font-bold text-muted num text-[13px]">{{ rp(sum(g.items)) }}</span>
+          </h3>
+          <div class="space-y-2">
+            <div v-for="item in g.items" :key="item.id" class="bg-surface rounded-[24px] p-4 border-2 transition-colors"
+              :class="needsPrice(item) ? 'border-coral' : 'border-transparent'">
+              <div class="flex items-start gap-3">
+                <label class="cursor-pointer mt-0.5">
+                  <input type="checkbox" v-model="item.isChecked" class="peer sr-only" :aria-label="'Centang ' + item.name">
+                  <span class="box" :class="{ on: item.isChecked }"><i v-if="item.isChecked" class="fa-solid fa-check"></i></span>
+                </label>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-[15px] leading-snug" :class="item.isChecked ? 'line-through text-muted' : ''">{{ item.name }}</p>
+                  <p v-if="needsPrice(item)" class="mt-1 inline-flex items-center gap-1 text-[11.5px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">⚠️ Sudah dibeli, harga belum diisi</p>
+                  <p v-else-if="item.custom" class="text-[11.5px] text-muted mt-0.5">{{ item.keep ? 'Barang tambahan' : 'Tambahan, hanya bulan ini' }}</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <p class="font-black num text-[15.5px] leading-tight" :class="item.totalSpent ? '' : 'text-muted/70'">{{ rp(item.totalSpent) }}</p>
+                  <p class="text-[11.5px] text-muted num">{{ item.totalQty }} qty</p>
+                </div>
+              </div>
+
+              <div class="mt-3.5 flex items-center gap-1.5">
+                <div class="relative flex-1 min-w-0">
+                  <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-muted pointer-events-none">Rp</span>
+                  <input type="text" inputmode="numeric" autocomplete="off" placeholder="Harga beli"
+                    :value="fmtNum(item.draftPrice)" @input="onPrice(item, $event)" @keyup.enter="submitItem(item)"
+                    class="w-full h-11 pl-9 pr-3 rounded-full bg-paper border-2 border-transparent text-[14.5px] font-bold num outline-none focus:border-acc placeholder:font-medium placeholder:text-muted/70">
+                </div>
+                <div class="flex items-center h-11 rounded-full bg-paper shrink-0">
+                  <button @click="item.draftQty = Math.max(1, (item.draftQty || 1) - 1)" class="w-8 h-full text-muted active:text-ink" aria-label="Kurangi qty"><i class="fa-solid fa-minus text-[10px]"></i></button>
+                  <span class="w-5 text-center text-[14.5px] font-black num">{{ item.draftQty }}</span>
+                  <button @click="item.draftQty = (item.draftQty || 1) + 1" class="w-8 h-full text-muted active:text-ink" aria-label="Tambah qty"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                </div>
+                <button @click="submitItem(item)" class="w-11 h-11 rounded-full bg-acc text-on-acc shrink-0 active:scale-90 transition-transform" aria-label="Simpan harga"><i class="fa-solid fa-check"></i></button>
+                <button @click="askReset(item)" class="w-11 h-11 rounded-full bg-paper text-muted shrink-0 active:scale-90 transition-transform" aria-label="Reset barang"><i class="fa-solid fa-rotate-left text-[13px]"></i></button>
+              </div>
+
+              <div class="flex items-center justify-between mt-2 min-h-[18px] px-1">
+                <p class="text-[12px] text-muted num">
+                  <template v-if="toInt(item.draftPrice)">{{ item.draftQty }} × {{ rp(toInt(item.draftPrice)) }} = <b class="text-ink">+{{ rp(toInt(item.draftPrice) * item.draftQty) }}</b></template>
+                </p>
+                <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[11px]"></i> Hapus</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="activeTab === 'bulanan'" class="mt-10">
+          <button @click="askCloseBook" class="w-full h-[52px] rounded-full bg-ink text-paper font-extrabold text-[15px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-solid fa-book text-[13px]"></i> Tutup Buku Bulan Ini
+          </button>
+          <p class="text-[12.5px] text-muted text-center mt-2.5 leading-relaxed px-4">Data {{ monthLabel(state.month) }} masuk arsip, lalu semua kembali ke nol untuk {{ monthLabel(nextMonth(state.month)) }}.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ RIWAYAT ============ -->
+    <section v-else-if="activeTab === 'riwayat'">
+      <div class="grid grid-cols-3 p-1 rounded-full bg-surface">
+        <button v-for="v in HISTORY_VIEWS" :key="v.id" @click="state.historyView = v.id"
+          class="h-10 rounded-full text-[13.5px] font-bold transition-colors"
+          :class="state.historyView === v.id ? 'bg-coral text-on-coral' : 'text-muted'">{{ v.label }}</button>
+      </div>
+
+      <!-- Bulan ini -->
+      <div v-if="state.historyView === 'bulan'" class="mt-5">
+        <h2 class="text-[20px] font-black tracking-[-0.03em]">Laporan {{ monthLabel(state.month) }}</h2>
+        <p class="text-[13px] text-muted mt-0.5">Siap dikirim lewat email atau disalin.</p>
+
+        <div v-if="unpriced.length" class="mt-3 rounded-[22px] bg-coral-soft p-4 text-[13.5px]">
+          <p class="font-bold text-coral">⚠️ {{ unpriced.length }} barang sudah dibeli tapi harganya belum diisi</p>
+          <p class="mt-1 leading-relaxed text-ink/80">{{ unpriced.map(i => i.name + ' (' + sectionLabel(i.tab) + ')').join(', ') }}</p>
+        </div>
+
+        <textarea readonly :value="reportText" rows="14" class="mt-3 w-full rounded-[22px] bg-surface p-4 text-[12.5px] leading-relaxed num outline-none resize-y"></textarea>
+
+        <div class="mt-2.5 grid grid-cols-2 gap-2">
+          <a :href="mailtoLink" target="_blank" rel="noopener" class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-regular fa-envelope"></i> Buka di Email
+          </a>
+          <button @click="copyText(reportText)" class="h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+            <i class="fa-regular fa-copy"></i> Salin Teks
+          </button>
+        </div>
+      </div>
+
+      <!-- Tahunan -->
+      <div v-else-if="state.historyView === 'tahun'" class="mt-5">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-[20px] font-black tracking-[-0.03em]">Ringkasan tahunan</h2>
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar">
+            <button v-for="y in years" :key="y" @click="selectedYear = y"
+              class="shrink-0 h-8 px-3.5 rounded-full text-[13px] font-bold transition-colors num"
+              :class="selectedYear === y ? 'bg-ink text-paper' : 'bg-surface text-muted'">{{ y }}</button>
+          </div>
+        </div>
+
+        <div class="mt-3 rounded-[28px] bg-surface p-5">
+          <p class="text-[12.5px] font-semibold text-muted">Total pengeluaran {{ selectedYear }}</p>
+          <p class="text-[32px] font-black tracking-[-0.035em] num leading-tight">{{ rp(yearStats.spent) }}</p>
+          <p class="mt-1.5 inline-flex text-[12.5px] font-bold num rounded-full px-2.5 py-1" :class="yearStats.budget - yearStats.spent < 0 ? 'bg-coral text-on-coral' : 'acc-M2 bg-acc-soft text-ink'">
+            <template v-if="yearStats.budget - yearStats.spent >= 0">🎉 Hemat {{ rp(yearStats.budget - yearStats.spent) }}</template>
+            <template v-else>Lewat {{ rp(yearStats.spent - yearStats.budget) }} dari anggaran</template>
+          </p>
+
+          <div class="mt-4 grid grid-cols-3 gap-2">
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Rata-rata/bulan</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.avg) }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Anggaran</p><p class="text-[13.5px] font-extrabold num">{{ rpShort(yearStats.budget) }}</p></div>
+            <div class="rounded-[18px] bg-paper px-3 py-2.5"><p class="text-[11px] text-muted">Tertinggi</p><p class="text-[13.5px] font-extrabold">{{ yearStats.top ? shortMonthName(yearStats.top.month) : '-' }}</p></div>
+          </div>
+
+          <div class="mt-6">
+            <div class="flex items-center justify-between text-[11.5px] text-muted mb-2">
+              <span class="font-semibold">Pengeluaran per bulan</span>
+              <span class="flex items-center gap-1.5"><span class="inline-block w-3 border-t-2 border-dashed border-ink/40"></span> Anggaran</span>
+            </div>
+            <div class="relative h-36 flex items-end gap-[5px]">
+              <div class="absolute left-0 right-0 border-t-2 border-dashed border-ink/25 pointer-events-none" :style="{ bottom: (yearStats.avgBudget / chartMax * 100) + '%' }"></div>
+              <div v-for="b in yearStats.bars" :key="b.m" class="flex-1 h-full flex flex-col justify-end items-center">
+                <div class="w-full rounded-[8px] transition-all duration-500"
+                  :class="!b.has ? 'bg-stone/60' : (b.spent > b.budget ? 'bg-ink' : (b.current ? 'bg-coral/45' : 'bg-coral'))"
+                  :style="{ height: (b.has ? Math.max(b.spent / chartMax * 100, 4) : 4) + '%' }"
+                  :title="b.label + ': ' + rp(b.spent)"></div>
+              </div>
+            </div>
+            <div class="flex gap-[5px] mt-1.5">
+              <span v-for="b in yearStats.bars" :key="'l' + b.m" class="flex-1 text-center text-[10px] font-semibold text-muted">{{ b.label.charAt(0) }}</span>
+            </div>
+            <p class="text-[11.5px] text-muted mt-2 leading-relaxed">Batang hitam berarti lewat anggaran<template v-if="yearStats.hasCurrent">, batang pudar adalah bulan berjalan</template>.</p>
+          </div>
+        </div>
+
+        <div class="mt-3 rounded-[24px] bg-surface p-5">
+          <h3 class="text-[15px] font-extrabold">Komposisi belanja</h3>
+          <div class="mt-3 h-4 rounded-full overflow-hidden flex bg-stone gap-[2px]">
+            <div v-for="s in yearStats.sections" :key="s.id" :class="'acc-' + s.id" class="h-full bg-acc" :style="{ width: pct(s.spent, yearStats.spent) + '%' }"></div>
+          </div>
+          <div class="mt-3 space-y-2">
+            <div v-for="s in yearStats.sections" :key="s.id" :class="'acc-' + s.id" class="flex items-center gap-2.5 text-[13.5px]">
+              <span class="w-3 h-3 rounded-full bg-acc shrink-0"></span>
+              <span class="flex-1">{{ s.label }}</span>
+              <span class="font-extrabold num">{{ rp(s.spent) }}</span>
+              <span class="w-10 text-right text-muted num text-[12.5px]">{{ pct(s.spent, yearStats.spent) }}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 rounded-[24px] bg-surface p-5">
+          <h3 class="text-[15px] font-extrabold">Pengeluaran terbesar</h3>
+          <div v-if="yearStats.topItems.length" class="mt-2">
+            <div v-for="(it, idx) in yearStats.topItems" :key="it.name" class="py-2 flex items-center gap-3 text-[13.5px]">
+              <span class="w-7 h-7 rounded-full grid place-items-center text-[12px] font-black shrink-0" :class="idx === 0 ? 'bg-coral text-on-coral' : 'bg-paper text-muted'">{{ idx + 1 }}</span>
+              <span class="flex-1 min-w-0 truncate font-semibold">{{ it.name }}</span>
+              <span class="font-extrabold num">{{ rp(it.spent) }}</span>
+            </div>
+          </div>
+          <p v-else class="mt-2 text-[13px] text-muted">Belum ada pengeluaran tercatat di tahun ini.</p>
+        </div>
+
+        <div class="mt-3 rounded-[24px] bg-surface p-5">
+          <h3 class="text-[15px] font-extrabold">Rincian per bulan</h3>
+          <div class="mt-2 divide-y divide-line">
+            <div v-for="e in yearEntries" :key="e.month" class="py-2.5 flex items-center gap-3 text-[13.5px]">
+              <span class="flex-1 font-semibold">{{ monthLabel(e.month) }} <span v-if="e.current" class="ml-1 text-[11px] font-bold text-coral bg-coral-soft rounded-full px-2 py-0.5">berjalan</span></span>
+              <span class="font-extrabold num">{{ rp(e.spent) }}</span>
+              <span class="w-[88px] text-right text-[12px] num" :class="e.budget - e.spent < 0 ? 'text-coral font-bold' : 'text-muted'">{{ e.budget - e.spent < 0 ? 'lewat ' + rpShort(e.spent - e.budget) : 'sisa ' + rpShort(e.budget - e.spent) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <button @click="copyText(buildYearReport(selectedYear))" class="mt-4 w-full h-12 rounded-full bg-ink text-paper font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[.98] transition-transform">
+          <i class="fa-regular fa-copy"></i> Salin Laporan Tahun {{ selectedYear }}
+        </button>
+      </div>
+
+      <!-- Arsip -->
+      <div v-else class="mt-5">
+        <h2 class="text-[20px] font-black tracking-[-0.03em]">Arsip bulan lalu</h2>
+        <p class="text-[13px] text-muted mt-0.5">Bulan yang sudah ditutup buku.</p>
+
+        <div v-if="!state.history.length" class="mt-3 rounded-[24px] bg-surface p-7 text-center">
+          <p class="text-[34px]">🗂️</p>
+          <p class="mt-2 text-[14px] text-muted leading-relaxed">Arsip pertama muncul setelah Anda menekan <b class="text-ink">Tutup Buku Bulan Ini</b> di tab Bulanan.</p>
+        </div>
+
+        <div v-else class="mt-3 space-y-2">
+          <div v-for="h in historyDesc" :key="h.id" class="bg-surface rounded-[24px] overflow-hidden">
+            <button @click="openArchive = openArchive === h.id ? null : h.id" class="w-full flex items-center gap-3 px-4 py-3.5 text-left" :aria-expanded="openArchive === h.id">
+              <div class="w-12 h-12 rounded-[16px] bg-coral-soft text-coral grid place-items-center shrink-0 text-[12px] font-black leading-tight text-center">{{ shortMonth(h.month) }}</div>
+              <div class="flex-1 min-w-0">
+                <p class="font-extrabold text-[15px]">{{ monthLabel(h.month) }}</p>
+                <p class="text-[12.5px] text-muted num">Terpakai {{ rp(h.totalSpent) }}</p>
+              </div>
+              <span class="w-8 h-8 rounded-full bg-paper grid place-items-center text-muted transition-transform duration-200" :class="openArchive === h.id ? 'rotate-180' : ''"><i class="fa-solid fa-chevron-down text-[11px]"></i></span>
+            </button>
+
+            <div v-if="openArchive === h.id" class="px-4 pb-4">
+              <div class="grid grid-cols-3 gap-2">
+                <div class="rounded-[16px] bg-paper px-3 py-2"><p class="text-[11px] text-muted">Budget</p><p class="text-[13px] font-extrabold num">{{ rpShort(h.budget) }}</p></div>
+                <div class="rounded-[16px] bg-paper px-3 py-2"><p class="text-[11px] text-muted">Terpakai</p><p class="text-[13px] font-extrabold num">{{ rpShort(h.totalSpent) }}</p></div>
+                <div class="rounded-[16px] bg-paper px-3 py-2"><p class="text-[11px] text-muted">Sisa</p><p class="text-[13px] font-extrabold num" :class="h.budget - h.totalSpent < 0 ? 'text-coral' : ''">{{ h.budget - h.totalSpent < 0 ? '-' : '' }}{{ rpShort(h.budget - h.totalSpent) }}</p></div>
+              </div>
+
+              <template v-for="s in SECTIONS" :key="s.id">
+                <div v-if="spentItems(h.items, s.id).length" class="mt-4" :class="'acc-' + s.id">
+                  <p class="text-[13px] font-extrabold flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-acc"></span>{{ s.label }}</span><span class="num">{{ rp(sum(h.items.filter(i => i.tab === s.id))) }}</span></p>
+                  <div class="mt-1 divide-y divide-line">
+                    <div v-for="(it, idx) in spentItems(h.items, s.id)" :key="idx" class="flex justify-between gap-3 py-1.5 text-[13.5px]">
+                      <span class="min-w-0">{{ it.name }} <span class="text-muted num">({{ it.totalQty }} qty)</span></span>
+                      <span class="font-bold num shrink-0">{{ rp(it.totalSpent) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <p v-if="!h.items.some(i => i.totalSpent > 0)" class="mt-3 text-[13px] text-muted">Tidak ada pengeluaran tercatat di bulan ini.</p>
+
+              <button @click="copyText(buildReport(h.month, h.items, h.budget))" class="mt-4 w-full h-11 rounded-full bg-paper font-bold text-[13.5px] flex items-center justify-center gap-2">
+                <i class="fa-regular fa-copy"></i> Salin Laporan {{ monthLabel(h.month) }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ NAVIGASI BAWAH ============ -->
+  <nav class="bottom-nav z-30 px-4 pointer-events-none" aria-label="Navigasi utama">
+    <div class="max-w-md mx-auto pointer-events-auto">
+      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-4 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
+        <button v-for="t in NAV" :key="t.id" @click="setTab(t.id)" class="relative h-[58px] rounded-[20px] flex flex-col items-center justify-center gap-1 transition-colors"
+          :class="activeTab === t.id ? 'bg-coral-soft text-coral' : 'text-muted'" :aria-current="activeTab === t.id ? 'page' : null">
+          <span class="text-[17px] leading-none"><i :class="['fa-solid', t.icon]"></i></span>
+          <span class="text-[11px] font-bold">{{ t.label }}</span>
+          <span v-if="navWarn(t.id)" class="absolute top-1.5 right-[22%] min-w-[17px] h-[17px] px-1 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center num">{{ navWarn(t.id) }}</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ TOAST ============ -->
+  <transition name="toast">
+    <div v-if="toast.show" class="fixed left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100%-2rem)] w-max px-4 py-3 rounded-full shadow-lg text-[13.5px] font-bold flex items-center gap-2"
+      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }"
+      :class="toast.type === 'error' ? 'bg-coral text-on-coral' : 'bg-ink text-paper'">
+      <span v-if="toast.type === 'error'"><i class="fa-solid fa-circle-exclamation"></i></span>
+      <span v-else><i class="fa-solid fa-circle-check"></i></span>
+      {{ toast.message }}
+    </div>
+  </transition>
+
+  <!-- ============ MODAL ============ -->
+  <transition name="fade">
+    <div v-if="modal.open" class="fixed inset-0 z-50 bg-black/45 flex items-end justify-center p-3" @click.self="closeModal" role="dialog" aria-modal="true">
+      <transition name="pop" appear>
+        <div class="w-full max-w-md bg-surface rounded-[30px] p-6 shadow-2xl max-h-[88vh] overflow-y-auto" :style="{ marginBottom: 'env(safe-area-inset-bottom, 0px)' }">
+          <div class="w-10 h-1.5 rounded-full bg-stone mx-auto -mt-2 mb-4"></div>
+
+          <template v-if="modal.type === 'reset'">
+            <p class="text-[34px]">🔄</p>
+            <h3 class="mt-1 text-[20px] font-black tracking-[-0.03em]">Reset {{ modal.item.name }}?</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">Total {{ modal.item.totalQty }} qty senilai {{ rp(modal.item.totalSpent) }} akan dihapus dan centangnya dilepas. Langkah ini tidak bisa dibatalkan.</p>
+            <div class="mt-6 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="confirmReset" class="h-12 rounded-full bg-coral text-on-coral font-bold">Ya, Reset</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'delete'">
+            <p class="text-[34px]">🗑️</p>
+            <h3 class="mt-1 text-[20px] font-black tracking-[-0.03em]">Hapus {{ modal.item.name }}?</h3>
+            <p class="mt-2 text-[14px] text-muted leading-relaxed">Barang ini akan dihapus dari daftar {{ sectionLabel(modal.item.tab) }}<template v-if="modal.item.totalSpent">, termasuk pengeluaran {{ rp(modal.item.totalSpent) }}</template>.</p>
+            <div class="mt-6 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="confirmDelete" class="h-12 rounded-full bg-coral text-on-coral font-bold">Ya, Hapus</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'add'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Tambah barang</h3>
+            <label class="block mt-4">
+              <span class="text-[12.5px] font-bold text-muted">Nama barang</span>
+              <input ref="addNameInput" v-model="modal.form.name" @keyup.enter="confirmAdd" placeholder="Contoh: Roti Tawar"
+                class="mt-1.5 w-full h-12 px-4 rounded-full bg-paper border-2 outline-none focus:border-coral text-[15px] font-semibold" :class="modal.error ? 'border-coral' : 'border-transparent'">
+            </label>
+            <p v-if="modal.error" class="text-[12.5px] text-coral font-semibold mt-1.5 px-1">{{ modal.error }}</p>
+
+            <div class="mt-4">
+              <span class="text-[12.5px] font-bold text-muted">Masuk ke daftar</span>
+              <div class="mt-1.5 grid grid-cols-5 gap-1.5">
+                <button v-for="s in SECTIONS" :key="s.id" @click="modal.form.target = s.id"
+                  :class="['acc-' + s.id, modal.form.target === s.id ? 'bg-acc text-on-acc' : 'bg-acc-soft text-ink']"
+                  class="h-12 rounded-[16px] text-[11.5px] font-bold leading-tight transition-colors">{{ s.short }}</button>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <span class="text-[12.5px] font-bold text-muted">Kategori</span>
+              <div class="mt-1.5 flex flex-wrap gap-1.5">
+                <button v-for="c in categoriesFor(modal.form.target)" :key="c" @click="modal.form.category = c"
+                  class="h-9 px-3.5 rounded-full text-[12.5px] font-bold transition-colors"
+                  :class="modal.form.category === c ? 'bg-ink text-paper' : 'bg-paper text-muted'">{{ catEmoji(c) }} {{ c }}</button>
+              </div>
+            </div>
+
+            <button @click="modal.form.keep = !modal.form.keep" class="mt-4 w-full flex items-center gap-3 rounded-[20px] bg-paper px-4 py-3 text-left" role="switch" :aria-checked="modal.form.keep">
+              <span class="flex-1">
+                <span class="block text-[14px] font-bold">Simpan untuk bulan berikutnya</span>
+                <span class="block text-[12px] text-muted mt-0.5">{{ modal.form.keep ? 'Tetap muncul setelah tutup buku.' : 'Hanya untuk bulan ini, hilang saat tutup buku.' }}</span>
+              </span>
+              <span class="w-12 h-7 rounded-full p-1 transition-colors shrink-0" :class="modal.form.keep ? 'bg-coral' : 'bg-stone'">
+                <span class="block w-5 h-5 rounded-full bg-white shadow transition-transform" :class="modal.form.keep ? 'translate-x-5' : ''"></span>
+              </span>
+            </button>
+
+            <div class="mt-6 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="confirmAdd" class="h-12 rounded-full bg-coral text-on-coral font-bold">Tambah</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'closeBook'">
+            <p class="text-[34px]">📒</p>
+            <h3 class="mt-1 text-[20px] font-black tracking-[-0.03em]">Tutup buku {{ monthLabel(state.month) }}?</h3>
+            <div class="mt-4 rounded-[20px] bg-paper p-4 text-[14px] space-y-1.5 num">
+              <p class="flex justify-between"><span class="text-muted">Budget</span><b>{{ rp(state.budget) }}</b></p>
+              <p class="flex justify-between"><span class="text-muted">Terpakai</span><b>{{ rp(totalSpent) }}</b></p>
+              <p class="flex justify-between"><span class="text-muted">Sisa dana</span><b :class="remaining < 0 ? 'text-coral' : ''">{{ rp(remaining) }}</b></p>
+            </div>
+            <p v-if="unpriced.length" class="mt-3 text-[13px] text-coral font-bold bg-coral-soft rounded-[18px] px-3.5 py-2.5">⚠️ Masih ada {{ unpriced.length }} barang dibeli tanpa harga.</p>
+            <p class="mt-3 text-[13.5px] text-muted leading-relaxed">Data bulan ini masuk arsip. Qty, harga, dan centang kembali ke nol, barang tambahan khusus bulan ini dihapus, dan bulan maju ke <b class="text-ink">{{ monthLabel(nextMonth(state.month)) }}</b>.</p>
+            <div class="mt-6 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="confirmCloseBook" class="h-12 rounded-full bg-ink text-paper font-bold">Tutup Buku</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'month'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Pilih bulan</h3>
+            <div class="mt-4 flex items-center justify-between bg-paper rounded-full p-1">
+              <button @click="modal.pickYear--" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun sebelumnya"><i class="fa-solid fa-chevron-left text-[11px]"></i></button>
+              <span class="text-[18px] font-black num">{{ modal.pickYear }}</span>
+              <button @click="modal.pickYear++" class="w-10 h-10 rounded-full bg-surface text-muted active:text-ink" aria-label="Tahun berikutnya"><i class="fa-solid fa-chevron-right text-[11px]"></i></button>
+            </div>
+            <div class="mt-3 grid grid-cols-3 gap-2">
+              <button v-for="(b, idx) in BULAN_PENDEK" :key="b" @click="pickMonth(idx + 1)"
+                class="h-12 rounded-[16px] font-bold text-[14px] transition-colors"
+                :class="isPicked(idx + 1) ? 'bg-coral text-on-coral' : (isNow(idx + 1) ? 'bg-coral-soft text-coral' : 'bg-paper text-ink')">{{ b }}</button>
+            </div>
+            <p class="mt-4 text-[12.5px] text-muted leading-relaxed">Ini hanya mengganti label bulan untuk catatan yang sedang berjalan. Untuk mulai bulan baru dengan daftar kosong, pakai Tutup Buku di tab Bulanan.</p>
+          </template>
+
+          <template v-else-if="modal.type === 'copied'">
+            <div class="text-center py-1">
+              <div class="w-16 h-16 mx-auto rounded-full bg-coral text-on-coral grid place-items-center text-2xl box on" style="width:64px;height:64px;border-radius:999px;border:0"><i class="fa-solid fa-check"></i></div>
+              <h3 class="mt-4 text-[20px] font-black tracking-[-0.03em]">Teks disalin!</h3>
+              <p class="mt-1 text-[14px] text-muted">Laporan siap ditempel di WhatsApp, catatan, atau email.</p>
+              <button @click="closeModal" class="mt-6 w-full h-12 rounded-full bg-ink text-paper font-bold">Oke</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'copyFail'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Salin manual</h3>
+            <p class="mt-1.5 text-[13.5px] text-muted">Browser ini menolak salin otomatis. Tekan lama teks di bawah, pilih semua, lalu salin.</p>
+            <textarea readonly :value="modal.text" rows="10" class="mt-3 w-full rounded-[18px] bg-paper p-3 text-[12.5px] outline-none"></textarea>
+            <button @click="closeModal" class="mt-3 w-full h-12 rounded-full bg-paper font-bold">Tutup</button>
+          </template>
+        </div>
+      </transition>
+    </div>
+  </transition>
+</div>
+
+<script>
+(function () {
+  const { createApp, reactive, ref, computed, watch, nextTick } = Vue;
+
+  const DEFAULT_BUDGET = 6000000;
+  const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
+  const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
+  const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const BULAN_PENDEK = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+  const NAV = [
+    { id: 'checklist', label: 'Daftar', icon: 'fa-list-check' },
+    { id: 'bulanan', label: 'Bulanan', icon: 'fa-calendar-days' },
+    { id: 'mingguan', label: 'Mingguan', icon: 'fa-basket-shopping' },
+    { id: 'riwayat', label: 'Riwayat', icon: 'fa-chart-simple' }
+  ];
+  const SECTIONS = [
+    { id: 'bulanan', label: 'Bulanan', short: 'Bulanan' },
+    { id: 'M1', label: 'Minggu 1', short: 'Mg 1' },
+    { id: 'M2', label: 'Minggu 2', short: 'Mg 2' },
+    { id: 'M3', label: 'Minggu 3', short: 'Mg 3' },
+    { id: 'M4', label: 'Minggu 4', short: 'Mg 4' }
+  ];
+  const WEEKS = [{ id: 'M1', n: 1 }, { id: 'M2', n: 2 }, { id: 'M3', n: 3 }, { id: 'M4', n: 4 }];
+  const WEEK_IDS = WEEKS.map(w => w.id);
+  const HISTORY_VIEWS = [
+    { id: 'bulan', label: 'Bulan Ini' },
+    { id: 'tahun', label: 'Tahunan' },
+    { id: 'arsip', label: 'Arsip' }
+  ];
+  const REKAP_IDS = SECTIONS.map(s => s.id);
+  const EMOJI = {
+    'Tagihan Rutin': '⚡', 'Kebutuhan Pokok': '🍚', 'Bumbu & Saus': '🧂', 'Cuci & Kebersihan': '🫧',
+    'Rumah Tangga': '🏠', 'Perlengkapan Mandi': '🛁', 'Lauk Hewani': '🍗', 'Sayur & Rempah': '🥬',
+    'Lauk Nabati & Pelengkap': '🍜', 'Buah, Minuman & Camilan': '🍎', 'Lain-lain': '🛒'
+  };
+
+  const MONTHLY_DEFAULTS = [
+    ['Listrik (Token/Tagihan)', 'Tagihan Rutin'],
+    ['Beras 10 kg', 'Kebutuhan Pokok'],
+    ['Gas 1 Tabung', 'Kebutuhan Pokok'],
+    ['Air Galon (8 Ulang, 2 RO)', 'Kebutuhan Pokok'],
+    ['Minyak Goreng (4 Liter)', 'Kebutuhan Pokok'],
+    ['Margarin (2)', 'Kebutuhan Pokok'],
+    ['Gula Pasir 200g (2)', 'Kebutuhan Pokok'],
+    ['Santan Cair (2)', 'Kebutuhan Pokok'],
+    ['Totole Kaldu Jamur (2)', 'Bumbu & Saus'],
+    ['Kecap Manis (2)', 'Bumbu & Saus'],
+    ['Saus Tiram (2)', 'Bumbu & Saus'],
+    ['Saus Sambal Besar (1)', 'Bumbu & Saus'],
+    ['Saus Teriyaki / Bulgogi', 'Bumbu & Saus'],
+    ['Saus Bolognese', 'Bumbu & Saus'],
+    ['Saus Wijen Sangrai', 'Bumbu & Saus'],
+    ['Detergen Cair (2 jerigen)', 'Cuci & Kebersihan'],
+    ['Pewangi Pakaian (2)', 'Cuci & Kebersihan'],
+    ['Pelicin Pakaian (2)', 'Cuci & Kebersihan'],
+    ['Pembersih Mesin Cuci', 'Cuci & Kebersihan'],
+    ['Sabun Cuci Piring Cair', 'Cuci & Kebersihan'],
+    ['Spons Cuci Piring (2)', 'Cuci & Kebersihan'],
+    ['Tisu Wajah (4 pack)', 'Rumah Tangga'],
+    ['Tisu Dapur (1 roll)', 'Rumah Tangga'],
+    ['Tisu Toilet (1 roll)', 'Rumah Tangga'],
+    ['Pengharum Ruangan (3)', 'Rumah Tangga'],
+    ['Pengharum Lemari (2)', 'Rumah Tangga'],
+    ['Plastik Sampah / Belanja', 'Rumah Tangga'],
+    ['Sabun Mandi Cair (3)', 'Perlengkapan Mandi'],
+    ['Sampo Rontok (2)', 'Perlengkapan Mandi'],
+    ['Pasta Gigi (2)', 'Perlengkapan Mandi']
+  ];
+  const WEEKLY_DEFAULTS = [
+    ['Telur (1 Box)', 'Lauk Hewani'],
+    ['Daging Ayam', 'Lauk Hewani'],
+    ['Daging Sapi / Ikan', 'Lauk Hewani'],
+    ['Sayuran Hijau', 'Sayur & Rempah'],
+    ['Rempah (Bawang, Cabe, dll)', 'Sayur & Rempah'],
+    ['Aneka Jamur', 'Sayur & Rempah'],
+    ['Aneka Tahu & Tempe', 'Lauk Nabati & Pelengkap'],
+    ['Mi / Pangsit / Keju', 'Lauk Nabati & Pelengkap'],
+    ['Buah-buahan Segar', 'Buah, Minuman & Camilan'],
+    ['Susu UHT / Yoghurt', 'Buah, Minuman & Camilan'],
+    ['Kopi / Minuman', 'Buah, Minuman & Camilan'],
+    ['Biskuit / Camilan Keluarga', 'Buah, Minuman & Camilan']
+  ];
+
+  // ---------- Helper ----------
+  const pad = n => String(n).padStart(2, '0');
+  const isValidMonth = v => typeof v === 'string' && /^\d{4}-(0[1-9]|1[0-2])$/.test(v);
+  function currentMonth() {
+    const d = new Date(); // waktu lokal, bukan UTC
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+  }
+  // Maju satu bulan murni dari string "YYYY-MM", bebas bug zona waktu
+  function nextMonth(ym) {
+    if (!isValidMonth(ym)) ym = currentMonth();
+    let [y, m] = ym.split('-').map(Number);
+    m += 1;
+    if (m > 12) { m = 1; y += 1; }
+    return y + '-' + pad(m);
+  }
+  function monthLabel(ym) {
+    if (!isValidMonth(ym)) return '-';
+    const [y, m] = ym.split('-').map(Number);
+    return BULAN[m - 1] + ' ' + y;
+  }
+  function shortMonth(ym) {
+    if (!isValidMonth(ym)) return '-';
+    const [y, m] = ym.split('-').map(Number);
+    return BULAN_PENDEK[m - 1] + ' ’' + String(y).slice(2);
+  }
+  function shortMonthName(ym) {
+    if (!isValidMonth(ym)) return '-';
+    return BULAN[Number(ym.slice(5)) - 1];
+  }
+  const nf = new Intl.NumberFormat('id-ID');
+  function rp(n) {
+    n = Math.round(Number(n) || 0);
+    return (n < 0 ? '-Rp ' : 'Rp ') + nf.format(Math.abs(n));
+  }
+  function rpShort(n) {
+    n = Math.abs(Math.round(Number(n) || 0));
+    if (n >= 1000000) return 'Rp ' + (n / 1000000).toLocaleString('id-ID', { maximumFractionDigits: 1 }) + ' jt';
+    if (n >= 1000) return 'Rp ' + Math.round(n / 1000) + ' rb';
+    return 'Rp ' + n;
+  }
+  const toInt = v => parseInt(String(v || '').replace(/\D/g, ''), 10) || 0;
+  const fmtNum = v => { const n = toInt(v); return n ? nf.format(n) : ''; };
+  const sum = arr => arr.reduce((t, i) => t + (Number(i.totalSpent) || 0), 0);
+  const pct = (a, b) => b > 0 ? Math.round(a / b * 100) : 0;
+  const sectionLabel = id => (SECTIONS.find(s => s.id === id) || { label: id }).label;
+  const catEmoji = c => EMOJI[c] || '🛒';
+  let idSeq = 0;
+  const uid = p => p + '-' + Date.now().toString(36) + '-' + (idSeq++).toString(36) + Math.random().toString(36).slice(2, 6);
+
+  function makeItem(id, name, category, tab, custom, keep) {
+    return { id, name, category, tab, isChecked: false, totalQty: 0, totalSpent: 0, custom: !!custom, keep: !!keep, draftPrice: '', draftQty: 1 };
+  }
+  function defaultItems() {
+    const items = MONTHLY_DEFAULTS.map(([n, c], i) => makeItem('bln-' + (i + 1), n, c, 'bulanan'));
+    WEEK_IDS.forEach(w => {
+      WEEKLY_DEFAULTS.forEach(([n, c], i) => items.push(makeItem(w + '-' + (i + 1), n, c, w)));
+    });
+    return items;
+  }
+  function normalizeItem(i) {
+    return {
+      id: String(i.id || uid('x')), name: String(i.name || 'Tanpa nama'), category: String(i.category || 'Lain-lain'),
+      tab: REKAP_IDS.includes(i.tab) ? i.tab : 'bulanan', isChecked: !!i.isChecked,
+      totalQty: Math.max(0, parseInt(i.totalQty, 10) || 0), totalSpent: Math.max(0, Number(i.totalSpent) || 0),
+      custom: !!i.custom, keep: !!i.keep, draftPrice: String(i.draftPrice || '').replace(/\D/g, ''), draftQty: Math.max(1, parseInt(i.draftQty, 10) || 1)
+    };
+  }
+  function loadState() {
+    const fresh = { month: currentMonth(), budget: DEFAULT_BUDGET, items: defaultItems(), history: [], checklistSection: 'bulanan', activeWeek: 'M1', historyView: 'bulan' };
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return fresh;
+      const s = JSON.parse(raw);
+      if (!s || !Array.isArray(s.items) || !s.items.length) return fresh;
+      return {
+        month: isValidMonth(s.month) ? s.month : currentMonth(),
+        budget: Number(s.budget) > 0 ? Number(s.budget) : DEFAULT_BUDGET,
+        items: s.items.map(normalizeItem),
+        history: Array.isArray(s.history) ? s.history.filter(h => h && Array.isArray(h.items) && isValidMonth(h.month)) : [],
+        checklistSection: REKAP_IDS.includes(s.checklistSection) ? s.checklistSection : 'bulanan',
+        activeWeek: WEEK_IDS.includes(s.activeWeek) ? s.activeWeek : 'M1',
+        historyView: HISTORY_VIEWS.some(v => v.id === s.historyView) ? s.historyView : 'bulan'
+      };
+    } catch (e) { return fresh; }
+  }
+  function loadTab(state) {
+    try {
+      const t = localStorage.getItem(TAB_KEY);
+      if (NAV.some(x => x.id === t)) return t;
+      if (WEEK_IDS.includes(t)) { state.activeWeek = t; return 'mingguan'; } // versi lama
+    } catch (e) {}
+    return 'checklist';
+  }
+
+  function buildReport(month, items, budget) {
+    budget = Number(budget) || DEFAULT_BUDGET;
+    const spent = sum(items);
+    const L = [];
+    L.push('LAPORAN BELANJA KITA');
+    L.push('Bulan: ' + monthLabel(month));
+    L.push('');
+    L.push('Total Budget : ' + rp(budget));
+    L.push('Terpakai     : ' + rp(spent));
+    L.push('Sisa Dana    : ' + rp(budget - spent));
+    L.push('');
+    L.push('⚠️ Sudah dibeli tapi harga belum diisi:');
+    const unp = items.filter(i => i.isChecked && !(Number(i.totalSpent) > 0));
+    if (!unp.length) L.push('- Tidak ada');
+    unp.forEach(i => L.push('- ' + i.name + ' (' + sectionLabel(i.tab) + ')'));
+    L.push('');
+    L.push('DETAIL PENGELUARAN');
+    let any = false;
+    SECTIONS.forEach(s => {
+      const its = items.filter(i => i.tab === s.id && Number(i.totalSpent) > 0);
+      if (!its.length) return;
+      any = true;
+      L.push('');
+      L.push('[' + s.label + '] Subtotal ' + rp(sum(its)));
+      its.forEach(i => L.push('- ' + i.name + ': ' + i.totalQty + ' qty, ' + rp(i.totalSpent)));
+    });
+    if (!any) L.push('- Belum ada pengeluaran');
+    return L.join('\n');
+  }
+
+  createApp({
+    setup() {
+      const state = reactive(loadState());
+      const activeTab = ref(loadTab(state));
+      const addNameInput = ref(null);
+      const budgetInput = ref(null);
+      const openArchive = ref(null);
+      const selectedYear = ref(state.month.slice(0, 4));
+      const editingBudget = ref(false);
+      const budgetDraft = ref('');
+      const modal = reactive({ open: false, type: '', item: null, text: '', form: { name: '', category: '', target: 'bulanan', keep: true }, error: '' });
+      const toast = reactive({ show: false, message: '', type: 'ok' });
+      let toastTimer = null;
+
+      // ---------- Auto-save real-time ----------
+      function save() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+      }
+      watch(state, save, { deep: true });
+      watch(activeTab, v => { try { localStorage.setItem(TAB_KEY, v); } catch (e) {} });
+      watch(() => state.month, (v, old) => {
+        if (!isValidMonth(v)) state.month = isValidMonth(old) ? old : currentMonth();
+      });
+      save();
+
+      // ---------- Computed bulan berjalan ----------
+      const totalSpent = computed(() => sum(state.items));
+      const remaining = computed(() => state.budget - totalSpent.value);
+      const usedPct = computed(() => state.budget > 0 ? totalSpent.value / state.budget * 100 : 0);
+      const unpriced = computed(() => state.items.filter(i => i.isChecked && !(i.totalSpent > 0)));
+      const rekapSection = computed(() => activeTab.value === 'mingguan' ? state.activeWeek : 'bulanan');
+      const reportText = computed(() => buildReport(state.month, state.items, state.budget));
+      const mailtoLink = computed(() =>
+        'mailto:sugiyarto784@gmail.com?subject=' + encodeURIComponent('Laporan Belanja Kita ' + monthLabel(state.month)) +
+        '&body=' + encodeURIComponent(reportText.value));
+      const historyDesc = computed(() => state.history.slice().reverse());
+      const greeting = computed(() => {
+        const h = new Date().getHours();
+        return h < 11 ? 'Selamat pagi, yuk cek belanjaan' : h < 15 ? 'Selamat siang, semangat belanjanya' : h < 19 ? 'Selamat sore, sudah belanja apa hari ini?' : 'Selamat malam, saatnya catat pengeluaran';
+      });
+
+      // ---------- Edit budget langsung di kartu ----------
+      function startBudgetEdit() {
+        budgetDraft.value = String(state.budget);
+        editingBudget.value = true;
+        nextTick(() => { const el = budgetInput.value; if (el) { el.focus(); el.select(); } });
+      }
+      function onBudgetInput(e) {
+        const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
+        budgetDraft.value = digits;
+        e.target.value = fmtNum(digits);
+      }
+      function saveBudget() {
+        if (!editingBudget.value) return;
+        const v = toInt(budgetDraft.value);
+        editingBudget.value = false;
+        if (v > 0 && v !== state.budget) { state.budget = v; showToast('Budget jadi ' + rp(v)); }
+      }
+      function cancelBudgetEdit() { editingBudget.value = false; }
+
+      // ---------- Ganti bulan (tanpa input bawaan browser) ----------
+      function shiftMonth(d) {
+        let [y, m] = state.month.split('-').map(Number);
+        m += d;
+        if (m > 12) { m = 1; y += 1; }
+        if (m < 1) { m = 12; y -= 1; }
+        state.month = y + '-' + pad(m);
+      }
+      function openMonthPicker() { openModal('month', { pickYear: Number(state.month.slice(0, 4)) }); }
+      function pickMonth(m) {
+        state.month = modal.pickYear + '-' + pad(m);
+        closeModal();
+        showToast('Bulan: ' + monthLabel(state.month));
+      }
+      const isPicked = m => state.month === modal.pickYear + '-' + pad(m);
+      const isNow = m => currentMonth() === modal.pickYear + '-' + pad(m);
+
+      // ---------- Data tahunan (arsip + bulan berjalan) ----------
+      const allEntries = computed(() => {
+        const map = {};
+        const add = (month, items, budget, current) => {
+          if (!map[month]) map[month] = { month, items: [], budget: Number(budget) || DEFAULT_BUDGET, current: false };
+          map[month].items = map[month].items.concat(items);
+          if (current) map[month].current = true;
+        };
+        state.history.forEach(h => add(h.month, h.items, h.budget, false));
+        add(state.month, state.items, state.budget, true);
+        return Object.values(map).map(e => Object.assign(e, { spent: sum(e.items) })).sort((a, b) => a.month.localeCompare(b.month));
+      });
+      const years = computed(() => [...new Set(allEntries.value.map(e => e.month.slice(0, 4)))].sort().reverse());
+      watch(years, ys => { if (!ys.includes(selectedYear.value)) selectedYear.value = ys[0]; }, { immediate: true });
+      const yearEntries = computed(() => allEntries.value.filter(e => e.month.startsWith(selectedYear.value)));
+      const yearStats = computed(() => {
+        const es = yearEntries.value;
+        const spent = es.reduce((t, e) => t + e.spent, 0);
+        const budget = es.reduce((t, e) => t + e.budget, 0);
+        const items = es.flatMap(e => e.items);
+        const sections = SECTIONS.map(s => ({ id: s.id, label: s.label, spent: sum(items.filter(i => i.tab === s.id)) }));
+        const byName = {};
+        items.forEach(i => { if (Number(i.totalSpent) > 0) byName[i.name] = (byName[i.name] || 0) + Number(i.totalSpent); });
+        const topItems = Object.entries(byName).map(([name, s]) => ({ name, spent: s })).sort((a, b) => b.spent - a.spent).slice(0, 5);
+        const top = es.filter(e => e.spent > 0).sort((a, b) => b.spent - a.spent)[0] || null;
+        const bars = BULAN.map((label, idx) => {
+          const e = es.find(x => Number(x.month.slice(5)) === idx + 1);
+          return { m: idx + 1, label, spent: e ? e.spent : 0, budget: e ? e.budget : state.budget, has: !!e && e.spent > 0, current: !!(e && e.current) };
+        });
+        return {
+          spent, budget, sections, topItems, top, bars,
+          count: es.length, avg: es.length ? spent / es.length : 0, avgBudget: es.length ? budget / es.length : state.budget,
+          hasCurrent: es.some(e => e.current && e.spent > 0)
+        };
+      });
+      const chartMax = computed(() => Math.max(yearStats.value.avgBudget * 1.15, ...yearStats.value.bars.map(b => b.spent)));
+
+      function buildYearReport(year) {
+        const s = yearStats.value;
+        const L = [];
+        L.push('LAPORAN BELANJA KITA TAHUN ' + year);
+        L.push('');
+        L.push('Total Anggaran   : ' + rp(s.budget) + ' (' + s.count + ' bulan)');
+        L.push('Total Terpakai   : ' + rp(s.spent));
+        L.push((s.budget - s.spent >= 0 ? 'Total Hemat      : ' : 'Lewat Anggaran   : ') + rp(Math.abs(s.budget - s.spent)));
+        L.push('Rata-rata/bulan  : ' + rp(s.avg));
+        L.push('');
+        L.push('KOMPOSISI');
+        s.sections.forEach(x => L.push('- ' + x.label + ': ' + rp(x.spent) + ' (' + pct(x.spent, s.spent) + '%)'));
+        L.push('');
+        L.push('RINCIAN PER BULAN');
+        yearEntries.value.forEach(e => L.push('- ' + monthLabel(e.month) + ': ' + rp(e.spent) + ' dari ' + rp(e.budget) + (e.current ? ' (berjalan)' : '')));
+        if (s.topItems.length) {
+          L.push('');
+          L.push('PENGELUARAN TERBESAR');
+          s.topItems.forEach((it, i) => L.push((i + 1) + '. ' + it.name + ': ' + rp(it.spent)));
+        }
+        return L.join('\n');
+      }
+
+      // ---------- Helper per daftar ----------
+      const itemsIn = tab => state.items.filter(i => i.tab === tab);
+      const countIn = tab => itemsIn(tab).length;
+      const doneIn = tab => itemsIn(tab).filter(i => i.isChecked).length;
+      const subtotal = tab => sum(itemsIn(tab));
+      const needsPrice = i => i.isChecked && !(i.totalSpent > 0);
+      const warnCount = tab => itemsIn(tab).filter(needsPrice).length;
+      const navWarn = id => id === 'bulanan' ? warnCount('bulanan') : id === 'mingguan' ? WEEK_IDS.reduce((t, w) => t + warnCount(w), 0) : 0;
+      const spentItems = (items, tab) => items.filter(i => i.tab === tab && Number(i.totalSpent) > 0);
+      function grouped(tab) {
+        const order = [], map = {};
+        itemsIn(tab).forEach(i => {
+          if (!map[i.category]) { map[i.category] = []; order.push(i.category); }
+          map[i.category].push(i);
+        });
+        return order.map(c => ({ category: c, items: map[c] }));
+      }
+      function categoriesFor(tab) {
+        const cats = [...new Set(itemsIn(tab).map(i => i.category))];
+        if (!cats.includes('Lain-lain')) cats.push('Lain-lain');
+        return cats;
+      }
+
+      // ---------- UI ----------
+      function showToast(message, type = 'ok') {
+        toast.message = message; toast.type = type; toast.show = true;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { toast.show = false; }, 2200);
+      }
+      function setTab(id) {
+        activeTab.value = id;
+        window.scrollTo({ top: 0 });
+      }
+      function openModal(type, extra) {
+        Object.assign(modal, { open: true, type, item: null, text: '', error: '' }, extra || {});
+      }
+      function closeModal() { modal.open = false; }
+
+      // ---------- Aksi barang ----------
+      function onPrice(item, e) {
+        const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
+        item.draftPrice = digits;
+        e.target.value = fmtNum(digits);
+      }
+      function submitItem(item) {
+        const price = toInt(item.draftPrice);
+        const qty = Math.max(1, parseInt(item.draftQty, 10) || 1);
+        if (!price) { showToast('Isi harga beli terlebih dahulu', 'error'); return; }
+        item.totalSpent += price * qty;
+        item.totalQty += qty;
+        item.isChecked = true;
+        item.draftPrice = '';
+        item.draftQty = 1;
+        showToast(item.name + ' +' + rp(price * qty));
+      }
+      function askReset(item) { openModal('reset', { item }); }
+      function confirmReset() {
+        const it = modal.item;
+        if (it) Object.assign(it, { totalQty: 0, totalSpent: 0, isChecked: false, draftPrice: '', draftQty: 1 });
+        closeModal();
+        showToast('Barang direset ke 0');
+      }
+      function askDelete(item) { openModal('delete', { item }); }
+      function confirmDelete() {
+        const it = modal.item;
+        const idx = state.items.findIndex(i => i.id === (it && it.id));
+        if (idx > -1) state.items.splice(idx, 1);
+        closeModal();
+        showToast('Barang dihapus');
+      }
+      function openAdd(target) {
+        const cats = categoriesFor(target);
+        openModal('add', { form: { name: '', target, category: cats[cats.length - 1], keep: target === 'bulanan' } });
+        nextTick(() => { addNameInput.value && addNameInput.value.focus(); });
+      }
+      watch(() => modal.form.target, (t, old) => {
+        if (!modal.open || modal.type !== 'add' || !old) return;
+        const cats = categoriesFor(t);
+        if (!cats.includes(modal.form.category)) modal.form.category = cats[cats.length - 1];
+        modal.form.keep = t === 'bulanan';
+        modal.error = '';
+      });
+      function confirmAdd() {
+        const name = (modal.form.name || '').trim();
+        const target = modal.form.target;
+        if (!name) { modal.error = 'Nama barang wajib diisi.'; return; }
+        if (itemsIn(target).some(i => i.name.toLowerCase() === name.toLowerCase())) { modal.error = 'Barang ini sudah ada di daftar ' + sectionLabel(target) + '.'; return; }
+        state.items.push(makeItem(uid('c'), name, modal.form.category || 'Lain-lain', target, true, modal.form.keep));
+        closeModal();
+        showToast(name + ' masuk ke ' + sectionLabel(target));
+      }
+
+      // ---------- Tutup buku ----------
+      function askCloseBook() { openModal('closeBook'); }
+      function confirmCloseBook() {
+        const from = state.month;
+        state.history.push({
+          id: uid('h'), month: from, budget: state.budget, totalSpent: totalSpent.value, closedAt: new Date().toISOString(),
+          items: state.items.map(i => ({ name: i.name, category: i.category, tab: i.tab, isChecked: i.isChecked, totalQty: i.totalQty, totalSpent: i.totalSpent }))
+        });
+        state.items = state.items.filter(i => !i.custom || i.keep).map(i => Object.assign({}, i, { isChecked: false, totalQty: 0, totalSpent: 0, draftPrice: '', draftQty: 1 }));
+        state.month = nextMonth(from);
+        closeModal();
+        window.scrollTo({ top: 0 });
+        showToast(monthLabel(from) + ' diarsipkan');
+      }
+
+      // ---------- Salin teks (execCommand dulu agar jalan di HP) ----------
+      function copyText(text) {
+        let ok = false;
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;';
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+        } catch (e) { ok = false; }
+        if (ok) { openModal('copied'); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => openModal('copied')).catch(() => openModal('copyFail', { text }));
+        } else {
+          openModal('copyFail', { text });
+        }
+      }
+
+      window.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.open) closeModal(); });
+
+      return {
+        NAV, SECTIONS, WEEKS, HISTORY_VIEWS, state, activeTab, addNameInput, budgetInput, openArchive, modal, toast, selectedYear,
+        editingBudget, budgetDraft, startBudgetEdit, onBudgetInput, saveBudget, cancelBudgetEdit,
+        BULAN_PENDEK, shiftMonth, openMonthPicker, pickMonth, isPicked, isNow,
+        totalSpent, remaining, usedPct, unpriced, rekapSection, reportText, mailtoLink, historyDesc, greeting,
+        years, yearEntries, yearStats, chartMax, buildYearReport,
+        rp, rpShort, pct, fmtNum, toInt, sum, monthLabel, shortMonth, shortMonthName, nextMonth, sectionLabel, catEmoji, buildReport,
+        countIn, doneIn, subtotal, needsPrice, warnCount, navWarn, grouped, categoriesFor, spentItems,
+        setTab, closeModal, onPrice, submitItem, askReset, confirmReset, askDelete, confirmDelete,
+        openAdd, confirmAdd, askCloseBook, confirmCloseBook, copyText
+      };
+    }
+  }).mount('#app');
+})();
+</script>
+</body>
+</html>
