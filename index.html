@@ -262,7 +262,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.2';
+const APP_VERSION = '4.4';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -378,15 +378,69 @@ function remote(fn) {
       .finally(() => { pendingWrites--; status(); });
   } catch (e) { pendingWrites--; console.error(e); }
 }
+// ---------- Antrean: catatan yang dibuat sebelum masuk akun disimpan di HP, lalu dikirim setelah masuk ----------
+const OUTBOX_KEY = 'belanjaKita_v4_outbox';
+const getOutbox = () => { try { const a = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } };
+const setOutbox = a => { try { localStorage.setItem(OUTBOX_KEY, JSON.stringify(a)); } catch (e) {} };
+const needQueue = () => cloud.mode !== 'local' && !(cloud.user && db);
+function queue(op) { const a = getOutbox(); a.push(op); setOutbox(a); status(); }
+// Gabungkan daftar (dompet, catatan uang, kategori, saran) per id, supaya data di server tidak tertimpa
+const ARR_KEYS = { wallets: 'id', moves: 'id', categories: 'id', suggest: 'n' };
+function mergeCfg(base, patch) {
+  const out = {};
+  Object.keys(patch || {}).forEach(k => {
+    if (ARR_KEYS[k] && Array.isArray(patch[k])) {
+      const key = ARR_KEYS[k], mine = patch[k], ids = new Set(mine.map(x => x && x[key]));
+      out[k] = (Array.isArray(base && base[k]) ? base[k] : []).filter(x => x && !ids.has(x[key])).concat(mine);
+    } else out[k] = patch[k];
+  });
+  return out;
+}
+function overlayOutbox() {
+  getOutbox().forEach(op => {
+    if (op.op === 'put') { const r = normReceipt(Object.assign({ id: op.id }, op.doc)); const i = S.receipts.findIndex(x => x.id === op.id); if (i >= 0) S.receipts[i] = r; else S.receipts.push(r); }
+    else if (op.op === 'del') S.receipts = S.receipts.filter(x => x.id !== op.id);
+    else if (op.op === 'cfg') S.config = normConfig(Object.assign({}, S.config, mergeCfg(S.config, op.patch)));
+  });
+}
+let flushing = false;
+async function flushOutbox() {
+  if (flushing || !(cloud.user && db) || cloud.mode === 'local') return;
+  const ops = getOutbox(); if (!ops.length) return;
+  flushing = true; status();
+  try {
+    let serverCfg = {};
+    try { const snap = await db.collection('config').doc('main').get(); serverCfg = snap.exists ? snap.data() : {}; } catch (e) {}
+    for (let i = 0; i < ops.length; i += 400) {
+      const b = db.batch();
+      ops.slice(i, i + 400).forEach(op => {
+        if (op.op === 'put') b.set(db.collection('receipts').doc(op.id), op.doc);
+        else if (op.op === 'del') b.delete(db.collection('receipts').doc(op.id));
+        else if (op.op === 'cfg') { const merged = mergeCfg(serverCfg, op.patch); serverCfg = Object.assign({}, serverCfg, merged); b.set(db.collection('config').doc('main'), merged, { merge: true }); }
+      });
+      await Promise.race([b.commit(), new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 30000))]);
+    }
+    setOutbox(getOutbox().slice(ops.length));
+    toast(ops.length + ' catatan dari HP ini sudah tersinkron');
+  } catch (e) { console.warn('Sinkron tertunda', e); setTimeout(flushOutbox, 15000); }
+  finally { flushing = false; status(); }
+}
 function putReceipt(r) {
   r = normReceipt(r);
   const i = S.receipts.findIndex(x => x.id === r.id);
   if (i >= 0) S.receipts[i] = r; else S.receipts.push(r);
-  cache(); remote(() => db.collection('receipts').doc(r.id).set(strip(r)));
+  cache();
+  if (needQueue()) queue({ op: 'put', id: r.id, doc: strip(r) }); else remote(() => db.collection('receipts').doc(r.id).set(strip(r)));
   return r;
 }
-function delReceipt(id) { S.receipts = S.receipts.filter(x => x.id !== id); cache(); remote(() => db.collection('receipts').doc(id).delete()); }
-function putConfig(patch) { Object.assign(S.config, clone(patch)); S.config = normConfig(S.config); cache(); remote(() => db.collection('config').doc('main').set(clone(patch), { merge: true })); }
+function delReceipt(id) {
+  S.receipts = S.receipts.filter(x => x.id !== id); cache();
+  if (needQueue()) queue({ op: 'del', id }); else remote(() => db.collection('receipts').doc(id).delete());
+}
+function putConfig(patch) {
+  Object.assign(S.config, clone(patch)); S.config = normConfig(S.config); cache();
+  if (needQueue()) queue({ op: 'cfg', patch: clone(patch) }); else remote(() => db.collection('config').doc('main').set(clone(patch), { merge: true }));
+}
 const saveWallets = () => putConfig({ wallets: S.config.wallets, moves: S.config.moves });
 
 // ================= Hitungan =================
@@ -505,13 +559,16 @@ function migrateLocal() {
 // ================= Tampilan =================
 function status() {
   const el = $('status'); if (!el) return;
+  const n = getOutbox().length, noUser = cloud.mode !== 'local' && !cloud.user;
   let dot = '#16B088', t = 'Tersinkron dengan keluarga';
   if (cloud.mode === 'local') { dot = '#B9B0A2'; t = 'Mode lokal, tidak tersinkron'; }
-  else if (!cloud.user) { dot = '#B9B0A2'; t = cloud.authKnown ? 'Belum masuk' : 'Menyambungkan…'; }
+  else if (noUser) { dot = '#E0A100'; t = n ? n + ' catatan belum tersinkron' : (cloud.authKnown || !cloud.available ? 'Belum masuk' : 'Menyambungkan…'); }
+  else if (flushing) { dot = '#E0A100'; t = 'Mengirim ' + n + ' catatan…'; }
   else if (!navigator.onLine) { dot = '#E0A100'; t = 'Offline, tersimpan di HP'; }
-  else if (pendingWrites || cloud.pending) { dot = '#E0A100'; t = 'Menyimpan…'; }
-  el.innerHTML = `<i style="background:${dot}"></i>${t}${cloud.mode !== 'local' && cloud.authKnown && !cloud.user ? ' <u style="color:var(--coral-ink);font-weight:700">Masuk</u>' : ''}`;
-  el.onclick = cloud.mode !== 'local' && cloud.authKnown && !cloud.user ? () => showLogin() : null;
+  else if (n || pendingWrites || cloud.pending) { dot = '#E0A100'; t = 'Menyimpan…'; }
+  const tap = noUser && (cloud.authKnown || !cloud.available);
+  el.innerHTML = `<i style="background:${dot}"></i>${t}${tap ? ' <u style="color:var(--coral-ink);font-weight:700">Masuk</u>' : ''}`;
+  el.style.cursor = tap ? 'pointer' : ''; el.onclick = tap ? () => showLogin() : null;
 }
 function receiptTitle(r) { if (r.note) return r.note; const n = r.lines.map(l => l.n); return n.length > 2 ? n.slice(0, 2).join(', ') + ' +' + (n.length - 2) : n.join(', ') || 'Belanja'; }
 function receiptSub(r) { return [dShort(r.date), r.lines.length > 1 ? r.lines.length + ' barang' : catName((r.lines[0] || {}).c), r.wallet ? walletName(r.wallet) : '', r.by].filter(Boolean).join(', '); }
@@ -723,7 +780,7 @@ function openEntry(init, back) {
     if (!(k !== 'buy' && noW)) {
       body += `<span class="lbl">Tanggal</span>${dateChips(f.date)}<p class="err" id="e-err" hidden></p>`;
       body += ed ? `<button class="save" id="e-save">Simpan perubahan</button><button class="del" id="e-del">${ed.lines.length > 1 ? 'Hapus barang ini' : 'Hapus catatan'}</button>`
-        : `<button class="save" id="e-save">Simpan</button>${k === 'buy' ? '<button class="btn" id="e-again" style="width:100%;margin-top:8px;background:var(--paper)">Simpan &amp; catat barang lain</button>' : ''}`;
+        : `<button class="save" id="e-save">Simpan</button>`;
     }
     openSheet(ed ? 'Ubah catatan' : 'Catat', body, root => {
       const keep = () => { const n = root.querySelector('#e-name'); if (n) f.name = n.value; const nt = root.querySelector('#e-note'); if (nt) f.note = nt.value; };
@@ -763,7 +820,6 @@ function openEntry(init, back) {
         toast(f.kind === 'in' ? rp(f.amount) + ' masuk ke ' + walletName(f.wallet) : rp(f.amount) + ' dipindah ke ' + walletName(f.to), () => { S.config.moves = S.config.moves.filter(x => x.id !== mv.id); saveWallets(); });
       };
       const sv = root.querySelector('#e-save'); if (sv) sv.onclick = () => save(false);
-      const ag = root.querySelector('#e-again'); if (ag) ag.onclick = () => save(true);
       const n = root.querySelector('#e-name'); if (n) n.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); n.blur(); } });
       if (ed) root.querySelector('#e-del').onclick = () => {
         const s = clone(ed);
@@ -1098,7 +1154,8 @@ function showLogin() {
         <p class="err" id="lg-err" ${errMsg ? '' : 'hidden'}>${esc(errMsg || '')}</p><button class="save" id="lg-go">Masuk</button>
         <button class="del" id="lg-forgot" style="color:var(--coral-ink)">Lupa kata sandi?</button>` : '<p class="hint" style="margin-top:10px">Pilih nama dulu.</p>'}
       ${!other ? '<button class="del" id="lg-other" style="color:var(--muted);font-weight:600">Pakai email lain</button>' : ''}
-      ${hasData && cloud.mode !== 'local' ? '<button class="del" id="lg-back" style="color:var(--ink)">Kembali ke catatan (simpan di HP dulu)</button>' : ''}
+      <button class="del" id="lg-net" style="color:var(--ink)">Cek koneksi ke server</button>
+      ${hasData && cloud.mode !== 'local' ? '<button class="del" id="lg-back" style="color:var(--ink)">Kembali ke catatan</button>' : ''}
       <button class="del" id="lg-local" style="color:var(--muted);font-weight:600;text-decoration:underline">Pakai di HP ini saja, tanpa sinkron</button></div>`;
     L.hidden = false;
     L.querySelectorAll('[data-who]').forEach(b => b.onclick = () => { who = b.dataset.who; other = false; try { localStorage.setItem(WHO_KEY, who); } catch (e) {} draw(); setTimeout(() => { const x = $('lg-pass'); x && x.focus(); }, 40); });
@@ -1122,32 +1179,71 @@ function showLogin() {
       auth.sendPasswordResetEmail(em).then(() => { er.hidden = true; toast('Link atur ulang kata sandi dikirim ke ' + em); }).catch(e => { er.textContent = loginError(e && e.code); er.hidden = false; });
     };
     const bk = $('lg-back'); if (bk) bk.onclick = () => { L.hidden = true; render(); };
+    $('lg-net').onclick = () => openNetCheck();
     $('lg-local').onclick = () => { setMode('local'); L.hidden = true; migrateLocal(); render(); };
   };
   draw();
 }
+// ---------- Cek koneksi: mana yang tidak bisa dihubungi ----------
+async function probe(url, opts) {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 9000);
+  try { const r = await fetch(url, Object.assign({ cache: 'no-store', signal: ctl.signal }, opts || {})); return { ok: true, code: r.status }; }
+  catch (e) { return { ok: false, err: e && e.name === 'AbortError' ? 'lama tidak menjawab' : 'tidak bisa dihubungi' }; }
+  finally { clearTimeout(t); }
+}
+async function openNetCheck() {
+  const L = $('login'), wasHidden = L.hidden; if (!wasHidden) L.hidden = true;
+  const rows = [
+    ['net', 'Internet di HP ini'], ['sdk', 'Layanan sinkron di aplikasi'], ['auth', 'Server login Google'], ['token', 'Server sesi Google'], ['db', 'Server data Firebase']
+  ];
+  const res = {};
+  const paint = () => openSheet('Cek koneksi', `<p class="hint" style="margin-top:0">Memeriksa server yang dibutuhkan untuk masuk dan sinkron.</p>
+    <div class="card" style="background:var(--paper);margin-top:10px">${rows.map(([k, n]) => { const r = res[k]; return `<div class="row"><span class="grow"><span class="t1">${n}</span><span class="t2">${r ? (r.ok ? 'Tersambung' : esc(r.err)) : 'Memeriksa…'}</span></span><b style="font-size:18px;color:${r ? (r.ok ? 'var(--green)' : 'var(--coral-ink)') : 'var(--muted)'}">${r ? (r.ok ? '✓' : '✕') : '…'}</b></div>`; }).join('')}</div>
+    ${Object.keys(res).length === rows.length ? advice() : ''}
+    <button class="save" id="nc-again">Periksa lagi</button>${!wasHidden ? '<button class="del" id="nc-back" style="color:var(--ink)">Kembali ke layar masuk</button>' : ''}`, root => {
+    root.querySelector('#nc-again').onclick = run;
+    const bk = root.querySelector('#nc-back'); if (bk) bk.onclick = () => { closeSheet(); showLogin(); };
+  });
+  const advice = () => {
+    if (!res.net.ok) return `<div class="alert">${svg('warn')}<span>HP ini tidak tersambung ke internet. Nyalakan data seluler atau Wi-Fi.</span></div>`;
+    if (!res.sdk.ok) return `<div class="alert">${svg('warn')}<span>Layanan sinkron tidak termuat (diambil dari cdn.jsdelivr.net). Tutup aplikasi lalu buka lagi, atau coba jaringan lain. Beberapa jaringan memblokir jsdelivr.</span></div>`;
+    if (!res.auth.ok || !res.token.ok) return `<div class="alert">${svg('warn')}<span><b>Server login Google diblokir di jaringan ini.</b> Coba: 1) ganti Wi-Fi ke data seluler atau sebaliknya, 2) Pengaturan HP, Jaringan, <b>DNS Pribadi</b> diatur ke Otomatis atau Nonaktif, 3) matikan VPN atau aplikasi pemblokir iklan, 4) pastikan tanggal dan jam HP otomatis.</span></div>`;
+    if (!res.db.ok) return `<div class="alert">${svg('warn')}<span>Server data Firebase tidak bisa dihubungi dari jaringan ini. Coba jaringan lain atau atur DNS Pribadi ke Otomatis.</span></div>`;
+    return `<div class="alert" style="background:#DDF3EA;color:#0B4F3E">${svg('check')}<span>Semua server bisa dihubungi. Kalau masuk masih gagal, kemungkinan kata sandinya salah: pakai "Lihat" untuk memeriksa, atau "Lupa kata sandi?".</span></div>`;
+  };
+  async function run() {
+    Object.keys(res).forEach(k => delete res[k]); paint();
+    res.net = navigator.onLine === false ? { ok: false, err: 'Offline' } : await probe('https://www.gstatic.com/generate_204', { mode: 'no-cors' }); paint();
+    res.sdk = auth ? { ok: true } : { ok: false, err: 'Tidak termuat' }; paint();
+    const body = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' };
+    res.auth = await probe('https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + FIREBASE_CONFIG.apiKey, body); paint();
+    res.token = await probe('https://securetoken.googleapis.com/v1/token?key=' + FIREBASE_CONFIG.apiKey, body); paint();
+    res.db = await probe('https://firestore.googleapis.com/v1/projects/' + FIREBASE_CONFIG.projectId + '/databases/(default)/documents/config/main'); paint();
+  }
+  run();
+}
 function stopSync() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
 let migrating = false, migrationTried = false;
 function startSync() {
-  stopSync(); cloud.ready = false;
+  stopSync(); cloud.ready = false; setTimeout(flushOutbox, 1200);
   if (S.receipts.length || S.config.wallets.length) { render(); hideBoot(); }
   let gotCfg = false, gotRec = false;
   const ready = () => { if (gotCfg && gotRec && !cloud.ready) { cloud.ready = true; hideBoot(); render(); } };
   setTimeout(() => { if (!cloud.ready) { cloud.ready = true; hideBoot(); render(); } }, 9000);
   unsubs.push(db.collection('config').doc('main').onSnapshot({ includeMetadataChanges: true }, s => {
     const d = s.exists ? s.data() : {};
-    if (s.exists || !s.metadata.fromCache) { S.config = normConfig(Object.assign({}, S.config, d)); cache(); }
+    if (s.exists || !s.metadata.fromCache) { S.config = normConfig(Object.assign({}, S.config, d)); overlayOutbox(); cache(); }
     // Data lama (versi 2.x/3.x) belum dipindah: jalankan pemindahan. Juga dicoba saat data berasal dari cache HP.
     if (Number(d.schema) !== 4 && !migrating && !migrationTried) { migrating = true; migrationTried = true; migrateCloud(d).finally(() => { migrating = false; }); }
     gotCfg = true; ready(); if (cloud.ready) render();
   }, e => { console.error(e); if (e && e.code === 'permission-denied') { toast('Akun ini tidak punya akses', null, true); stopSync(); } }));
   unsubs.push(db.collection('receipts').onSnapshot({ includeMetadataChanges: true }, s => {
     cloud.pending = s.metadata.hasPendingWrites;
-    if (!(s.empty && s.metadata.fromCache)) { S.receipts = s.docs.map(d => normReceipt(Object.assign({ id: d.id }, d.data()))); cache(); }
+    if (!(s.empty && s.metadata.fromCache)) { S.receipts = s.docs.map(d => normReceipt(Object.assign({ id: d.id }, d.data()))); overlayOutbox(); cache(); }
     gotRec = true; ready(); if (cloud.ready) render(); else status();
   }, e => { console.error(e); if (e && e.code === 'permission-denied') { cloud.rulesBlocked = true; render(); } }));
 }
-function signOut() { stopSync(); if (auth) auth.signOut(); toast('Berhasil keluar'); }
+function signOut() { if (getOutbox().length) { toast('Masih ada ' + getOutbox().length + ' catatan belum tersinkron. Tunggu sampai terkirim dulu.', null, true); return; } stopSync(); if (auth) auth.signOut(); toast('Berhasil keluar'); }
 
 // ================= Klik umum =================
 document.addEventListener('click', e => {
@@ -1166,6 +1262,8 @@ document.addEventListener('click', e => {
   else if (d.ry) { rYear = String(Number(rYear) + Number(d.ry)); renderRiwayat(); }
   else if (d.pick) openPicker(d.pick);
   else if (d.openm) { rMonth = d.openm; rMode = 'month'; renderRiwayat(); window.scrollTo({ top: 0 }); }
+  else if (d.act === 'login') showLogin();
+  else if (d.act === 'netcheck') openNetCheck();
   else if (d.act === 'budget') openBudget();
   else if (d.act === 'cats') openCats();
   else if (d.act === 'money-in') openMoney('in');
@@ -1188,7 +1286,7 @@ $('fab').innerHTML = svg('plus', 2.6); $('fab').onclick = () => openPlus();
 const NAV = { home: ['basket', 'Belanja'], dompet: ['wallet', 'Dompet'], riwayat: ['chart', 'Riwayat'] };
 document.querySelectorAll('.nav .tab[data-go]').forEach(b => { const [ic, n] = NAV[b.dataset.go]; b.innerHTML = svg(ic) + n; });
 $('nav-more').innerHTML = svg('dots') + 'Lainnya'; $('nav-more').onclick = openSettings;
-window.addEventListener('online', status); window.addEventListener('offline', status);
+window.addEventListener('online', () => { status(); flushOutbox(); }); window.addEventListener('offline', status);
 try {
   if (window.firebase && firebase.initializeApp) {
     firebase.initializeApp(FIREBASE_CONFIG); auth = firebase.auth(); db = firebase.firestore();
