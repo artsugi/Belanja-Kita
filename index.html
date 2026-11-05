@@ -111,6 +111,30 @@
   .bk-sec { margin: 18px 4px 8px; font-size: 15px; font-weight: 800; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .bk-sec span { font-size: 13px; font-weight: 700; color: rgb(var(--muted)); }
   .bk-err { margin: 10px 2px 0; font-size: 13px; font-weight: 700; color: rgb(var(--coral)); }
+  .bk-nav { display: grid; grid-template-columns: 1fr 1fr 76px 1fr 1fr; align-items: center; gap: 4px; }
+  .bk-nav .tab { position: relative; height: 58px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 700; color: rgb(var(--muted)); }
+  .bk-nav .tab.on { background: rgb(var(--coral-soft)); color: #B8392B; }
+  .bk-nav .tab i { font-size: 17px; }
+  .bk-nav .badge { position: absolute; top: 6px; right: 22%; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: #D23A2C; color: #fff; font-size: 10px; font-weight: 800; display: grid; place-items: center; }
+  .bk-fab { justify-self: center; width: 62px; height: 62px; margin-top: -30px; border-radius: 50%; background: #D23A2C; color: #fff; border: 4px solid rgb(var(--surface)); font-size: 22px; display: grid; place-items: center; box-shadow: 0 10px 22px -8px rgba(210,58,44,.6); }
+  .bk-menu { display: grid; gap: 8px; margin-top: 14px; }
+  .bk-menu button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 12px 14px; border-radius: 18px; background: rgb(var(--paper)); text-align: left; }
+  .bk-menu .ic { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; background: rgb(var(--surface)); color: #B8392B; font-size: 16px; }
+  .bk-menu .ic.dark { background: rgb(var(--ink)); color: #fff; }
+  .bk-menu b { display: block; font-size: 15px; font-weight: 800; } .bk-menu small { display: block; font-size: 12.5px; color: rgb(var(--muted)); font-weight: 500; margin-top: 1px; }
+  .bk-toggle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: rgb(var(--stone) / .55); padding: 4px; border-radius: 18px; margin-bottom: 12px; }
+  .bk-toggle button { height: 42px; border-radius: 14px; font-weight: 700; font-size: 14.5px; color: rgb(var(--muted)); }
+  .bk-toggle button.on { background: rgb(var(--surface)); color: rgb(var(--ink)); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .bk-left { margin-top: 18px; }
+  .bk-left .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .bk-left .chips button { height: 36px; padding: 0 13px; border-radius: 999px; background: rgb(var(--surface)); font-size: 13.5px; font-weight: 700; }
+  .bk-more { margin-top: 10px; width: 100%; height: 44px; border-radius: 16px; background: rgb(var(--surface)); font-size: 13.5px; font-weight: 800; color: rgb(var(--ink)); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .bk-bars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: end; height: 120px; margin-top: 12px; }
+  .bk-bars div { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; font-size: 11.5px; font-weight: 800; }
+  .bk-bars i { display: block; width: 100%; border-radius: 10px; background: rgb(var(--acc)); min-height: 4px; }
+  .bk-bars span { font-size: 12px; font-weight: 700; color: rgb(var(--muted)); }
+  /* Teks putih di atas coral: coral lebih gelap supaya terbaca di bawah sinar matahari */
+  button.bg-coral, a.bg-coral, .bk-tool.main { background-color: #D23A2C !important; }
   .bk-wsel { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: rgb(var(--muted)); }
   .bk-wsel .bk-select { height: 40px; font-size: 13.5px; border-radius: 999px; background-color: rgb(var(--surface)); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
@@ -144,7 +168,7 @@
       <div class="absolute right-16 -bottom-14 w-28 h-28 rounded-full bg-white/10 pointer-events-none"></div>
       <div class="relative">
         <div class="flex items-center justify-between">
-          <p class="text-[12.5px] font-semibold text-white/85">Sisa dana {{ monthLabel(state.month) }}</p>
+          <p class="text-[12.5px] font-semibold text-white/85">Sisa anggaran {{ monthLabel(state.month) }}</p>
           <span v-if="remaining < 0" class="text-[12px] font-bold bg-black/80 text-white rounded-full px-2.5 py-1">Melebihi anggaran</span>
           <span v-else class="text-[12px] font-bold bg-white/20 rounded-full px-2.5 py-1 num">{{ Math.round(usedPct) }}% terpakai</span>
         </div>
@@ -192,6 +216,10 @@
 
     <!-- ============ BULANAN & MINGGUAN ============ -->
     <section v-if="activeTab === 'bulanan' || activeTab === 'mingguan'">
+      <div class="bk-toggle" role="group" aria-label="Pilih daftar">
+        <button :class="{ on: activeTab === 'bulanan' }" @click="setTab('bulanan')">Bulanan</button>
+        <button :class="{ on: activeTab === 'mingguan' }" @click="state.activeWeek = thisWeek; setTab('mingguan')">Mingguan</button>
+      </div>
       <div v-if="activeTab === 'mingguan'" class="grid grid-cols-4 gap-2 mb-3">
         <button v-for="w in WEEKS" :key="w.id" @click="state.activeWeek = w.id; expandedId = null"
           :class="['acc-' + w.id, state.activeWeek === w.id ? 'bg-acc text-on-acc scale-[1.03]' : 'bg-acc-soft text-ink']"
@@ -214,9 +242,9 @@
           </div>
         </div>
 
-        <div class="bk-actions">
+        <div class="bk-actions" :style="warnCount(rekapSection) ? '' : 'grid-template-columns:1fr'">
           <button @click="openPick(rekapSection)" class="bk-act dark"><i class="fa-solid fa-plus"></i> Tambah belanjaan</button>
-          <button @click="openPrices(rekapSection)" class="bk-act line">Isi harga<small>{{ warnCount(rekapSection) ? warnCount(rekapSection) + ' barang' : 'semua terisi' }}</small></button>
+          <button v-if="warnCount(rekapSection)" @click="openPrices(rekapSection)" class="bk-act line">Isi harga<small>{{ warnCount(rekapSection) }} barang</small></button>
         </div>
         <button @click="openAdd(rekapSection)" class="bk-link">Barang baru yang belum ada di daftar</button>
 
@@ -226,7 +254,15 @@
           <p class="text-[13px] text-muted mt-0.5">Lihat atau isi harganya di bagian “Sudah dibeli”.</p>
         </div>
 
-        <div v-for="g in listGroups(rekapSection)" :key="g.key" class="mt-6">
+        <div v-if="!showFullList && toBuyIn(rekapSection).length" class="bk-left">
+          <div class="px-1 flex items-baseline justify-between"><span class="text-[14px] font-extrabold">Belum dibeli</span><span class="text-[12.5px] font-bold text-muted num">{{ notBoughtIn(rekapSection).length }} barang</span></div>
+          <div class="chips">
+            <button v-for="i in notBoughtIn(rekapSection).slice(0, 14)" :key="i.id" @click="openPick(rekapSection, i.id)">{{ i.name }}</button>
+          </div>
+          <button @click="showFullList = true" class="bk-more"><i class="fa-solid fa-list-check"></i> Lihat daftar lengkap dan harga</button>
+        </div>
+        <button v-else-if="showFullList" @click="showFullList = false" class="bk-more" style="margin-top:14px"><i class="fa-solid fa-compress"></i> Ringkas daftar</button>
+        <div v-for="g in listGroups(rekapSection)" v-show="showFullList || g.kind === 'done'" :key="g.key" class="mt-6">
           <h3 v-if="g.kind === 'cat'" class="text-[14px] font-extrabold mb-2 px-1 flex items-center gap-2">
             <span class="text-[17px]">{{ catEmoji(g.category) }}</span>{{ g.category }}
           </h3>
@@ -271,7 +307,7 @@
                 <div v-if="entriesOf(item).length" class="mb-3 rounded-[16px] bg-surface overflow-hidden">
                   <div v-for="(e, ei) in entriesOf(item)" :key="e.eid" class="flex items-center gap-2 pl-3 pr-1 py-1 text-[13px]" :class="[ei ? 'border-t border-line' : '', editing && editing.entry.eid === e.eid ? 'bg-acc-soft/50' : '']">
                     <span class="w-[52px] shrink-0 text-muted font-semibold">{{ e.legacy ? 'Lama' : fmtDay(e.date) }}</span>
-                    <span class="flex-1 min-w-0 truncate num text-muted">{{ e.qty }} × {{ rp(e.price) }}<template v-if="e.admin"> + admin {{ rp(e.admin) }}</template><template v-if="e.wallet">, {{ walletName(e.wallet) }}</template></span>
+                    <span class="flex-1 min-w-0 truncate num text-muted">{{ e.qty }} × {{ rp(e.price) }}<template v-if="e.admin"> + admin {{ rp(e.admin) }}</template><template v-if="e.wallet">, {{ walletName(e.wallet) }}</template><template v-if="e.by">, {{ e.by }}</template></span>
                     <span class="font-extrabold num shrink-0">{{ rp(e.amount) }}</span>
                     <button @click="startEdit(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Ubah catatan ini"><i class="fa-solid fa-pen text-[12px]"></i></button>
                     <button @click="removeEntry(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Hapus catatan ini"><i class="fa-regular fa-trash-can text-[13px]"></i></button>
@@ -306,6 +342,7 @@
                   <div class="flex items-center gap-3 shrink-0">
                     <button v-if="editing && editing.itemId === item.id" @click="cancelEdit(item)" class="text-[12px] text-coral font-bold">Batal ubah</button>
                     <button v-else-if="item.totalSpent || item.totalQty || item.isChecked" @click="askReset(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-rotate-left text-[12px]"></i> Kosongkan</button>
+                    <button @click="openEditItem(item)" class="text-[12px] text-muted font-semibold"><i class="fa-solid fa-pen text-[11px]"></i> Ubah</button>
                     <button v-if="item.custom" @click="askDelete(item)" class="text-[12px] text-muted font-semibold"><i class="fa-regular fa-trash-can text-[12px]"></i> Hapus</button>
                   </div>
                 </div>
@@ -320,12 +357,12 @@
     <!-- ============ DOMPET ============ -->
     <section v-else-if="activeTab === 'dompet'">
       <div class="bk-card">
-        <p class="text-[12.5px] font-semibold text-muted">Total di semua dompet</p>
+        <p class="text-[12.5px] font-semibold text-muted">Uang di dompet</p>
         <p class="text-[28px] font-black tracking-[-0.03em] num leading-tight">{{ rp(walletsTotal) }}</p>
-        <p class="text-[12.5px] text-muted mt-1">Saldo berkurang otomatis saat harga belanjaan dicatat dengan dompet itu.</p>
+        <p class="text-[12.5px] text-muted mt-1">Uang yang benar-benar ada. Berbeda dengan sisa anggaran, yang dihitung dari anggaran bulan ini.</p>
       </div>
       <div v-if="state.wallets.length" class="bk-card" style="margin-top:10px;padding-top:4px;padding-bottom:4px">
-        <button v-for="w in state.wallets" :key="w.id" @click="openWalletEdit(w)" class="bk-wallet">
+        <button v-for="w in state.wallets" :key="w.id" @click="openWalletInfo(w)" class="bk-wallet">
           <span class="bk-wico"><i class="fa-solid fa-wallet"></i></span>
           <span class="flex-1 min-w-0"><span class="block text-[15px] font-extrabold">{{ w.name }}</span><span class="block text-[12.5px] text-muted">Terpakai bulan ini {{ rp(walletSpentIn(w.id, state.month)) }}</span></span>
           <span class="text-[15px] font-black num">{{ rp(walletBal(w.id)) }}</span>
@@ -338,17 +375,18 @@
       <div class="bk-tools">
         <button @click="openMove('in')" class="bk-tool main"><i class="fa-solid fa-plus"></i>Isi uang</button>
         <button @click="openMove('transfer')" class="bk-tool"><i class="fa-solid fa-right-left"></i>Pindah</button>
-        <button @click="openWalletEdit(null)" class="bk-tool"><i class="fa-solid fa-wallet"></i>Dompet baru</button>
+        <button @click="openAdjust(null)" class="bk-tool"><i class="fa-solid fa-scale-balanced"></i>Sesuaikan</button>
       </div>
+      <button @click="openWalletEdit(null)" class="bk-more"><i class="fa-solid fa-wallet"></i> Tambah dompet</button>
       <template v-if="movesDesc.length">
-        <div class="bk-sec">Uang masuk &amp; pindah</div>
+        <div class="bk-sec">Uang masuk, pindah &amp; penyesuaian</div>
         <div class="bk-card" style="padding-top:4px;padding-bottom:4px">
           <div v-for="m in movesDesc" :key="m.id" class="bk-row">
             <div class="flex-1 min-w-0">
-              <p class="text-[14.5px] font-bold leading-snug">{{ m.note || (m.type === 'in' ? 'Uang belanja masuk' : 'Pindah uang') }}</p>
-              <p class="text-[12.5px] text-muted">{{ m.type === 'in' ? 'Masuk ke ' + walletName(m.wallet) : walletName(m.wallet) + ' ke ' + walletName(m.to) }}, {{ fmtDay(m.date) }}<template v-if="m.admin">, admin {{ rp(m.admin) }}</template></p>
+              <p class="text-[14.5px] font-bold leading-snug">{{ m.note || (m.type === 'in' ? 'Uang belanja masuk' : m.type === 'adjust' ? 'Penyesuaian saldo' : 'Pindah uang') }}</p>
+              <p class="text-[12.5px] text-muted">{{ m.type === 'transfer' ? walletName(m.wallet) + ' ke ' + walletName(m.to) : walletName(m.wallet) }}, {{ fmtDay(m.date) }}<template v-if="m.admin">, admin {{ rp(m.admin) }}</template><template v-if="m.by">, {{ m.by }}</template></p>
             </div>
-            <span class="text-[14.5px] font-black num">{{ m.type === 'in' ? '+' : '' }}{{ rp(m.amount) }}</span>
+            <span class="text-[14.5px] font-black num">{{ m.type === 'in' || (m.type === 'adjust' && m.amount > 0) ? '+' : '' }}{{ rp(m.amount) }}</span>
             <button @click="removeMove(m)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" :aria-label="'Hapus catatan ' + rp(m.amount)"><i class="fa-regular fa-trash-can text-[13px]"></i></button>
           </div>
         </div>
@@ -405,6 +443,13 @@
           </div>
           <div class="mt-4 pt-3 border-t border-line flex items-center justify-between text-[14.5px]">
             <span class="font-bold">Total pengeluaran</span><span class="font-black num">{{ rp(rSpent) }}</span>
+          </div>
+        </div>
+
+        <div class="mt-3 bk-card">
+          <h3 class="text-[15px] font-extrabold">Belanja per minggu</h3>
+          <div class="bk-bars">
+            <div v-for="w in WEEKS" :key="w.id" :class="'acc-' + w.id"><span class="num" style="color:rgb(var(--ink))">{{ rSub(w.id) ? rpShort(rSub(w.id)).replace('Rp ', '') : '–' }}</span><i :style="{ height: weekBarHeight(w.id) + 'px' }"></i><span>Mg {{ w.n }}</span></div>
           </div>
         </div>
 
@@ -543,6 +588,10 @@
         </div>
 
         <div class="mt-4 grid gap-2" :class="canAutoMail ? 'grid-cols-2' : 'grid-cols-1'">
+          <div v-if="yearWallets.length" class="mb-3 bk-card">
+            <h3 class="text-[15px] font-extrabold">Per dompet {{ selectedYear }}</h3>
+            <div class="bk-row" v-for="w in yearWallets" :key="w.id"><span class="flex-1 font-semibold text-[14px]">{{ w.name }}</span><span class="font-extrabold num text-[14px]">{{ rp(w.amount) }}</span></div>
+          </div>
           <button v-if="canAutoMail" @click="sendMail('Laporan Belanja Kita Tahun ' + selectedYear, buildYearReport(selectedYear))" :disabled="mail.busy"
             class="h-12 rounded-full bg-coral text-on-coral font-bold text-[14px] flex items-center justify-center gap-2 disabled:opacity-60 active:scale-[.98] transition-transform">
             <i class="fa-regular fa-paper-plane"></i> {{ mail.busy ? 'Mengirim…' : 'Kirim ke Email' }}
@@ -560,13 +609,14 @@
   <!-- ============ NAVIGASI BAWAH ============ -->
   <nav class="bottom-nav z-30 px-4 pointer-events-none" aria-label="Navigasi utama">
     <div class="max-w-md mx-auto pointer-events-auto">
-      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-4 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
-        <button v-for="t in NAV" :key="t.id" @click="setTab(t.id)" class="relative h-[58px] rounded-[20px] flex flex-col items-center justify-center gap-1 transition-colors"
-          :class="activeTab === t.id ? 'bg-coral-soft text-coral' : 'text-muted'" :aria-current="activeTab === t.id ? 'page' : null">
-          <span class="text-[17px] leading-none"><i :class="['fa-solid', t.icon]"></i></span>
-          <span class="text-[12px] font-bold">{{ t.label }}</span>
-          <span v-if="navWarn(t.id)" class="absolute top-1.5 right-[22%] min-w-[17px] h-[17px] px-1 rounded-full bg-coral text-on-coral text-[10px] font-bold grid place-items-center num">{{ navWarn(t.id) }}</span>
+      <div class="bg-surface rounded-[26px] p-1.5 bk-nav shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
+        <button @click="setTab(listTab)" class="tab" :class="{ on: activeTab === 'bulanan' || activeTab === 'mingguan' }" :aria-current="activeTab === 'bulanan' || activeTab === 'mingguan' ? 'page' : null">
+          <i class="fa-solid fa-basket-shopping"></i>Belanja<span v-if="navWarn('bulanan') + navWarn('mingguan')" class="badge num">{{ navWarn('bulanan') + navWarn('mingguan') }}</span>
         </button>
+        <button @click="setTab('dompet')" class="tab" :class="{ on: activeTab === 'dompet' }" :aria-current="activeTab === 'dompet' ? 'page' : null"><i class="fa-solid fa-wallet"></i>Dompet</button>
+        <button @click="openPlus" class="bk-fab" aria-label="Tambah atau catat"><i class="fa-solid fa-plus"></i></button>
+        <button @click="setTab('riwayat')" class="tab" :class="{ on: activeTab === 'riwayat' }" :aria-current="activeTab === 'riwayat' ? 'page' : null"><i class="fa-solid fa-chart-simple"></i>Riwayat</button>
+        <button @click="openSettings" class="tab"><i class="fa-solid fa-ellipsis"></i>Lainnya</button>
       </div>
     </div>
   </nav>
@@ -624,7 +674,7 @@
   <!-- ============ VERSI BARU ============ -->
   <transition name="toast">
     <div v-if="updateReady" class="fixed left-1/2 -translate-x-1/2 z-[55] w-[calc(100%-2rem)] max-w-[420px] pl-4 pr-2 py-2 rounded-full bg-ink text-paper shadow-lg flex items-center gap-2 text-[13.5px] font-bold"
-      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }">
+      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 112px)' }">
       <span class="flex-1">Versi baru Belanja Kita tersedia</span>
       <button @click="reloadApp" class="h-8 px-3.5 rounded-full bg-coral text-on-coral font-extrabold shrink-0">Muat ulang</button>
     </div>
@@ -633,7 +683,7 @@
   <!-- ============ TOAST ============ -->
   <transition name="toast">
     <div v-if="toast.show" class="fixed left-1/2 -translate-x-1/2 z-[60] max-w-[calc(100%-2rem)] w-max pl-4 pr-2 py-2 min-h-[48px] rounded-full shadow-lg text-[13.5px] font-bold flex items-center gap-2"
-      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 100px)' }"
+      :style="{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 112px)' }"
       :class="toast.type === 'error' ? 'bg-coral text-on-coral' : 'bg-ink text-paper'">
       <span v-if="toast.type === 'error'"><i class="fa-solid fa-circle-exclamation"></i></span>
       <span v-else><i class="fa-solid fa-circle-check"></i></span>
@@ -733,8 +783,8 @@
           </template>
 
           <template v-else-if="modal.type === 'pick'">
-            <h3 class="text-[20px] font-black tracking-[-0.03em]">Tambah belanjaan</h3>
-            <p class="text-[13px] text-muted mt-0.5">Ketuk barang yang sudah masuk troli. Harga bisa diisi nanti.</p>
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">{{ modal.withPrice ? 'Catat dengan harga' : 'Tambah belanjaan' }}</h3>
+            <p class="text-[13px] text-muted mt-0.5">{{ modal.withPrice ? 'Pilih barangnya, lalu isi harga dan dompet.' : 'Ketuk barang yang sudah masuk troli. Harga bisa diisi nanti.' }}</p>
             <span class="bk-label">Masuk ke daftar</span>
             <select v-model="modal.pickTab" @change="modal.sel = []" class="bk-select" aria-label="Masuk ke daftar">
               <option v-for="s in SECTIONS" :key="s.id" :value="s.id">{{ s.label + (s.id === thisWeek ? ' (minggu ini)' : '') }}</option>
@@ -757,7 +807,7 @@
             <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
             <div class="mt-4 grid grid-cols-2 gap-2">
               <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
-              <button @click="confirmPick" :disabled="!pickCount" class="h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ pickCount ? 'Masukkan ' + pickCount + ' barang' : 'Pilih barang' }}</button>
+              <button @click="confirmPick" :disabled="!pickCount" class="h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ !pickCount ? 'Pilih barang' : modal.withPrice ? 'Lanjut isi harga (' + pickCount + ')' : 'Masukkan ' + pickCount + ' barang' }}</button>
             </div>
           </template>
 
@@ -822,6 +872,69 @@
             <div class="mt-5 grid grid-cols-2 gap-2">
               <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
               <button @click="saveMove" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'plus'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Mau mencatat apa?</h3>
+            <div class="bk-menu">
+              <button @click="openPick(listSection())"><span class="ic dark"><i class="fa-solid fa-cart-shopping"></i></span><span><b>Tambah belanjaan</b><small>Pilih dari daftar, harga diisi nanti</small></span></button>
+              <button @click="openPick(listSection(), null, true)"><span class="ic"><i class="fa-solid fa-receipt"></i></span><span><b>Catat dengan harga</b><small>Pilih barang, langsung isi harga dan dompet</small></span></button>
+              <button @click="openAdd(listSection())"><span class="ic"><i class="fa-solid fa-plus"></i></span><span><b>Barang baru</b><small>Belum ada di daftar</small></span></button>
+              <button @click="openMove('in')"><span class="ic"><i class="fa-solid fa-arrow-down"></i></span><span><b>Isi uang belanja</b><small>Uang masuk ke dompet</small></span></button>
+              <button @click="openMove('transfer')"><span class="ic"><i class="fa-solid fa-right-left"></i></span><span><b>Pindah uang</b><small>Contoh: tarik tunai dari BCA</small></span></button>
+              <button @click="openAdjust(null)"><span class="ic"><i class="fa-solid fa-scale-balanced"></i></span><span><b>Sesuaikan saldo</b><small>Samakan dengan uang yang sebenarnya</small></span></button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'walletInfo'">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-[20px] font-black tracking-[-0.03em]">{{ walletName(modal.wid) }}</h3>
+              <button @click="openWalletEdit(state.wallets.find(w => w.id === modal.wid))" class="h-9 px-4 rounded-full bg-paper text-[13px] font-bold">Ubah</button>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Saldo</p><p class="text-[15px] font-extrabold num">{{ rp(walletBal(modal.wid)) }}</p></div>
+              <div class="rounded-[16px] bg-paper px-3 py-2.5"><p class="text-[12px] text-muted">Terpakai bulan ini</p><p class="text-[15px] font-extrabold num">{{ rp(walletSpentIn(modal.wid, state.month)) }}</p></div>
+            </div>
+            <span class="bk-label">Riwayat dompet</span>
+            <div class="bk-pick-list" style="max-height:40vh;margin-top:0;padding:0 14px">
+              <div v-for="r in walletHistory(modal.wid)" :key="r.key" class="bk-row">
+                <div class="flex-1 min-w-0"><p class="text-[14px] font-bold leading-snug">{{ r.title }}</p><p class="text-[12px] text-muted">{{ r.sub }}</p></div>
+                <span class="text-[14px] font-extrabold num" :style="r.amount > 0 ? 'color:#0F7A5F' : ''">{{ r.amount > 0 ? '+' : '' }}{{ rp(r.amount) }}</span>
+              </div>
+              <p v-if="!walletHistory(modal.wid).length" class="py-5 text-[13px] text-muted text-center">Belum ada catatan untuk dompet ini.</p>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <button @click="openAdjust(modal.wid)" class="h-12 rounded-full bg-paper font-bold">Sesuaikan saldo</button>
+              <button @click="closeModal" class="h-12 rounded-full bg-coral text-on-coral font-bold">Tutup</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'adjust'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Sesuaikan saldo</h3>
+            <p class="text-[13px] text-muted mt-0.5">Isi uang yang sebenarnya ada. Selisihnya dicatat sebagai penyesuaian.</p>
+            <span class="bk-label">Dompet</span>
+            <select v-model="modal.form.wallet" class="bk-select" aria-label="Dompet"><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name + ', menurut catatan ' + rp(walletBal(w.id)) }}</option></select>
+            <span class="bk-label">Saldo sebenarnya</span>
+            <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.real)" @input="onMoney(modal.form, 'real', $event)" placeholder="0" aria-label="Saldo sebenarnya"></div>
+            <p class="text-[13px] font-bold mt-2 px-1" :style="adjustDiff < 0 ? 'color:#B8392B' : 'color:#0F7A5F'">{{ modal.form.real === '' ? '' : adjustDiff === 0 ? 'Sudah sama, tidak ada selisih.' : 'Selisih ' + (adjustDiff > 0 ? '+' : '') + rp(adjustDiff) }}</p>
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="saveAdjust" class="h-12 rounded-full bg-coral text-on-coral font-bold">Sesuaikan</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'editItem'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Ubah barang</h3>
+            <span class="bk-label">Nama barang</span>
+            <input v-model="modal.form.name" class="bk-input" aria-label="Nama barang">
+            <span class="bk-label">Kategori</span>
+            <select v-model="modal.form.category" class="bk-select" aria-label="Kategori"><option v-for="c in allCategories" :key="c" :value="c">{{ catEmoji(c) + ' ' + c }}</option></select>
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="saveEditItem" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan</button>
             </div>
           </template>
 
@@ -939,7 +1052,7 @@
   const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
-  const APP_VERSION = '3.0';
+  const APP_VERSION = '3.1';
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
@@ -1097,10 +1210,11 @@
     if (e.wallet) o.wallet = String(e.wallet);       // dompet yang dipakai bayar
     if (Number(e.admin) > 0) o.admin = Number(e.admin); // biaya admin, sudah termasuk di amount
     if (e.note) o.note = String(e.note).slice(0, 120);
+    if (e.by) o.by = String(e.by).slice(0, 20);
     return o;
   };
   const normWallet = w => ({ id: String(w.id || uid('w')), name: String(w.name || 'Dompet').slice(0, 30), initial: Number(w.initial) || 0, createdAt: String(w.createdAt || '') });
-  const normMove = m => ({ id: String(m.id || uid('m')), type: m.type === 'transfer' ? 'transfer' : 'in', amount: Math.max(0, Number(m.amount) || 0), admin: Math.max(0, Number(m.admin) || 0),
+  const normMove = m => ({ id: String(m.id || uid('m')), type: ['transfer', 'adjust'].includes(m.type) ? m.type : 'in', amount: m.type === 'adjust' ? (Number(m.amount) || 0) : Math.max(0, Number(m.amount) || 0), admin: Math.max(0, Number(m.admin) || 0), by: String(m.by || '').slice(0, 20),
     wallet: String(m.wallet || ''), to: String(m.to || ''), date: /^\d{4}-\d{2}-\d{2}$/.test(m.date || '') ? m.date : '', note: String(m.note || '').slice(0, 80) });
   const normEntries = arr => Array.isArray(arr) ? arr.filter(e => e && e.eid).map(normEntry) : [];
   function normalizeItem(i) {
@@ -1957,7 +2071,7 @@
       // ---------- Catatan per pembelian ----------
       const editing = ref(null);
       const entryMonth = ref(state.month);
-      const clean = e => { const o = { eid: e.eid, price: e.price, qty: e.qty, amount: e.amount, date: e.date }; if (e.wallet) o.wallet = e.wallet; if (e.admin) o.admin = e.admin; if (e.note) o.note = e.note; return o; };
+      const clean = e => { const o = { eid: e.eid, price: e.price, qty: e.qty, amount: e.amount, date: e.date }; if (e.wallet) o.wallet = e.wallet; if (e.admin) o.admin = e.admin; if (e.note) o.note = e.note; if (e.by) o.by = e.by; return o; };
       function entriesOf(item) {
         const list = (item.entries || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const amt = (Number(item.totalSpent) || 0) - list.reduce((t, e) => t + e.amount, 0);
@@ -1966,6 +2080,7 @@
         return list;
       }
       function pushEntry(item, entry, keepCheck) {
+        if (!entry.by && personName.value) entry.by = personName.value;
         item.entries = (item.entries || []).concat([entry]);
         item.totalSpent = (Number(item.totalSpent) || 0) + entry.amount;
         item.totalQty = (Number(item.totalQty) || 0) + entry.qty;
@@ -2144,7 +2259,7 @@
         const w = state.wallets.find(x => x.id === id); if (!w) return 0;
         let b = Number(w.initial) || 0;
         state.moves.forEach(m => {
-          if (m.type === 'in' && m.wallet === id) b += m.amount;
+          if ((m.type === 'in' || m.type === 'adjust') && m.wallet === id) b += m.amount;
           if (m.type === 'transfer') { if (m.wallet === id) b -= m.amount + m.admin; if (m.to === id) b += m.amount; }
         });
         walletEntries.value.forEach(x => { if (x.e.wallet === id) b -= x.e.amount; });
@@ -2186,7 +2301,7 @@
         const f = modal.form, amount = toInt(f.amount);
         if (!amount) { modal.error = 'Isi jumlahnya.'; return; }
         if (f.type === 'transfer' && f.wallet === f.to) { modal.error = 'Pilih dompet tujuan yang berbeda.'; return; }
-        const m = normMove({ id: uid('m'), type: f.type, amount, admin: f.type === 'transfer' ? toInt(f.admin) : 0, wallet: f.wallet, to: f.type === 'transfer' ? f.to : '', date: f.date || todayISO(), note: (f.note || '').trim() });
+        const m = normMove({ id: uid('m'), by: personName.value, type: f.type, amount, admin: f.type === 'transfer' ? toInt(f.admin) : 0, wallet: f.wallet, to: f.type === 'transfer' ? f.to : '', date: f.date || todayISO(), note: (f.note || '').trim() });
         state.moves.push(m); saveWallets(); closeModal();
         showToast(f.type === 'in' ? rp(amount) + ' masuk ke ' + walletName(m.wallet) : rp(amount) + ' dipindah ke ' + walletName(m.to), 'ok', { label: 'Batalkan', fn: () => { state.moves = state.moves.filter(x => x.id !== m.id); saveWallets(); } });
       }
@@ -2208,8 +2323,8 @@
       });
 
       // ---------- Tambah belanjaan: pilih dari daftar (dropdown dengan pencarian) ----------
-      function openPick(tab) {
-        openModal('pick', { pickTab: tab, q: '', sel: [], newSel: false });
+      function openPick(tab, preId, withPrice) {
+        openModal('pick', { pickTab: tab, q: '', sel: preId ? [preId] : [], newSel: false, withPrice: !!withPrice });
         nextTick(() => { const el = document.getElementById('pick-search'); if (el) { try { el.focus({ preventScroll: true }); } catch (e) {} } });
       }
       const pickData = computed(() => {
@@ -2238,6 +2353,7 @@
         }
         if (!picked.length) { modal.error = 'Ketuk barang yang sudah masuk troli.'; return; }
         picked.forEach(i => toggleCheck(i, true, true));
+        if (modal.withPrice) { openPrices(null, picked.map(i => i.id)); return; }
         closeModal();
         showToast(picked.length + ' barang masuk Sudah dibeli', 'ok', { label: 'Batalkan', fn: () => {
           picked.forEach(i => { if (i !== created) toggleCheck(i, false, true); });
@@ -2246,8 +2362,8 @@
       }
 
       // ---------- Isi harga sekaligus ----------
-      function openPrices(tab) {
-        const rows = state.items.filter(i => needsPrice(i) && (!tab || i.tab === tab)).map(item => { const last = lastPriceOf(item); return { item, price: last ? String(last.price) : '' }; });
+      function openPrices(tab, ids) {
+        const rows = state.items.filter(i => needsPrice(i) && (!tab || i.tab === tab) && (!ids || ids.includes(i.id))).map(item => { const last = lastPriceOf(item); return { item, price: last ? String(last.price) : '' }; });
         if (!rows.length) { showToast('Semua harga sudah diisi'); return; }
         openModal('prices', { rows, pWallet: defaultWallet(), pAdmin: '', showAdmin: false });
       }
@@ -2267,6 +2383,62 @@
         closeModal();
         showToast(saved.length + ' harga tersimpan, ' + rp(saved.reduce((t, x) => t + x.entry.amount, 0)), 'ok', { label: 'Batalkan', fn: () => saved.forEach(x => { dropEntry(x.item, x.entry); toggleCheck(x.item, true, true); }) });
       }
+
+      // ---------- v3.1: menu +, navigasi, info dompet, sesuaikan saldo, ubah barang ----------
+      const personName = computed(() => { const u = cloud.user; if (!u) return ''; const f = FAMILY.find(x => x.email === String(u.email || '').toLowerCase()); return f ? f.name : ''; });
+      const listTab = ref(['bulanan', 'mingguan'].includes(activeTab.value) ? activeTab.value : 'bulanan');
+      watch(activeTab, v => { if (v === 'bulanan' || v === 'mingguan') listTab.value = v; });
+      const listSection = () => (activeTab.value === 'mingguan' || (activeTab.value !== 'bulanan' && listTab.value === 'mingguan')) ? state.activeWeek : 'bulanan';
+      function openPlus() { openModal('plus'); }
+      const FULL_KEY = 'catatanBelanjaKeluarga_fulllist_v3';
+      const showFullList = ref((() => { try { return localStorage.getItem(FULL_KEY) === '1'; } catch (e) { return false; } })());
+      watch(showFullList, v => { try { localStorage.setItem(FULL_KEY, v ? '1' : '0'); } catch (e) {} });
+      const notBoughtIn = tab => toBuyIn(tab).filter(i => !(Number(i.totalSpent) > 0));
+      function openWalletInfo(w) { openModal('walletInfo', { wid: w.id }); }
+      function walletHistory(id) {
+        const rows = [];
+        walletEntries.value.forEach(x => { if (x.e.wallet === id) rows.push({ key: 'e' + x.e.eid, date: x.e.date || '', title: x.name, sub: [fmtDay(x.e.date), sectionLabel(x.tab), x.e.admin ? 'admin ' + rp(x.e.admin) : '', x.e.by || ''].filter(Boolean).join(', '), amount: -x.e.amount }); });
+        state.moves.forEach(m => {
+          const sub = [fmtDay(m.date), m.by || ''].filter(Boolean).join(', ');
+          if (m.type === 'in' && m.wallet === id) rows.push({ key: m.id, date: m.date, title: m.note || 'Uang belanja masuk', sub, amount: m.amount });
+          if (m.type === 'adjust' && m.wallet === id) rows.push({ key: m.id, date: m.date, title: 'Penyesuaian saldo', sub, amount: m.amount });
+          if (m.type === 'transfer' && m.wallet === id) rows.push({ key: m.id + 'o', date: m.date, title: (m.note || 'Pindah') + ' ke ' + walletName(m.to), sub: sub + (m.admin ? ', admin ' + rp(m.admin) : ''), amount: -(m.amount + m.admin) });
+          if (m.type === 'transfer' && m.to === id) rows.push({ key: m.id + 'i', date: m.date, title: (m.note || 'Pindah') + ' dari ' + walletName(m.wallet), sub, amount: m.amount });
+        });
+        return rows.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 80);
+      }
+      function openAdjust(wid) {
+        if (!state.wallets.length) { openWalletEdit(null); showToast('Tambahkan dompet dulu'); return; }
+        openModal('adjust', { form: { wallet: wid || defaultWallet(), real: '' } });
+      }
+      const adjustDiff = computed(() => modal.type === 'adjust' ? toInt(modal.form.real) - walletBal(modal.form.wallet) : 0);
+      function saveAdjust() {
+        const f = modal.form;
+        if (f.real === '' || f.real == null) { modal.error = 'Isi saldo sebenarnya (boleh 0).'; return; }
+        const diff = adjustDiff.value;
+        if (!diff) { closeModal(); showToast('Saldo sudah sama'); return; }
+        const m = normMove({ id: uid('m'), type: 'adjust', amount: diff, wallet: f.wallet, date: todayISO(), by: personName.value });
+        state.moves.push(m); saveWallets(); closeModal();
+        showToast('Saldo ' + walletName(m.wallet) + ' disesuaikan', 'ok', { label: 'Batalkan', fn: () => { state.moves = state.moves.filter(x => x.id !== m.id); saveWallets(); } });
+      }
+      const allCategories = computed(() => [...new Set(state.items.map(i => i.category).concat(Object.keys(EMOJI)))]);
+      function openEditItem(item) { openModal('editItem', { item, form: { name: item.name, category: item.category } }); }
+      function saveEditItem() {
+        const it = modal.item, name = cleanName((modal.form.name || '').trim()), category = modal.form.category || 'Lain-lain';
+        if (!name) { modal.error = 'Nama barang wajib diisi.'; return; }
+        if (state.items.some(i => i !== it && i.tab === it.tab && i.name.toLowerCase() === name.toLowerCase())) { modal.error = 'Nama ini sudah ada di daftar ' + sectionLabel(it.tab) + '.'; return; }
+        const before = { name: it.name, category: it.category };
+        it.name = name; it.category = category;
+        remote(() => itemRef(it.id).update({ name, category }));
+        closeModal();
+        showToast('Barang diperbarui', 'ok', { label: 'Batalkan', fn: () => { Object.assign(it, before); remote(() => itemRef(it.id).update(before)); } });
+      }
+      const weekBarHeight = id => { const max = Math.max(1, ...WEEK_IDS.map(w => rSub(w))); return Math.round(rSub(id) / max * 80); };
+      const yearWallets = computed(() => {
+        const rows = {};
+        walletEntries.value.forEach(x => { if (String(x.month).startsWith(selectedYear.value)) rows[x.e.wallet] = (rows[x.e.wallet] || 0) + x.e.amount; });
+        return Object.keys(rows).map(id => ({ id, name: walletName(id) || 'Dompet terhapus', amount: rows[id] })).sort((a, b) => b.amount - a.amount);
+      });
 
       // ---------- Rapikan nama barang (tanpa jumlah) & cadangan ----------
       const CLEAN_KEY = 'catatanBelanjaKeluarga_names_v3', BACKUP_KEY = 'catatanBelanjaKeluarga_backup_v24';
@@ -2349,7 +2521,8 @@
         setTab, closeModal, onPrice, submitItem, askReset, confirmReset, askDelete, confirmDelete,
         openAdd, confirmAdd, copyText,
         lastWallet, rowWallet, walletName, walletBal, walletsTotal, walletSpentIn, movesDesc, onMoney, openWalletEdit, saveWalletEdit, deleteWallet, openMove, saveMove, removeMove, rWallets,
-        openPick, pickData, togglePick, pickCount, confirmPick, openPrices, pricesTotal, savePrices, downloadBackup, todayISO
+        openPick, pickData, togglePick, pickCount, confirmPick, openPrices, pricesTotal, savePrices, downloadBackup, todayISO,
+        listTab, listSection, openPlus, showFullList, notBoughtIn, openWalletInfo, walletHistory, openAdjust, adjustDiff, saveAdjust, allCategories, openEditItem, saveEditItem, weekBarHeight, yearWallets
       };
     }
   }).mount('#app');
