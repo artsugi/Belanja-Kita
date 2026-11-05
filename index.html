@@ -72,6 +72,47 @@
   .slide-enter-from, .slide-leave-to { transform: translateY(-100%); opacity: 0; }
   .toast-enter-active, .toast-leave-active { transition: transform .22s cubic-bezier(.2,1.3,.4,1), opacity .2s; }
   .toast-enter-from, .toast-leave-to { transform: translate(-50%, 14px); opacity: 0; }
+  /* ---- Komponen v3 ---- */
+  .bk-actions { display: grid; grid-template-columns: 1.45fr 1fr; gap: 8px; margin-top: 12px; }
+  .bk-act { height: 60px; border-radius: 20px; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .bk-act.dark { background: rgb(var(--ink)); color: #fff; }
+  .bk-act.line { background: rgb(var(--surface)); border: 2px solid rgb(var(--coral)); flex-direction: column; gap: 0; font-size: 14px; }
+  .bk-act.line small { font-size: 12px; font-weight: 700; color: rgb(var(--coral)); }
+  .bk-link { display: block; margin: 10px auto 0; font-size: 13px; font-weight: 800; color: rgb(var(--muted)); text-decoration: underline; text-underline-offset: 3px; }
+  .bk-label { display: block; font-size: 12.5px; font-weight: 700; color: rgb(var(--muted)); margin: 14px 2px 6px; }
+  .bk-input, .bk-select { width: 100%; height: 48px; padding: 0 14px; border-radius: 16px; background: rgb(var(--paper)); border: 2px solid transparent; font: inherit; font-size: 15px; font-weight: 600; outline: none; color: rgb(var(--ink)); }
+  .bk-input:focus, .bk-select:focus { border-color: rgb(var(--coral)); }
+  .bk-select { appearance: none; -webkit-appearance: none; padding-right: 38px; background-image: linear-gradient(45deg, transparent 50%, rgb(var(--muted)) 50%), linear-gradient(135deg, rgb(var(--muted)) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 14px) 50%; background-size: 6px 6px; background-repeat: no-repeat; }
+  .bk-money { position: relative; } .bk-money span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 800; color: rgb(var(--muted)); font-size: 14px; pointer-events: none; }
+  .bk-money .bk-input { padding-left: 42px; font-weight: 800; font-size: 17px; }
+  .bk-pick-list { max-height: 46vh; overflow-y: auto; margin-top: 10px; border-radius: 18px; background: rgb(var(--paper)); overscroll-behavior: contain; }
+  .bk-pick-head { padding: 10px 14px 4px; font-size: 12px; font-weight: 800; color: rgb(var(--muted)); }
+  .bk-pick-row { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 14px; text-align: left; font-size: 15px; font-weight: 700; }
+  .bk-pick-row + .bk-pick-row { border-top: 1px solid rgb(var(--line)); }
+  .bk-pick-row small { display: block; font-size: 12px; font-weight: 600; color: rgb(var(--muted)); }
+  .bk-chk { width: 26px; height: 26px; border-radius: 9px; border: 2px solid rgb(var(--stone)); display: grid; place-items: center; font-size: 12px; flex-shrink: 0; background: #fff; }
+  .bk-chk.on { background: rgb(var(--coral)); border-color: rgb(var(--coral)); color: #fff; }
+  .bk-card { background: rgb(var(--surface)); border-radius: 24px; padding: 16px 18px; }
+  .bk-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .bk-row + .bk-row { border-top: 1px solid rgb(var(--line)); }
+  .bk-row .bk-money { width: 150px; flex-shrink: 0; } .bk-row .bk-input { height: 46px; text-align: right; }
+  .bk-seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: rgb(var(--paper)); padding: 4px; border-radius: 999px; }
+  .bk-seg button { height: 38px; border-radius: 999px; font-weight: 700; font-size: 13.5px; color: rgb(var(--muted)); }
+  .bk-seg button.on { background: rgb(var(--ink)); color: #fff; }
+  .bk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bk-chip { height: 38px; padding: 0 14px; border-radius: 999px; background: rgb(var(--paper)); font-weight: 700; font-size: 13.5px; color: rgb(var(--muted)); }
+  .bk-chip.on { background: rgb(var(--ink)); color: #fff; }
+  .bk-wallet { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 0; text-align: left; }
+  .bk-wallet + .bk-wallet { border-top: 1px solid rgb(var(--line)); }
+  .bk-wico { width: 40px; height: 40px; border-radius: 13px; background: rgb(var(--coral-soft)); color: rgb(var(--coral)); display: grid; place-items: center; flex-shrink: 0; }
+  .bk-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+  .bk-tool { height: 64px; border-radius: 18px; background: rgb(var(--surface)); font-weight: 800; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .bk-tool.main { background: rgb(var(--coral)); color: #fff; }
+  .bk-sec { margin: 18px 4px 8px; font-size: 15px; font-weight: 800; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .bk-sec span { font-size: 13px; font-weight: 700; color: rgb(var(--muted)); }
+  .bk-err { margin: 10px 2px 0; font-size: 13px; font-weight: 700; color: rgb(var(--coral)); }
+  .bk-wsel { margin-top: 8px; display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: rgb(var(--muted)); }
+  .bk-wsel .bk-select { height: 40px; font-size: 13.5px; border-radius: 999px; background-color: rgb(var(--surface)); }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -169,14 +210,15 @@
           </div>
           <div class="text-right">
             <p class="text-[12.5px] font-bold num">{{ doneIn(rekapSection) }}/{{ countIn(rekapSection) }} <span class="font-medium text-ink/60">dibeli</span></p>
-            <button v-if="warnCount(rekapSection)" @click="openQuick(rekapSection)" class="mt-1.5 h-8 px-3 rounded-full bg-coral text-on-coral text-[12.5px] font-bold num inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi {{ warnCount(rekapSection) }} harga</button>
+            <button v-if="warnCount(rekapSection)" @click="openPrices(rekapSection)" class="mt-1.5 h-8 px-3 rounded-full bg-coral text-on-coral text-[12.5px] font-bold num inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi {{ warnCount(rekapSection) }} harga</button>
           </div>
         </div>
 
-        <button @click="openAdd(rekapSection)" class="mt-3 w-full h-12 rounded-full border-2 border-dashed border-acc/50 text-ink font-bold text-[14px] flex items-center justify-center gap-2 active:bg-acc-soft transition-colors">
-          <span class="w-6 h-6 rounded-full bg-acc text-on-acc grid place-items-center text-[12px]"><i class="fa-solid fa-plus"></i></span>
-          Tambah Barang
-        </button>
+        <div class="bk-actions">
+          <button @click="openPick(rekapSection)" class="bk-act dark"><i class="fa-solid fa-plus"></i> Tambah belanjaan</button>
+          <button @click="openPrices(rekapSection)" class="bk-act line">Isi harga<small>{{ warnCount(rekapSection) ? warnCount(rekapSection) + ' barang' : 'semua terisi' }}</small></button>
+        </div>
+        <button @click="openAdd(rekapSection)" class="bk-link">Barang baru yang belum ada di daftar</button>
 
         <div v-if="countIn(rekapSection) && !toBuyIn(rekapSection).length" class="mt-6 rounded-[24px] bg-surface px-5 py-6 text-center">
           <p class="text-[30px]">🎉</p>
@@ -197,7 +239,7 @@
               </span>
               <span class="w-7 h-7 rounded-full bg-surface grid place-items-center transition-transform shrink-0 text-muted" :class="showBought ? 'rotate-180' : ''"><i class="fa-solid fa-chevron-down text-[10px]"></i></span>
             </button>
-            <button @click="openQuick(rekapSection)" class="h-9 px-3.5 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0 inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi harga</button>
+            <button @click="openPrices(rekapSection)" class="h-9 px-3.5 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0 inline-flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[11px]"></i> Isi harga</button>
           </div>
           <div v-if="g.kind === 'cat' || showBought" class="bg-surface rounded-[24px] overflow-hidden">
             <div v-for="(item, idx) in g.items" :key="item.id" :id="'item-' + item.id" class="transition-colors"
@@ -229,7 +271,7 @@
                 <div v-if="entriesOf(item).length" class="mb-3 rounded-[16px] bg-surface overflow-hidden">
                   <div v-for="(e, ei) in entriesOf(item)" :key="e.eid" class="flex items-center gap-2 pl-3 pr-1 py-1 text-[13px]" :class="[ei ? 'border-t border-line' : '', editing && editing.entry.eid === e.eid ? 'bg-acc-soft/50' : '']">
                     <span class="w-[52px] shrink-0 text-muted font-semibold">{{ e.legacy ? 'Lama' : fmtDay(e.date) }}</span>
-                    <span class="flex-1 min-w-0 truncate num text-muted">{{ e.qty }} × {{ rp(e.price) }}</span>
+                    <span class="flex-1 min-w-0 truncate num text-muted">{{ e.qty }} × {{ rp(e.price) }}<template v-if="e.admin"> + admin {{ rp(e.admin) }}</template><template v-if="e.wallet">, {{ walletName(e.wallet) }}</template></span>
                     <span class="font-extrabold num shrink-0">{{ rp(e.amount) }}</span>
                     <button @click="startEdit(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Ubah catatan ini"><i class="fa-solid fa-pen text-[12px]"></i></button>
                     <button @click="removeEntry(item, e)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" aria-label="Hapus catatan ini"><i class="fa-regular fa-trash-can text-[13px]"></i></button>
@@ -253,6 +295,9 @@
                   </div>
                   <button @click="submitItem(item)" class="h-11 px-4 rounded-full bg-acc text-on-acc font-bold text-[14px] shrink-0 active:scale-95 transition-transform">{{ editing && editing.itemId === item.id ? 'Perbarui' : 'Simpan' }}</button>
                 </div>
+                <label v-if="state.wallets.length" class="bk-wsel">Dibayar dari
+                  <select v-model="rowWallet" class="bk-select" style="flex:1"><option value="">Tanpa dompet</option><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name }}, saldo {{ rp(walletBal(w.id)) }}</option></select>
+                </label>
                 <div class="flex items-center justify-between gap-3 mt-2.5 min-h-[20px] px-1">
                   <p class="text-[12px] text-muted num">
                     <template v-if="toInt(item.draftPrice)">{{ item.draftQty }} × {{ rp(toInt(item.draftPrice)) }} = <b class="text-ink">+{{ rp(toInt(item.draftPrice) * item.draftQty) }}</b></template>
@@ -270,6 +315,44 @@
         </div>
 
       </div>
+    </section>
+
+    <!-- ============ DOMPET ============ -->
+    <section v-else-if="activeTab === 'dompet'">
+      <div class="bk-card">
+        <p class="text-[12.5px] font-semibold text-muted">Total di semua dompet</p>
+        <p class="text-[28px] font-black tracking-[-0.03em] num leading-tight">{{ rp(walletsTotal) }}</p>
+        <p class="text-[12.5px] text-muted mt-1">Saldo berkurang otomatis saat harga belanjaan dicatat dengan dompet itu.</p>
+      </div>
+      <div v-if="state.wallets.length" class="bk-card" style="margin-top:10px;padding-top:4px;padding-bottom:4px">
+        <button v-for="w in state.wallets" :key="w.id" @click="openWalletEdit(w)" class="bk-wallet">
+          <span class="bk-wico"><i class="fa-solid fa-wallet"></i></span>
+          <span class="flex-1 min-w-0"><span class="block text-[15px] font-extrabold">{{ w.name }}</span><span class="block text-[12.5px] text-muted">Terpakai bulan ini {{ rp(walletSpentIn(w.id, state.month)) }}</span></span>
+          <span class="text-[15px] font-black num">{{ rp(walletBal(w.id)) }}</span>
+        </button>
+      </div>
+      <div v-else class="bk-card" style="margin-top:10px;text-align:center">
+        <p class="text-[15px] font-extrabold">Belum ada dompet</p>
+        <p class="text-[13px] text-muted mt-1">Contoh: Tunai, BCA, GoPay. Isi saldonya sekarang atau mulai dari Rp 0.</p>
+      </div>
+      <div class="bk-tools">
+        <button @click="openMove('in')" class="bk-tool main"><i class="fa-solid fa-plus"></i>Isi uang</button>
+        <button @click="openMove('transfer')" class="bk-tool"><i class="fa-solid fa-right-left"></i>Pindah</button>
+        <button @click="openWalletEdit(null)" class="bk-tool"><i class="fa-solid fa-wallet"></i>Dompet baru</button>
+      </div>
+      <template v-if="movesDesc.length">
+        <div class="bk-sec">Uang masuk &amp; pindah</div>
+        <div class="bk-card" style="padding-top:4px;padding-bottom:4px">
+          <div v-for="m in movesDesc" :key="m.id" class="bk-row">
+            <div class="flex-1 min-w-0">
+              <p class="text-[14.5px] font-bold leading-snug">{{ m.note || (m.type === 'in' ? 'Uang belanja masuk' : 'Pindah uang') }}</p>
+              <p class="text-[12.5px] text-muted">{{ m.type === 'in' ? 'Masuk ke ' + walletName(m.wallet) : walletName(m.wallet) + ' ke ' + walletName(m.to) }}, {{ fmtDay(m.date) }}<template v-if="m.admin">, admin {{ rp(m.admin) }}</template></p>
+            </div>
+            <span class="text-[14.5px] font-black num">{{ m.type === 'in' ? '+' : '' }}{{ rp(m.amount) }}</span>
+            <button @click="removeMove(m)" class="w-9 h-9 rounded-full text-muted active:bg-paper shrink-0" :aria-label="'Hapus catatan ' + rp(m.amount)"><i class="fa-regular fa-trash-can text-[13px]"></i></button>
+          </div>
+        </div>
+      </template>
     </section>
 
     <!-- ============ RIWAYAT ============ -->
@@ -323,6 +406,13 @@
           <div class="mt-4 pt-3 border-t border-line flex items-center justify-between text-[14.5px]">
             <span class="font-bold">Total pengeluaran</span><span class="font-black num">{{ rp(rSpent) }}</span>
           </div>
+        </div>
+
+        <div v-if="rWallets.list.length || rWallets.admin" class="mt-3 bk-card">
+          <h3 class="text-[15px] font-extrabold">Per dompet</h3>
+          <div class="bk-row" v-for="w in rWallets.list" :key="w.id"><span class="flex-1 font-semibold text-[14px]">{{ w.name }}</span><span class="font-extrabold num text-[14px]">{{ rp(w.amount) }}</span></div>
+          <div class="bk-row" v-if="rWallets.without"><span class="flex-1 font-semibold text-[14px] text-muted">Tanpa dompet</span><span class="font-extrabold num text-[14px] text-muted">{{ rp(rWallets.without) }}</span></div>
+          <div class="bk-row" v-if="rWallets.admin"><span class="flex-1 text-[13.5px] text-muted">Biaya admin (sudah termasuk)</span><span class="font-bold num text-[13.5px] text-muted">{{ rp(rWallets.admin) }}</span></div>
         </div>
 
         <div class="mt-3 rounded-[24px] bg-surface p-5">
@@ -470,7 +560,7 @@
   <!-- ============ NAVIGASI BAWAH ============ -->
   <nav class="bottom-nav z-30 px-4 pointer-events-none" aria-label="Navigasi utama">
     <div class="max-w-md mx-auto pointer-events-auto">
-      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-3 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
+      <div class="bg-surface rounded-[26px] p-1.5 grid grid-cols-4 gap-1 shadow-[0_10px_30px_-8px_rgba(0,0,0,.25)]">
         <button v-for="t in NAV" :key="t.id" @click="setTab(t.id)" class="relative h-[58px] rounded-[20px] flex flex-col items-center justify-center gap-1 transition-colors"
           :class="activeTab === t.id ? 'bg-coral-soft text-coral' : 'text-muted'" :aria-current="activeTab === t.id ? 'page' : null">
           <span class="text-[17px] leading-none"><i :class="['fa-solid', t.icon]"></i></span>
@@ -580,10 +670,10 @@
           </template>
 
           <template v-else-if="modal.type === 'add'">
-            <h3 class="text-[20px] font-black tracking-[-0.03em]">Tambah barang</h3>
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Barang baru</h3>
             <label class="block mt-4">
               <span class="text-[12.5px] font-bold text-muted">Nama barang</span>
-              <input ref="addNameInput" v-model="modal.form.name" @keyup.enter="confirmAdd" placeholder="Contoh: Roti Tawar"
+              <input ref="addNameInput" v-model="modal.form.name" @keyup.enter="confirmAdd" placeholder="Contoh: Roti tawar (tanpa jumlah)"
                 class="mt-1.5 w-full h-12 px-4 rounded-full bg-paper border-2 outline-none focus:border-coral text-[15px] font-semibold" :class="modal.error ? 'border-coral' : 'border-transparent'">
             </label>
             <p v-if="modal.error" class="text-[12.5px] text-coral font-semibold mt-1.5 px-1">{{ modal.error }}</p>
@@ -616,9 +706,122 @@
               </span>
             </button>
 
+            <span class="bk-label">Status</span>
+            <div class="bk-seg">
+              <button :class="{ on: !modal.form.bought }" @click="modal.form.bought = false">Rencana beli</button>
+              <button :class="{ on: modal.form.bought }" @click="modal.form.bought = true">Sudah dibeli</button>
+            </div>
+            <template v-if="modal.form.bought">
+              <span class="bk-label">Harga (boleh diisi nanti)</span>
+              <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.price)" @input="onMoney(modal.form, 'price', $event)" placeholder="0" aria-label="Harga"></div>
+              <span class="bk-label">Biaya admin (kalau ada)</span>
+              <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.admin)" @input="onMoney(modal.form, 'admin', $event)" placeholder="0" aria-label="Biaya admin"></div>
+              <template v-if="state.wallets.length">
+                <span class="bk-label">Dibayar dari</span>
+                <select v-model="modal.form.wallet" class="bk-select" aria-label="Dibayar dari"><option value="">Tanpa dompet</option><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name }}, saldo {{ rp(walletBal(w.id)) }}</option></select>
+              </template>
+              <span class="bk-label">Keterangan (boleh kosong)</span>
+              <input v-model="modal.form.note" class="bk-input" placeholder="Contoh: beli di pasar, harga promo" aria-label="Keterangan">
+              <span class="bk-label">Tanggal beli</span>
+              <input v-model="modal.form.date" type="date" :max="todayISO()" class="bk-input" aria-label="Tanggal beli">
+            </template>
+
             <div class="mt-6 grid grid-cols-2 gap-2">
               <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
-              <button @click="confirmAdd" class="h-12 rounded-full bg-coral text-on-coral font-bold">Tambah</button>
+              <button @click="confirmAdd" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'pick'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Tambah belanjaan</h3>
+            <p class="text-[13px] text-muted mt-0.5">Ketuk barang yang sudah masuk troli. Harga bisa diisi nanti.</p>
+            <span class="bk-label">Masuk ke daftar</span>
+            <select v-model="modal.pickTab" @change="modal.sel = []" class="bk-select" aria-label="Masuk ke daftar">
+              <option v-for="s in SECTIONS" :key="s.id" :value="s.id">{{ s.label + (s.id === thisWeek ? ' (minggu ini)' : '') }}</option>
+            </select>
+            <input id="pick-search" v-model="modal.q" class="bk-input" style="margin-top:10px" placeholder="Cari, atau ketik barang baru" aria-label="Cari barang" autocomplete="off">
+            <div class="bk-pick-list">
+              <button v-if="pickData.newName" @click="modal.newSel = !modal.newSel" class="bk-pick-row">
+                <span class="bk-chk" :class="{ on: modal.newSel }"><i v-if="modal.newSel" class="fa-solid fa-check"></i></span>
+                <span class="flex-1 min-w-0">Isi manual: “{{ pickData.newName }}”<small>Barang baru, masuk ke {{ sectionLabel(modal.pickTab) }}</small></span>
+              </button>
+              <template v-for="g in pickData.groups" :key="g.key">
+                <div class="bk-pick-head">{{ g.title === 'Sudah dibeli bulan ini (beli lagi)' ? g.title : catEmoji(g.title) + ' ' + g.title }}</div>
+                <button v-for="i in g.items" :key="i.id" @click="togglePick(i.id)" class="bk-pick-row" :aria-pressed="modal.sel.includes(i.id)">
+                  <span class="bk-chk" :class="{ on: modal.sel.includes(i.id) }"><i v-if="modal.sel.includes(i.id)" class="fa-solid fa-check"></i></span>
+                  <span class="flex-1 min-w-0">{{ i.name }}<small v-if="lastPriceOf(i)">Terakhir {{ rp(lastPriceOf(i).price) }}</small></span>
+                </button>
+              </template>
+              <p v-if="!pickData.groups.length && !pickData.newName" class="px-4 py-5 text-[13px] text-muted text-center">{{ modal.q ? 'Tidak ketemu. Ketik nama lengkapnya untuk menambah barang baru.' : 'Semua barang di daftar ini sudah dibeli.' }}</p>
+            </div>
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="confirmPick" :disabled="!pickCount" class="h-12 rounded-full bg-coral text-on-coral font-bold disabled:opacity-60">{{ pickCount ? 'Masukkan ' + pickCount + ' barang' : 'Pilih barang' }}</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'prices'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">Isi harga</h3>
+            <p class="text-[13px] text-muted mt-0.5">Terisi dari harga terakhir. Ubah yang berbeda saja.</p>
+            <template v-if="state.wallets.length">
+              <span class="bk-label">Dibayar dari</span>
+              <select v-model="modal.pWallet" class="bk-select" aria-label="Dibayar dari"><option value="">Tanpa dompet</option><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name }}, saldo {{ rp(walletBal(w.id)) }}</option></select>
+            </template>
+            <div class="mt-2">
+              <div v-for="r in modal.rows" :key="r.item.id" class="bk-row">
+                <label :for="'pr-' + r.item.id" class="flex-1 min-w-0"><span class="block text-[15px] font-bold leading-snug">{{ r.item.name }}</span><span class="block text-[12px] text-muted">{{ sectionLabel(r.item.tab) }}</span></label>
+                <div class="bk-money"><span>Rp</span><input :id="'pr-' + r.item.id" class="bk-input" inputmode="numeric" :value="fmtNum(r.price)" @input="onMoney(r, 'price', $event)" placeholder="0"></div>
+              </div>
+            </div>
+            <button v-if="!modal.showAdmin" @click="modal.showAdmin = true" class="mt-2 text-[13.5px] font-extrabold text-coral">+ Biaya admin</button>
+            <template v-else>
+              <span class="bk-label">Biaya admin (transfer, QRIS, ongkir)</span>
+              <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.pAdmin)" @input="onMoney(modal, 'pAdmin', $event)" placeholder="0" aria-label="Biaya admin"></div>
+            </template>
+            <div class="mt-4 pt-3 border-t border-line flex items-center justify-between"><span class="text-[14px] font-bold text-muted">Total</span><span class="text-[22px] font-black num">{{ rp(pricesTotal) }}</span></div>
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-4 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Nanti</button>
+              <button @click="savePrices" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan semua</button>
+            </div>
+          </template>
+
+          <template v-else-if="modal.type === 'walletEdit'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">{{ modal.form.isNew ? 'Dompet baru' : 'Ubah dompet' }}</h3>
+            <span class="bk-label">Nama dompet</span>
+            <input v-model="modal.form.name" class="bk-input" placeholder="Contoh: Tunai, BCA, GoPay" aria-label="Nama dompet">
+            <span class="bk-label">Saldo awal</span>
+            <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.initial)" @input="onMoney(modal.form, 'initial', $event)" placeholder="0" aria-label="Saldo awal"></div>
+            <p class="text-[12.5px] text-muted mt-1.5 px-1">Isi saldo saat mulai memakai dompet ini. Belanja sebelumnya tidak mengurangi saldo.</p>
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="saveWalletEdit" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan</button>
+            </div>
+            <button v-if="!modal.form.isNew" @click="deleteWallet" class="mt-3 w-full h-10 text-[13px] font-bold text-coral">Hapus dompet</button>
+          </template>
+
+          <template v-else-if="modal.type === 'move'">
+            <h3 class="text-[20px] font-black tracking-[-0.03em]">{{ modal.form.type === 'in' ? 'Isi uang belanja' : 'Pindah uang' }}</h3>
+            <span class="bk-label">Jumlah</span>
+            <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.amount)" @input="onMoney(modal.form, 'amount', $event)" placeholder="0" aria-label="Jumlah"></div>
+            <span class="bk-label">{{ modal.form.type === 'in' ? 'Masuk ke' : 'Dari' }}</span>
+            <select v-model="modal.form.wallet" class="bk-select"><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name }}, saldo {{ rp(walletBal(w.id)) }}</option></select>
+            <template v-if="modal.form.type === 'transfer'">
+              <span class="bk-label">Ke</span>
+              <select v-model="modal.form.to" class="bk-select"><option v-for="w in state.wallets" :key="w.id" :value="w.id">{{ w.name }}</option></select>
+              <span class="bk-label">Biaya admin (kalau ada)</span>
+              <div class="bk-money"><span>Rp</span><input class="bk-input" inputmode="numeric" :value="fmtNum(modal.form.admin)" @input="onMoney(modal.form, 'admin', $event)" placeholder="0" aria-label="Biaya admin"></div>
+            </template>
+            <span class="bk-label">Keterangan (boleh kosong)</span>
+            <input v-model="modal.form.note" class="bk-input" :placeholder="modal.form.type === 'in' ? 'Contoh: uang belanja November' : 'Contoh: tarik tunai'" aria-label="Keterangan">
+            <span class="bk-label">Tanggal</span>
+            <input v-model="modal.form.date" type="date" :max="todayISO()" class="bk-input" aria-label="Tanggal">
+            <p v-if="modal.error" class="bk-err">{{ modal.error }}</p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+              <button @click="closeModal" class="h-12 rounded-full bg-paper font-bold">Batal</button>
+              <button @click="saveMove" class="h-12 rounded-full bg-coral text-on-coral font-bold">Simpan</button>
             </div>
           </template>
 
@@ -651,6 +854,10 @@
               <button v-else @click="closeModal(); backToLogin()" class="h-9 px-4 rounded-full bg-coral text-on-coral text-[13px] font-bold shrink-0">Masuk</button>
             </div>
 
+            <button @click="downloadBackup" class="mt-3 w-full flex items-center gap-3 rounded-[20px] bg-paper px-4 py-3 text-left">
+              <span class="w-10 h-10 rounded-full bg-coral-soft text-coral grid place-items-center shrink-0"><i class="fa-solid fa-download"></i></span>
+              <span class="flex-1"><span class="block text-[14px] font-bold">Unduh cadangan</span><span class="block text-[12px] text-muted mt-0.5">Simpan semua catatan sebagai file di HP ini.</span></span>
+            </button>
             <p class="mt-4 px-1 text-[12px] text-muted">Belanja Kita versi {{ APP_VERSION }}</p>
             <button @click="closeModal" class="mt-2 w-full h-12 rounded-full bg-paper font-bold">Tutup</button>
           </template>
@@ -732,7 +939,7 @@
   const MAIL_URL = 'https://script.google.com/macros/s/AKfycbyLVwApa-NZM0o4-Mg13x8qPAg5k6eaIMiq-1Nh9LPokW9wTiqT39gjFjb5wevWgWd7Hw/exec';
   const MODE_KEY = 'catatanBelanjaKeluarga_mode_v1';
   function loadMode() { try { return localStorage.getItem(MODE_KEY) === 'local' ? 'local' : 'cloud'; } catch (e) { return 'cloud'; } }
-  const APP_VERSION = '2.4';
+  const APP_VERSION = '3.0';
   const DEFAULT_BUDGET = 6000000;
   const STORAGE_KEY = 'catatanBelanjaKeluarga_state_v1';
   const TAB_KEY = 'catatanBelanjaKeluarga_tab_v1';
@@ -742,6 +949,7 @@
   const NAV = [
     { id: 'bulanan', label: 'Bulanan', icon: 'fa-calendar-days' },
     { id: 'mingguan', label: 'Mingguan', icon: 'fa-basket-shopping' },
+    { id: 'dompet', label: 'Dompet', icon: 'fa-wallet' },
     { id: 'riwayat', label: 'Riwayat', icon: 'fa-chart-simple' }
   ];
   const SECTIONS = [
@@ -862,6 +1070,14 @@
   const pct = (a, b) => b > 0 ? Math.round(a / b * 100) : 0;
   const sectionLabel = id => (SECTIONS.find(s => s.id === id) || { label: id }).label;
   const catEmoji = c => EMOJI[c] || '🛒';
+  // Nama barang tanpa jumlah: "Beras 10 kg" -> "Beras", "Telur (1 Box)" -> "Telur".
+  // Kurung tanpa angka dibiarkan, mis. "Rempah (Bawang, Cabe, dll)".
+  function cleanName(n) {
+    const orig = String(n || '').trim();
+    let x = orig.replace(/\s*\([^)]*\d[^)]*\)/g, '').trim();
+    x = x.replace(/\s+\d+([.,]\d+)?\s*(kg|g|gr|gram|ml|l|liter|ltr|tabung|pack|pak|roll|box|jerigen|pcs|buah|bungkus|botol|sachet|ikat|ekor|lembar)?\.?$/i, '').trim();
+    return x || orig;
+  }
   let idSeq = 0;
   const uid = p => p + '-' + Date.now().toString(36) + '-' + (idSeq++).toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -869,14 +1085,23 @@
     return { id, name, category, tab, isChecked: false, totalQty: 0, totalSpent: 0, boughtOn: '', entries: [], custom: !!custom, keep: !!keep, draftPrice: '', draftQty: 1 };
   }
   function defaultItems() {
-    const items = MONTHLY_DEFAULTS.map(([n, c], i) => makeItem('bln-' + (i + 1), n, c, 'bulanan'));
+    const items = MONTHLY_DEFAULTS.map(([n, c], i) => makeItem('bln-' + (i + 1), cleanName(n), c, 'bulanan'));
     WEEK_IDS.forEach(w => {
-      WEEKLY_DEFAULTS.forEach(([n, c], i) => items.push(makeItem(w + '-' + (i + 1), n, c, w)));
+      WEEKLY_DEFAULTS.forEach(([n, c], i) => items.push(makeItem(w + '-' + (i + 1), cleanName(n), c, w)));
     });
     items.forEach((it, idx) => { it.order = idx; });
     return items;
   }
-  const normEntry = e => ({ eid: String(e.eid), price: Math.max(0, Number(e.price) || 0), qty: Math.max(1, parseInt(e.qty, 10) || 1), amount: Math.max(0, Number(e.amount) || 0), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date || '') ? e.date : '' });
+  const normEntry = e => {
+    const o = { eid: String(e.eid), price: Math.max(0, Number(e.price) || 0), qty: Math.max(1, parseInt(e.qty, 10) || 1), amount: Math.max(0, Number(e.amount) || 0), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date || '') ? e.date : '' };
+    if (e.wallet) o.wallet = String(e.wallet);       // dompet yang dipakai bayar
+    if (Number(e.admin) > 0) o.admin = Number(e.admin); // biaya admin, sudah termasuk di amount
+    if (e.note) o.note = String(e.note).slice(0, 120);
+    return o;
+  };
+  const normWallet = w => ({ id: String(w.id || uid('w')), name: String(w.name || 'Dompet').slice(0, 30), initial: Number(w.initial) || 0, createdAt: String(w.createdAt || '') });
+  const normMove = m => ({ id: String(m.id || uid('m')), type: m.type === 'transfer' ? 'transfer' : 'in', amount: Math.max(0, Number(m.amount) || 0), admin: Math.max(0, Number(m.admin) || 0),
+    wallet: String(m.wallet || ''), to: String(m.to || ''), date: /^\d{4}-\d{2}-\d{2}$/.test(m.date || '') ? m.date : '', note: String(m.note || '').slice(0, 80) });
   const normEntries = arr => Array.isArray(arr) ? arr.filter(e => e && e.eid).map(normEntry) : [];
   function normalizeItem(i) {
     return {
@@ -887,7 +1112,7 @@
     };
   }
   function loadState() {
-    const fresh = { month: currentMonth(), budget: DEFAULT_BUDGET, items: defaultItems(), history: [], checklistSection: 'bulanan', activeWeek: 'M1', historyView: 'bulan' };
+    const fresh = { month: currentMonth(), budget: DEFAULT_BUDGET, items: defaultItems(), history: [], wallets: [], moves: [], checklistSection: 'bulanan', activeWeek: 'M1', historyView: 'bulan' };
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return fresh;
@@ -898,6 +1123,8 @@
         budget: Number(s.budget) > 0 ? Number(s.budget) : DEFAULT_BUDGET,
         items: s.items.map((it, idx) => normalizeItem(Object.assign({ order: idx }, it))),
         history: Array.isArray(s.history) ? s.history.filter(h => h && Array.isArray(h.items) && isValidMonth(h.month)) : [],
+        wallets: Array.isArray(s.wallets) ? s.wallets.map(normWallet) : [],
+        moves: Array.isArray(s.moves) ? s.moves.map(normMove) : [],
         checklistSection: REKAP_IDS.includes(s.checklistSection) ? s.checklistSection : 'bulanan',
         activeWeek: WEEK_IDS.includes(s.activeWeek) ? s.activeWeek : 'M1',
         historyView: HISTORY_VIEWS.some(v => v.id === s.historyView) ? s.historyView : 'bulan'
@@ -965,7 +1192,7 @@
       // ---------- Sinkron keluarga (Firebase) ----------
       const login = reactive({ email: '', password: '', error: '', busy: false, show: false });
       const passwordInput = ref(null);
-      const cloud = reactive({ checkModel: false, autoMonth: false, available: false, mode: loadMode(), user: null, authChecked: false, ready: false, pending: false, online: navigator.onLine !== false });
+      const cloud = reactive({ namesClean: false, checkModel: false, autoMonth: false, available: false, mode: loadMode(), user: null, authChecked: false, ready: false, pending: false, online: navigator.onLine !== false });
       let db = null, auth = null, unsubs = [];
       const FV = () => firebase.firestore.FieldValue;
       const itemRef = id => db.collection('items').doc(id);
@@ -986,7 +1213,7 @@
       }
       function stopSync() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
       async function seedCloud() {
-        const ops = [b => b.set(cfgRef(), { month: state.month, budget: state.budget, createdAt: new Date().toISOString() })];
+        const ops = [b => b.set(cfgRef(), { month: state.month, budget: state.budget, wallets: JSON.parse(JSON.stringify(state.wallets || [])), moves: JSON.parse(JSON.stringify(state.moves || [])), createdAt: new Date().toISOString() })];
         state.items.forEach(i => ops.push(b => b.set(itemRef(i.id), itemDoc(i))));
         state.history.forEach(h => {
           const copy = JSON.parse(JSON.stringify(h));
@@ -1021,6 +1248,9 @@
             cloud.autoMonth = !!d.autoMonth;
             cloud.checkModel = d.checkModel === 2;
             if (Number(d.budget) > 0) state.budget = Number(d.budget);
+            if (Array.isArray(d.wallets)) state.wallets = d.wallets.map(normWallet);
+            if (Array.isArray(d.moves)) state.moves = d.moves.map(normMove);
+            cloud.namesClean = !!d.namesClean;
           }
           mark('cfg');
         }, onErr));
@@ -1163,7 +1393,7 @@
         }
       }
       // Harga terakhir per nama barang, dari bulan ini dan riwayat
-      const keyOf = name => String(name || '').trim().toLowerCase();
+      const keyOf = name => cleanName(name).toLowerCase();
       const lastPrices = computed(() => {
         const map = {};
         const put = (name, price, date) => {
@@ -1234,6 +1464,7 @@
         const price = toInt(modal.qPrice), qty = Math.max(1, modal.qQty || 1);
         if (!price) { showToast('Isi harga atau pilih Lewati', 'error'); return; }
         const entry = { eid: uid('e'), price, qty, amount: price * qty, date: todayISO() };
+        if (lastWallet.value && state.wallets.some(w => w.id === lastWallet.value)) entry.wallet = lastWallet.value;
         if (c.month === state.month && state.items.includes(c.item)) pushEntry(c.item, entry);
         else addToPastMonth(c.item, entry, c.month, c.item);
         modal.qSaved = (modal.qSaved || 0) + 1;
@@ -1726,7 +1957,7 @@
       // ---------- Catatan per pembelian ----------
       const editing = ref(null);
       const entryMonth = ref(state.month);
-      const clean = e => ({ eid: e.eid, price: e.price, qty: e.qty, amount: e.amount, date: e.date });
+      const clean = e => { const o = { eid: e.eid, price: e.price, qty: e.qty, amount: e.amount, date: e.date }; if (e.wallet) o.wallet = e.wallet; if (e.admin) o.admin = e.admin; if (e.note) o.note = e.note; return o; };
       function entriesOf(item) {
         const list = (item.entries || []).slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
         const amt = (Number(item.totalSpent) || 0) - list.reduce((t, e) => t + e.amount, 0);
@@ -1765,6 +1996,7 @@
       }
       function startEdit(item, entry) {
         editing.value = { itemId: item.id, entry: Object.assign({}, entry) };
+        rowWallet.value = entry.wallet || lastWallet.value;
         item.draftPrice = String(entry.price);
         item.draftQty = entry.qty;
         focusPrice(item.id);
@@ -1793,6 +2025,10 @@
         if (!price) { showToast('Isi harga terlebih dahulu', 'error'); return; }
         const ed = editing.value && editing.value.itemId === item.id ? editing.value : null;
         const entry = { eid: uid('e'), price, qty, amount: price * qty, date: ed ? (ed.entry.date || todayISO()) : todayISO() };
+        const w = rowWallet.value || (ed && ed.entry.wallet) || '';
+        if (w) { entry.wallet = w; rememberWallet(w); }
+        if (ed && ed.entry.admin) { entry.admin = ed.entry.admin; entry.amount += ed.entry.admin; }
+        if (ed && ed.entry.note) entry.note = ed.entry.note;
         item.draftPrice = ''; item.draftQty = 1;
         expandedId.value = null;
         if (ed) {
@@ -1847,7 +2083,7 @@
       }
       function openAdd(target) {
         const cats = categoriesFor(target);
-        openModal('add', { form: { name: '', target, category: cats[cats.length - 1], keep: target === 'bulanan' } });
+        openModal('add', { form: { name: '', target, category: cats[cats.length - 1], keep: target === 'bulanan', bought: false, price: '', admin: '', note: '', wallet: defaultWallet(), date: todayISO() } });
         nextTick(() => { addNameInput.value && addNameInput.value.focus(); });
       }
       watch(() => modal.form.target, (t, old) => {
@@ -1866,8 +2102,206 @@
         fresh.order = Date.now();
         state.items.push(fresh);
         remote(() => itemRef(fresh.id).set(itemDoc(fresh)));
+        const f = Object.assign({}, modal.form);
         closeModal();
+        if (f.bought) {
+          const price = toInt(f.price), admin = toInt(f.admin);
+          if (price) {
+            const entry = { eid: uid('e'), price, qty: 1, amount: price + admin, date: /^\d{4}-\d{2}-\d{2}$/.test(f.date) ? f.date : todayISO() };
+            if (f.wallet) { entry.wallet = f.wallet; rememberWallet(f.wallet); }
+            if (admin) entry.admin = admin;
+            if ((f.note || '').trim()) entry.note = f.note.trim();
+            pushEntry(fresh, entry);
+            showToast(name + ' ' + rp(entry.amount) + ' tercatat di ' + sectionLabel(target));
+          } else {
+            toggleCheck(fresh, true, true);
+            showToast(name + ' masuk Sudah dibeli, harga diisi nanti');
+          }
+          return;
+        }
         showToast(name + ' ditambahkan ke ' + sectionLabel(target));
+      }
+
+      // ---------- Dompet (sumber uang) ----------
+      const WALLET_KEY = 'catatanBelanjaKeluarga_wallet_v3';
+      const lastWallet = ref((() => { try { return localStorage.getItem(WALLET_KEY) || ''; } catch (e) { return ''; } })());
+      const rowWallet = ref(lastWallet.value);
+      function rememberWallet(id) { lastWallet.value = id || ''; try { localStorage.setItem(WALLET_KEY, lastWallet.value); } catch (e) {} }
+      function defaultWallet() { return state.wallets.some(w => w.id === lastWallet.value) ? lastWallet.value : (state.wallets[0] ? state.wallets[0].id : ''); }
+      function saveWallets() {
+        remote(() => cfgRef().set({ wallets: JSON.parse(JSON.stringify(state.wallets)), moves: JSON.parse(JSON.stringify(state.moves)) }, { merge: true }));
+      }
+      const walletName = id => (state.wallets.find(w => w.id === id) || {}).name || '';
+      // Semua catatan pembelian yang punya dompet, bulan ini dan arsip
+      const walletEntries = computed(() => {
+        const out = [];
+        const add = (i, month) => normEntries(i.entries).forEach(e => { if (e.wallet) out.push({ e, name: i.name, tab: i.tab, month }); });
+        state.items.forEach(i => add(i, state.month));
+        state.history.forEach(h => (h.items || []).forEach(i => add(i, h.month)));
+        return out;
+      });
+      function walletBal(id) {
+        const w = state.wallets.find(x => x.id === id); if (!w) return 0;
+        let b = Number(w.initial) || 0;
+        state.moves.forEach(m => {
+          if (m.type === 'in' && m.wallet === id) b += m.amount;
+          if (m.type === 'transfer') { if (m.wallet === id) b -= m.amount + m.admin; if (m.to === id) b += m.amount; }
+        });
+        walletEntries.value.forEach(x => { if (x.e.wallet === id) b -= x.e.amount; });
+        return b;
+      }
+      const walletsTotal = computed(() => state.wallets.reduce((t, w) => t + walletBal(w.id), 0));
+      const walletSpentIn = (id, month) => walletEntries.value.filter(x => x.e.wallet === id && x.month === month).reduce((t, x) => t + x.e.amount, 0);
+      const walletUsed = id => state.moves.some(m => m.wallet === id || m.to === id) || walletEntries.value.some(x => x.e.wallet === id);
+      const movesDesc = computed(() => state.moves.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 30));
+      function onMoney(obj, key, e) {
+        const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12);
+        obj[key] = digits; e.target.value = fmtNum(digits);
+      }
+      function openWalletEdit(w) {
+        openModal('walletEdit', { form: w ? { id: w.id, name: w.name, initial: String(Math.max(0, w.initial) || ''), isNew: false } : { id: '', name: '', initial: '', isNew: true } });
+      }
+      function saveWalletEdit() {
+        const f = modal.form, name = (f.name || '').trim();
+        if (!name) { modal.error = 'Beri nama dompetnya.'; return; }
+        if (state.wallets.some(w => w.id !== f.id && w.name.toLowerCase() === name.toLowerCase())) { modal.error = 'Nama dompet sudah ada.'; return; }
+        if (f.isNew) { const w = normWallet({ id: uid('w'), name, initial: toInt(f.initial), createdAt: todayISO() }); state.wallets.push(w); if (!lastWallet.value) rememberWallet(w.id); }
+        else { const w = state.wallets.find(x => x.id === f.id); if (w) { w.name = name; w.initial = toInt(f.initial); } }
+        saveWallets(); closeModal(); showToast(f.isNew ? 'Dompet ' + name + ' ditambahkan' : 'Dompet disimpan');
+      }
+      function deleteWallet() {
+        const id = modal.form.id; if (!id) return;
+        if (walletUsed(id)) { modal.error = 'Dompet ini sudah dipakai di catatan, tidak bisa dihapus.'; return; }
+        const before = state.wallets.slice();
+        state.wallets = state.wallets.filter(w => w.id !== id); saveWallets(); closeModal();
+        showToast('Dompet dihapus', 'ok', { label: 'Batalkan', fn: () => { state.wallets = before; saveWallets(); } });
+      }
+      function openMove(type) {
+        if (!state.wallets.length) { openWalletEdit(null); showToast('Tambahkan dompet dulu'); return; }
+        if (type === 'transfer' && state.wallets.length < 2) { showToast('Butuh minimal dua dompet untuk pindah uang', 'error'); return; }
+        const a = defaultWallet(), b = (state.wallets.find(w => w.id !== a) || {}).id || '';
+        openModal('move', { form: { type, wallet: a, to: b, amount: '', admin: '', note: '', date: todayISO() } });
+      }
+      function saveMove() {
+        const f = modal.form, amount = toInt(f.amount);
+        if (!amount) { modal.error = 'Isi jumlahnya.'; return; }
+        if (f.type === 'transfer' && f.wallet === f.to) { modal.error = 'Pilih dompet tujuan yang berbeda.'; return; }
+        const m = normMove({ id: uid('m'), type: f.type, amount, admin: f.type === 'transfer' ? toInt(f.admin) : 0, wallet: f.wallet, to: f.type === 'transfer' ? f.to : '', date: f.date || todayISO(), note: (f.note || '').trim() });
+        state.moves.push(m); saveWallets(); closeModal();
+        showToast(f.type === 'in' ? rp(amount) + ' masuk ke ' + walletName(m.wallet) : rp(amount) + ' dipindah ke ' + walletName(m.to), 'ok', { label: 'Batalkan', fn: () => { state.moves = state.moves.filter(x => x.id !== m.id); saveWallets(); } });
+      }
+      function removeMove(m) {
+        const before = state.moves.slice();
+        state.moves = state.moves.filter(x => x.id !== m.id); saveWallets();
+        showToast('Catatan uang dihapus', 'ok', { label: 'Batalkan', fn: () => { state.moves = before; saveWallets(); } });
+      }
+      const rWallets = computed(() => {
+        const rows = {}; let admin = 0, withWallet = 0;
+        rViews.value.forEach(i => normEntries(i.entries).forEach(e => {
+          if (e.admin) admin += e.admin;
+          if (!e.wallet) return;
+          withWallet += e.amount;
+          rows[e.wallet] = (rows[e.wallet] || 0) + e.amount;
+        }));
+        const list = Object.keys(rows).map(id => ({ id, name: walletName(id) || 'Dompet terhapus', amount: rows[id] })).sort((a, b) => b.amount - a.amount);
+        return { list, admin, without: Math.max(0, rSpent.value - withWallet) };
+      });
+
+      // ---------- Tambah belanjaan: pilih dari daftar (dropdown dengan pencarian) ----------
+      function openPick(tab) {
+        openModal('pick', { pickTab: tab, q: '', sel: [], newSel: false });
+        nextTick(() => { const el = document.getElementById('pick-search'); if (el) { try { el.focus({ preventScroll: true }); } catch (e) {} } });
+      }
+      const pickData = computed(() => {
+        if (modal.type !== 'pick') return { groups: [], newName: '' };
+        const q = (modal.q || '').trim().toLowerCase();
+        const match = i => !q || i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q);
+        const pool = itemsIn(modal.pickTab).filter(i => !i.isChecked && match(i));
+        const fresh = pool.filter(i => !(Number(i.totalSpent) > 0)), again = pool.filter(i => Number(i.totalSpent) > 0);
+        const groups = [], map = {};
+        fresh.forEach(i => { if (!map[i.category]) { map[i.category] = { key: 'c-' + i.category, title: i.category, items: [] }; groups.push(map[i.category]); } map[i.category].items.push(i); });
+        if (again.length) groups.push({ key: 'again', title: 'Sudah dibeli bulan ini (beli lagi)', items: again });
+        const raw = (modal.q || '').trim();
+        const exists = raw && itemsIn(modal.pickTab).some(i => i.name.toLowerCase() === raw.toLowerCase());
+        return { groups, newName: raw && !exists ? cleanName(raw) : '' };
+      });
+      function togglePick(id) { const k = modal.sel.indexOf(id); if (k > -1) modal.sel.splice(k, 1); else modal.sel.push(id); }
+      const pickCount = computed(() => modal.type === 'pick' ? modal.sel.length + (modal.newSel && pickData.value.newName ? 1 : 0) : 0);
+      function confirmPick() {
+        const tab = modal.pickTab, picked = state.items.filter(i => modal.sel.includes(i.id));
+        let created = null;
+        if (modal.newSel && pickData.value.newName) {
+          created = makeItem(uid('c'), pickData.value.newName, 'Lain-lain', tab, true, tab === 'bulanan');
+          created.order = Date.now(); state.items.push(created);
+          remote(() => itemRef(created.id).set(itemDoc(created)));
+          picked.push(created);
+        }
+        if (!picked.length) { modal.error = 'Ketuk barang yang sudah masuk troli.'; return; }
+        picked.forEach(i => toggleCheck(i, true, true));
+        closeModal();
+        showToast(picked.length + ' barang masuk Sudah dibeli', 'ok', { label: 'Batalkan', fn: () => {
+          picked.forEach(i => { if (i !== created) toggleCheck(i, false, true); });
+          if (created) { state.items = state.items.filter(i => i.id !== created.id); remote(() => itemRef(created.id).delete()); }
+        } });
+      }
+
+      // ---------- Isi harga sekaligus ----------
+      function openPrices(tab) {
+        const rows = state.items.filter(i => needsPrice(i) && (!tab || i.tab === tab)).map(item => { const last = lastPriceOf(item); return { item, price: last ? String(last.price) : '' }; });
+        if (!rows.length) { showToast('Semua harga sudah diisi'); return; }
+        openModal('prices', { rows, pWallet: defaultWallet(), pAdmin: '', showAdmin: false });
+      }
+      const pricesTotal = computed(() => modal.type === 'prices' ? (modal.rows || []).reduce((t, r) => t + toInt(r.price), 0) + toInt(modal.pAdmin) : 0);
+      function savePrices() {
+        const ok = (modal.rows || []).filter(r => toInt(r.price) > 0);
+        if (!ok.length) { modal.error = 'Isi minimal satu harga.'; return; }
+        const admin = toInt(modal.pAdmin), wallet = modal.pWallet, saved = [];
+        ok.forEach((r, idx) => {
+          const price = toInt(r.price), a = idx === 0 ? admin : 0;
+          const entry = { eid: uid('e'), price, qty: 1, amount: price + a, date: r.item.boughtOn && r.item.boughtOn.slice(0, 7) === state.month ? r.item.boughtOn : todayISO() };
+          if (wallet) entry.wallet = wallet;
+          if (a) entry.admin = a;
+          pushEntry(r.item, entry); saved.push({ item: r.item, entry });
+        });
+        if (wallet) rememberWallet(wallet);
+        closeModal();
+        showToast(saved.length + ' harga tersimpan, ' + rp(saved.reduce((t, x) => t + x.entry.amount, 0)), 'ok', { label: 'Batalkan', fn: () => saved.forEach(x => { dropEntry(x.item, x.entry); toggleCheck(x.item, true, true); }) });
+      }
+
+      // ---------- Rapikan nama barang (tanpa jumlah) & cadangan ----------
+      const CLEAN_KEY = 'catatanBelanjaKeluarga_names_v3', BACKUP_KEY = 'catatanBelanjaKeluarga_backup_v24';
+      function backupLocal() {
+        try { if (!localStorage.getItem(BACKUP_KEY)) localStorage.setItem(BACKUP_KEY, JSON.stringify({ at: new Date().toISOString(), version: '2.4', state: JSON.parse(JSON.stringify(state)) })); } catch (e) {}
+      }
+      function runNameCleanup() {
+        try { if (localStorage.getItem(CLEAN_KEY) === '1' && (cloud.mode === 'local' || cloud.namesClean)) return; } catch (e) {}
+        const list = [];
+        state.items.forEach(i => {
+          const c = cleanName(i.name);
+          if (c !== i.name && !state.items.some(o => o !== i && o.tab === i.tab && o.name.toLowerCase() === c.toLowerCase())) list.push({ item: i, name: c });
+        });
+        if (list.length) {
+          backupLocal();
+          list.forEach(x => { x.item.name = x.name; remote(() => itemRef(x.item.id).update({ name: x.name })); });
+          showToast(list.length + ' nama barang dirapikan, tanpa jumlah');
+        }
+        try { localStorage.setItem(CLEAN_KEY, '1'); } catch (e) {}
+        remote(() => cfgRef().set({ namesClean: true }, { merge: true }));
+      }
+      watch(() => (cloud.mode === 'local' || !cloud.available) ? 'local' : (cloud.user && cloud.ready ? 'cloud' : ''), v => {
+        if (v === 'local') runNameCleanup();
+        if (v === 'cloud' && !cloud.namesClean) runNameCleanup();
+      }, { immediate: true });
+      function downloadBackup() {
+        const data = { app: 'Belanja Kita', version: APP_VERSION, exportedAt: new Date().toISOString(), month: state.month, budget: state.budget,
+          items: state.items.map(i => Object.assign({ id: i.id }, itemDoc(i))), history: JSON.parse(JSON.stringify(state.history)),
+          wallets: JSON.parse(JSON.stringify(state.wallets)), moves: JSON.parse(JSON.stringify(state.moves)) };
+        try {
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+          const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'belanja-kita-cadangan-' + todayISO() + '.json';
+          document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+          showToast('Cadangan diunduh');
+        } catch (e) { showToast('Gagal mengunduh cadangan', 'error'); }
       }
 
       // ---------- Tutup buku ----------
@@ -1913,7 +2347,9 @@
         rp, rpShort, pct, fmtNum, toInt, sum, monthLabel, shortMonth, shortMonthName, nextMonth, sectionLabel, catEmoji, buildReport,
         countIn, doneIn, subtotal, needsPrice, warnCount, navWarn, grouped, categoriesFor, spentItems,
         setTab, closeModal, onPrice, submitItem, askReset, confirmReset, askDelete, confirmDelete,
-        openAdd, confirmAdd, copyText
+        openAdd, confirmAdd, copyText,
+        lastWallet, rowWallet, walletName, walletBal, walletsTotal, walletSpentIn, movesDesc, onMoney, openWalletEdit, saveWalletEdit, deleteWallet, openMove, saveMove, removeMove, rWallets,
+        openPick, pickData, togglePick, pickCount, confirmPick, openPrices, pricesTotal, savePrices, downloadBackup, todayISO
       };
     }
   }).mount('#app');
