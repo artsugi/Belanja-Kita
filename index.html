@@ -22,6 +22,7 @@
   :root {
     --paper: #F6F4F1; --surface: #FFFFFF; --stone: #E4DED2; --line: #ECE7DE;
     --ink: #151210; --muted: #5C554C; --coral: #F95C4B; --coral-dk: #D23A2C; --coral-ink: #B8392B; --coral-soft: #FFE3DF;
+    --dark: #3B3733; /* abu-abu gelap untuk latar yang dulu hitam */
     --green: #0F7A5F; --amber: #B26A00;
     --font: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color-scheme: only light;
@@ -55,7 +56,7 @@
   .hero::after { content: ""; position: absolute; right: -40px; top: -50px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,.1); pointer-events: none; }
   .hero .cap { font-size: 13px; font-weight: 700; opacity: .92; display: flex; justify-content: space-between; gap: 8px; }
   .hero .cap span { background: rgba(255,255,255,.2); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
-  .hero .cap span.over { background: rgba(0,0,0,.75); }
+  .hero .cap span.over { background: var(--dark); }
   .hero .big { font-size: 34px; font-weight: 900; letter-spacing: -0.035em; line-height: 1.08; margin-top: 2px; }
   .bar { height: 8px; border-radius: 4px; background: rgba(0,0,0,.15); overflow: hidden; margin-top: 10px; }
   .bar i { display: block; height: 100%; background: #fff; border-radius: 4px; }
@@ -89,7 +90,7 @@
   .cat .head span { font-weight: 700; } .cat .head b { white-space: nowrap; }
   .cat .meter { margin-top: 7px; height: 7px; border-radius: 4px; background: var(--paper); overflow: hidden; }
   .cat .meter i { display: block; height: 100%; border-radius: 4px; background: var(--coral); }
-  .cat .meter i.warn { background: var(--amber); } .cat .meter i.over { background: var(--ink); }
+  .cat .meter i.warn { background: var(--amber); } .cat .meter i.over { background: var(--dark); }
   .cat small { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); }
   .cat small.over { color: var(--coral-ink); font-weight: 700; }
   .ico { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; background: var(--coral-soft); color: var(--coral-ink); font-size: 18px; }
@@ -116,7 +117,7 @@
   .btns2 { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .btn { height: 50px; border-radius: 18px; font-weight: 800; font-size: 14.5px; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); }
   .btn.main { background: var(--coral-dk); color: #fff; }
-  .btn.dark { background: var(--ink); color: #fff; }
+  .btn.dark { background: var(--dark); color: #fff; }
   .btn:disabled { opacity: .55; }
   .tools { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .tool { height: 66px; border-radius: 18px; background: var(--surface); font-weight: 800; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
@@ -146,7 +147,7 @@
   .money .in { padding-left: 40px; font-weight: 800; font-size: 17px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { height: 38px; padding: 0 14px; border-radius: 999px; background: var(--paper); font-weight: 700; font-size: 13.5px; color: var(--muted); }
-  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .chip[aria-pressed="true"] { background: var(--dark); color: #fff; }
   .link { font-size: 13.5px; font-weight: 800; color: var(--coral-ink); }
   .err { margin: 10px 2px 0; font-size: 13px; font-weight: 700; color: var(--coral-ink); }
   .hint { margin: 6px 2px 0; font-size: 12.5px; color: var(--muted); }
@@ -205,7 +206,7 @@
   .mp-grid button:disabled { opacity: .3; }
   .mp-grid button i { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--coral-dk); }
 
-  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 112px); z-index: 60; background: var(--ink); color: #fff; padding: 8px 8px 8px 16px; min-height: 48px; border-radius: 24px; font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); width: max-content; max-width: calc(100% - 28px); }
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 112px); z-index: 60; background: var(--dark); color: #fff; padding: 8px 8px 8px 16px; min-height: 48px; border-radius: 24px; font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); width: max-content; max-width: calc(100% - 28px); }
   .toast.solo { padding-right: 16px; } .toast.err { background: var(--coral-ink); }
   .toast button { height: 34px; padding: 0 13px; border-radius: 17px; background: rgba(255,255,255,.18); font-weight: 800; flex-shrink: 0; }
   .screen { position: fixed; inset: 0; z-index: 70; background: var(--paper); overflow-y: auto; }
@@ -220,6 +221,13 @@
   .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 300px; margin: 0 auto; width: 100%; }
   .keys button { height: 64px; border-radius: 22px; background: var(--surface); font-size: 26px; font-weight: 700; }
   .keys button.plain { background: transparent; color: var(--muted); font-size: 20px; }
+  .who { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .who button { height: 64px; border-radius: 20px; background: var(--surface); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent; }
+  .who button[aria-pressed="true"] { background: var(--dark); color: #fff; }
+  .who button i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 14px; background: var(--coral-soft); color: var(--coral-ink); }
+  .who button[aria-pressed="true"] i { background: rgba(255,255,255,.18); color: #fff; }
+  .pw { position: relative; } .pw .in { padding-right: 52px; background: #fff; height: 54px; font-size: 16px; }
+  .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; color: var(--muted); font-size: 13px; font-weight: 800; }
   .bio-btn { margin: 16px auto 0; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 22px; border-radius: 25px; background: var(--coral-dk); color: #fff; font-weight: 800; font-size: 15px; }
   .boot { position: fixed; inset: 0; z-index: 90; background: var(--paper); display: grid; place-items: center; transition: opacity .25s; }
   .boot.out { opacity: 0; pointer-events: none; }
@@ -254,7 +262,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.1';
+const APP_VERSION = '4.2';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -502,7 +510,8 @@ function status() {
   else if (!cloud.user) { dot = '#B9B0A2'; t = cloud.authKnown ? 'Belum masuk' : 'Menyambungkan…'; }
   else if (!navigator.onLine) { dot = '#E0A100'; t = 'Offline, tersimpan di HP'; }
   else if (pendingWrites || cloud.pending) { dot = '#E0A100'; t = 'Menyimpan…'; }
-  el.innerHTML = `<i style="background:${dot}"></i>${t}`;
+  el.innerHTML = `<i style="background:${dot}"></i>${t}${cloud.mode !== 'local' && cloud.authKnown && !cloud.user ? ' <u style="color:var(--coral-ink);font-weight:700">Masuk</u>' : ''}`;
+  el.onclick = cloud.mode !== 'local' && cloud.authKnown && !cloud.user ? () => showLogin() : null;
 }
 function receiptTitle(r) { if (r.note) return r.note; const n = r.lines.map(l => l.n); return n.length > 2 ? n.slice(0, 2).join(', ') + ' +' + (n.length - 2) : n.join(', ') || 'Belanja'; }
 function receiptSub(r) { return [dShort(r.date), r.lines.length > 1 ? r.lines.length + ' barang' : catName((r.lines[0] || {}).c), r.wallet ? walletName(r.wallet) : '', r.by].filter(Boolean).join(', '); }
@@ -1073,31 +1082,49 @@ function loginError(code) {
   if (code === 'auth/network-request-failed' || code === 'timeout') return 'Tidak bisa terhubung ke server. Coba ganti jaringan (Wi-Fi atau data seluler).';
   return 'Gagal masuk (' + (code || 'error') + ').';
 }
+const WHO_KEY = 'belanjaKita_v4_who';
 function showLogin() {
   hideBoot();
   const L = $('login'), hasData = S.receipts.length || S.config.wallets.length;
-  L.innerHTML = `<div class="screen-in"><div class="logo" style="width:64px;height:64px;font-size:30px">${svg('basket')}</div><h1>Belanja Kita</h1><p>Masuk sekali di HP ini. Catatan belanja dan dompet tersambung otomatis dengan keluarga.</p>
-    <span class="lbl" style="margin-top:24px">Siapa yang memakai HP ini?</span><div class="two">${FAMILY.map(p => `<button class="btn" data-person="${p.email}">${p.name}</button>`).join('')}</div>
-    <span class="lbl">Email</span><input class="in" id="lg-email" type="email" autocomplete="username" style="background:#fff">
-    <span class="lbl">Kata sandi</span><input class="in" id="lg-pass" type="password" autocomplete="current-password" style="background:#fff">
-    <p class="err" id="lg-err" hidden></p><button class="save" id="lg-go">Masuk</button>
-    ${hasData && cloud.mode !== 'local' ? '<button class="del" id="lg-back" style="color:var(--ink)">Kembali ke catatan</button>' : ''}
-    <button class="del" id="lg-local" style="color:var(--muted);font-weight:600;text-decoration:underline">Pakai di HP ini saja, tanpa sinkron</button></div>`;
-  L.hidden = false;
-  L.querySelectorAll('[data-person]').forEach(b => b.onclick = () => { L.querySelectorAll('[data-person]').forEach(x => x.classList.toggle('dark', x === b)); $('lg-email').value = b.dataset.person; $('lg-pass').focus(); });
-  const goBtn = $('lg-go');
-  const doLogin = () => {
-    const er = $('lg-err');
-    if (!auth) { er.textContent = 'Layanan sinkron belum termuat. Periksa koneksi lalu buka ulang.'; er.hidden = false; return; }
-    goBtn.disabled = true; goBtn.textContent = 'Sedang masuk…';
-    Promise.race([auth.signInWithEmailAndPassword($('lg-email').value.trim(), $('lg-pass').value), new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), 25000))])
-      .then(() => { setMode('cloud'); })
-      .catch(e => { er.textContent = loginError(e && e.code); er.hidden = false; })
-      .finally(() => { goBtn.disabled = false; goBtn.textContent = 'Masuk'; });
+  let who = (() => { try { return localStorage.getItem(WHO_KEY) || ''; } catch (e) { return ''; } })(), other = false, showPw = false;
+  if (!FAMILY.some(p => p.email === who)) who = '';
+  const draw = (errMsg) => {
+    const p = FAMILY.find(x => x.email === who);
+    L.innerHTML = `<div class="screen-in"><div class="logo" style="width:64px;height:64px;font-size:30px">${svg('basket')}</div><h1>Belanja Kita</h1><p>Masuk sekali di HP ini. Setelah itu tetap masuk, dan catatan tersambung dengan keluarga.</p>
+      <span class="lbl" style="margin-top:24px">Siapa yang memakai HP ini?</span>
+      <div class="who">${FAMILY.map(f => `<button type="button" data-who="${f.email}" aria-pressed="${!other && who === f.email}"><i>${f.name[0]}</i>${f.name}</button>`).join('')}</div>
+      ${other ? `<span class="lbl">Email</span><input class="in" id="lg-email" type="email" autocomplete="username" style="background:#fff;height:54px" value="">` : ''}
+      ${p || other ? `<span class="lbl">Kata sandi${p && !other ? ' ' + p.name : ''}</span><div class="pw"><input class="in" id="lg-pass" type="${showPw ? 'text' : 'password'}" autocomplete="current-password" enterkeyhint="go"><button type="button" id="lg-eye">${showPw ? 'Tutup' : 'Lihat'}</button></div>
+        <p class="err" id="lg-err" ${errMsg ? '' : 'hidden'}>${esc(errMsg || '')}</p><button class="save" id="lg-go">Masuk</button>
+        <button class="del" id="lg-forgot" style="color:var(--coral-ink)">Lupa kata sandi?</button>` : '<p class="hint" style="margin-top:10px">Pilih nama dulu.</p>'}
+      ${!other ? '<button class="del" id="lg-other" style="color:var(--muted);font-weight:600">Pakai email lain</button>' : ''}
+      ${hasData && cloud.mode !== 'local' ? '<button class="del" id="lg-back" style="color:var(--ink)">Kembali ke catatan (simpan di HP dulu)</button>' : ''}
+      <button class="del" id="lg-local" style="color:var(--muted);font-weight:600;text-decoration:underline">Pakai di HP ini saja, tanpa sinkron</button></div>`;
+    L.hidden = false;
+    L.querySelectorAll('[data-who]').forEach(b => b.onclick = () => { who = b.dataset.who; other = false; try { localStorage.setItem(WHO_KEY, who); } catch (e) {} draw(); setTimeout(() => { const x = $('lg-pass'); x && x.focus(); }, 40); });
+    const ot = $('lg-other'); if (ot) ot.onclick = () => { other = true; draw(); setTimeout(() => $('lg-email').focus(), 40); };
+    const eye = $('lg-eye'); if (eye) eye.onclick = () => { const v = $('lg-pass').value; showPw = !showPw; draw(); $('lg-pass').value = v; $('lg-pass').focus(); };
+    const email = () => other ? ($('lg-email').value || '').trim().toLowerCase() : who;
+    const goBtn = $('lg-go');
+    const doLogin = () => {
+      const er = $('lg-err'), pass = $('lg-pass').value;
+      if (!auth) { er.textContent = 'Layanan sinkron belum termuat. Periksa koneksi, lalu tutup dan buka lagi.'; er.hidden = false; return; }
+      if (!email() || !pass) { er.textContent = 'Isi kata sandinya dulu.'; er.hidden = false; return; }
+      goBtn.disabled = true; goBtn.textContent = 'Sedang masuk…'; er.hidden = true;
+      Promise.race([auth.signInWithEmailAndPassword(email(), pass), new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), 25000))])
+        .then(() => { setMode('cloud'); goBtn.textContent = 'Berhasil'; })
+        .catch(e => { er.textContent = loginError(e && e.code); er.hidden = false; goBtn.disabled = false; goBtn.textContent = 'Masuk'; });
+    };
+    if (goBtn) { goBtn.onclick = doLogin; $('lg-pass').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doLogin(); } }); }
+    const fg = $('lg-forgot'); if (fg) fg.onclick = () => {
+      const er = $('lg-err'), em = email();
+      if (!auth || !em) { er.textContent = 'Pilih nama atau isi email dulu.'; er.hidden = false; return; }
+      auth.sendPasswordResetEmail(em).then(() => { er.hidden = true; toast('Link atur ulang kata sandi dikirim ke ' + em); }).catch(e => { er.textContent = loginError(e && e.code); er.hidden = false; });
+    };
+    const bk = $('lg-back'); if (bk) bk.onclick = () => { L.hidden = true; render(); };
+    $('lg-local').onclick = () => { setMode('local'); L.hidden = true; migrateLocal(); render(); };
   };
-  goBtn.onclick = doLogin; $('lg-pass').addEventListener('keyup', e => { if (e.key === 'Enter') doLogin(); });
-  const bk = $('lg-back'); if (bk) bk.onclick = () => { L.hidden = true; render(); };
-  $('lg-local').onclick = () => { setMode('local'); L.hidden = true; migrateLocal(); render(); };
+  draw();
 }
 function stopSync() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
 let migrating = false, migrationTried = false;
