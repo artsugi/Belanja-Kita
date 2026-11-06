@@ -291,6 +291,13 @@
   .lg2 .bar { display: block; margin: 7px 0 0 17px; height: 5px; border-radius: 3px; background: #EEF1F5; overflow: hidden; } .lg2 .bar i { display: block; height: 100%; border-radius: 3px; }
   .cgrid button { color: var(--ink); } .cgrid button span { color: #4B5563; }
   .cgrid button.on { background: var(--coral); color: #fff; box-shadow: 0 10px 20px -12px rgba(37,99,235,0.6); } .cgrid button.on span { color: #fff; }
+  .hint-w { font-size: 11.5px; font-weight: 600; opacity: .85; margin-top: 1px; }
+  .quick2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .quick2 button { height: 52px; border-radius: 18px; background: #fff; border: var(--glass-b); box-shadow: var(--glass-sh); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+  .quick2 svg { font-size: 18px; color: var(--coral); }
+  .insight p { margin: 0; } .insight p b { display: block; font-size: 14.5px; font-weight: 800; color: var(--ink); } .insight p span { display: block; font-size: 13px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+  .logo.back { transform: none; background: #fff; color: var(--ink); border: var(--glass-b); cursor: pointer; }
+  .stat small, .t2, .ybars span { font-size: 12px; }
 </style>
 </head>
 <body>
@@ -323,7 +330,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.7';
+const APP_VERSION = '4.8';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -341,7 +348,7 @@ const LOCK_AFTER = 5 * 60 * 1000;
 const DEFAULT_BUDGET = 6000000;
 const DEFAULT_CATS = [
   { id: 'pokok', name: 'Kebutuhan pokok' }, { id: 'lauk', name: 'Lauk & sayur' }, { id: 'bumbu', name: 'Bumbu & dapur' },
-  { id: 'bersih', name: 'Kebersihan & mandi' }, { id: 'rumah', name: 'Rumah tangga & tagihan' }, { id: 'buah', name: 'Buah & camilan' }, { id: 'lain', name: 'Lain-lain' }
+  { id: 'bersih', name: 'Kebersihan & mandi' }, { id: 'rumah', name: 'Rumah tangga & tagihan' }, { id: 'buah', name: 'Buah & camilan' }, { id: 'jajan', name: 'Jajan & makan di luar' }, { id: 'lain', name: 'Lain-lain' }
 ];
 // kategori lama (v2/v3) -> kategori baru
 const OLD_CAT_MAP = {
@@ -365,7 +372,7 @@ const P = {
   lock: '<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>',
   tag: '<path d="M3 12V4h8l10 10-8 8Z"/><circle cx="7.5" cy="8.5" r="1.3"/>', dl: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>', trash: '<path d="M9 7V4h6v3M4 7h16M6 7l1 13h10l1-13"/>',
   finger: '<path d="M12 11v3a8 8 0 0 1-1.6 4.8"/><path d="M8.5 10.5a3.5 3.5 0 0 1 7 0v2.3a12 12 0 0 1-.9 4.6"/><path d="M5.3 9.2A7 7 0 0 1 18.8 11v1.6c0 1.3-.1 2.6-.4 3.8"/><path d="M7 19.2a11 11 0 0 0 1.1-4.4V11"/>',
-  pen: '<path d="M4 20h4L19 9l-4-4L4 16Z"/>', chev: '<path d="m6 9 6 6 6-6"/>', check: '<path d="m5 12 4.5 4.5L19 7"/>', warn: '<path d="M12 3.5 2.8 19.5h18.4Z"/><path d="M12 10v4.5M12 17.2v.1"/>', cal: '<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>'
+  list: '<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>', pen: '<path d="M4 20h4L19 9l-4-4L4 16Z"/>', chev: '<path d="m6 9 6 6 6-6"/>', check: '<path d="m5 12 4.5 4.5L19 7"/>', warn: '<path d="M12 3.5 2.8 19.5h18.4Z"/><path d="M12 10v4.5M12 17.2v.1"/>', cal: '<rect x="4" y="5" width="16" height="15" rx="2.5"/><path d="M4 10h16M9 3v4M15 3v4"/>'
 };
 const svg = (n, w = 2) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
 
@@ -402,17 +409,20 @@ function cleanName(n) {
 const nameKey = n => cleanName(n).toLowerCase().replace(/\s+/g, ' ');
 
 // ================= Data =================
+// Anggaran berlaku per bulan: perubahan berlaku mulai bulan itu, bulan lalu tetap memakai anggarannya sendiri
+function budgetFor(m) { const b = S.config.budgets || {}, ks = Object.keys(b).filter(k => k <= m).sort(); return ks.length ? b[ks[ks.length - 1]] : S.config.budget; }
 const EMPTY = () => ({ config: { budget: DEFAULT_BUDGET, categories: clone(DEFAULT_CATS), wallets: [], moves: [], suggest: [], schema: 4 }, receipts: [] });
 let S = EMPTY();
 try { const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); if (c && c.config && Array.isArray(c.receipts)) S = c; } catch (e) {}
 function normConfig(c) {
-  c = Object.assign({}, c || {});
+  c = Object.assign({}, c || {}); c.budgets_in = c.budgets;
   c.budget = Number(c.budget) > 0 ? Number(c.budget) : DEFAULT_BUDGET;
   c.categories = Array.isArray(c.categories) && c.categories.length ? c.categories.filter(x => x && x.id).map(x => ({ id: String(x.id), name: String(x.name || 'Kategori'), budget: Math.max(0, Number(x.budget) || 0) })) : clone(DEFAULT_CATS);
   if (!c.categories.some(x => x.id === 'lain')) c.categories.push({ id: 'lain', name: 'Lain-lain', budget: 0 });
   c.wallets = Array.isArray(c.wallets) ? c.wallets.filter(w => w && w.id).map(w => ({ id: String(w.id), name: String(w.name || 'Dompet'), initial: Number(w.initial) || 0, createdAt: String(w.createdAt || '') })) : [];
   c.moves = Array.isArray(c.moves) ? c.moves.filter(m => m && m.id).map(m => ({ id: String(m.id), type: ['in', 'transfer', 'adjust'].includes(m.type) ? m.type : 'in', amount: m.type === 'adjust' ? (Number(m.amount) || 0) : Math.max(0, Number(m.amount) || 0), admin: Math.max(0, Number(m.admin) || 0), wallet: String(m.wallet || ''), to: String(m.to || ''), date: validDate(m.date) ? m.date : '', note: String(m.note || ''), by: String(m.by || '') })) : [];
   c.weekBudget = Math.max(0, Number(c.weekBudget) || 0);
+  c.budgets = {}; Object.keys((c.budgets_raw = c.budgets_in) || {}).forEach(k => { if (/^\d{4}-\d{2}$/.test(k) && Number(c.budgets_raw[k]) > 0) c.budgets[k] = Number(c.budgets_raw[k]); }); delete c.budgets_raw; delete c.budgets_in;
   c.suggest = Array.isArray(c.suggest) ? c.suggest.filter(x => x && x.n).map(x => ({ n: String(x.n), c: String(x.c || 'lain') })) : [];
   return c;
 }
@@ -620,13 +630,14 @@ function migrateLocal() {
 
 // ================= Tampilan (Frost) =================
 // Warna & ikon kategori: tanpa ungu, beda jelas satu sama lain
-const PALETTE = [['#E8806E', '#F0A496'], ['#DDA640', '#EBC57A'], ['#3FAEA2', '#79CDC4'], ['#DC7BA6', '#EAA6C5'], ['#4CA8D6', '#86C6E6'], ['#B98A62', '#D4B192'], ['#7DAA4E', '#A8C982'], ['#5E9C96', '#92C0BB'], ['#D08A5E', '#E3B190'], ['#A2A65A', '#C4C78E']];
-const CAT_LOOK = { lain: [0, 'dots'], rumah: [1, 'house'], lauk: [2, 'fish'], buah: [3, 'apple'], bersih: [4, 'drop'], pokok: [5, 'bag'], bumbu: [6, 'chili'] };
+const PALETTE = [['#E8806E', '#F0A496'], ['#DDA640', '#EBC57A'], ['#3FAEA2', '#79CDC4'], ['#DC7BA6', '#EAA6C5'], ['#4CA8D6', '#86C6E6'], ['#B98A62', '#D4B192'], ['#7DAA4E', '#A8C982'], ['#5E9C96', '#92C0BB'], ['#D08A5E', '#E3B190'], ['#A2A65A', '#C4C78E'], ['#9CA3AF', '#C4C9D1']];
+const CAT_LOOK = { jajan: [0, 'cup'], lain: [10, 'dots'], rumah: [1, 'house'], lauk: [2, 'fish'], buah: [3, 'apple'], bersih: [4, 'drop'], pokok: [5, 'bag'], bumbu: [6, 'chili'] };
 Object.assign(P, {
   dots: '<circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/>',
   house: '<path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M10 20v-5h4v5"/>', fish: '<path d="M3 12c3-4 8-5 12-3l4-3v12l-4-3c-4 2-9 1-12-3Z"/>',
   apple: '<path d="M12 7c-4-2-8 1-7 6 1 4 4 7 7 6 3 1 6-2 7-6 1-5-3-8-7-6Z"/><path d="M12 7c0-2 1-3 3-4"/>', drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/>',
   bag: '<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7Z"/><path d="M8 9c0-3 2-5 4-5s4 2 4 5"/>', chili: '<path d="M14 4c3 1 5 4 4 8-1 5-7 8-11 8 2-2 3-5 3-8"/>',
+  cup: '<path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5Z"/><path d="M16 10h2a2 2 0 0 1 0 4h-2"/><path d="M8 3v2M11 3v2"/>',
   alert: '<path d="M12 8v5M12 16.5v.1"/><circle cx="12" cy="12" r="9"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>', filter: '<path d="M4 6h16M7 12h10M10 18h4"/>'
 });
 function catLook(id) {
@@ -653,7 +664,7 @@ const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
 // Setengah lingkaran: 100% = pengeluaran, persen di tiap bagian
 let gid = 0;
 function gauge(map, tot, big, small, badge) {
-  const items = catList(map), G = 'g' + (++gid) + '_';
+  const items = catList(map), G = 'g' + (++gid) + '_'; tot = sum(items, x => x.v);
   if (!tot || !items.length) return `<div class="empty">Belum ada pengeluaran.</div>`;
   const W = 340, cx = W / 2, cy = 172, r = 116, sw = 30, rl = 154, gap = items.length > 1 ? 0.038 : 0;
   let a0 = Math.PI, arcs = '', labels = '', defs = '';
@@ -674,11 +685,11 @@ function gauge(map, tot, big, small, badge) {
     <div class="c"><small>${small}</small><b class="num">${big}</b>${badge ? `<span class="badge">${badge}</span>` : ''}</div></div>`;
 }
 function catList(map) {
-  const list = Object.keys(map).filter(k => map[k] > 0).map(id => ({ id, v: map[id] }));
+  const list = Object.keys(map).filter(k => map[k] > 0 && k !== ADMIN_CAT).map(id => ({ id, v: map[id] }));
   return list.sort((a, b) => b.v - a.v);
 }
 function legendRows(map, tot, withBudget, limit) {
-  const items = catList(map); if (!items.length) return '';
+  const items = catList(map); if (!items.length) return ''; tot = sum(items, x => x.v);
   const mx = items[0].v; const shown = limit ? items.slice(0, limit) : items;
   return shown.map(x => {
     const L = catLook(x.id), c = cats().find(k => k.id === x.id), b = withBudget && c ? c.budget : 0, over = b && x.v > b;
@@ -736,7 +747,7 @@ function bindArea(sel) {
 const HARI3 = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
 function weekPoints(ws) { const t = todayISO(); return HARI3.map((l, i) => { const d = isoAdd(ws, i); return { l, d, v: d > t ? null : total(inRange(d, d)) }; }); }
 function monthPoints(m) { const t = todayISO(); return Array.from({ length: daysIn(m) }, (_, i) => { const d = m + '-' + pad2(i + 1); return { l: String(i + 1), d, v: d > t ? null : total(inRange(d, d)) }; }); }
-const autoWeekBudget = (m) => S.config.budget / daysIn(m) * 7;
+const autoWeekBudget = (m) => budgetFor(m) / daysIn(m) * 7;
 const weekBudget = (m) => S.config.weekBudget || autoWeekBudget(m);
 
 function status() {
@@ -751,13 +762,14 @@ function status() {
 }
 function header(page) {
   const h = new Date().getHours(), greet = h < 11 ? 'Selamat pagi,' : h < 15 ? 'Selamat siang,' : h < 18 ? 'Selamat sore,' : 'Selamat malam,';
-  const T = { home: [greet, person() || 'Keluarga'], dompet: ['Belanja Kita', 'Dompet'], riwayat: ['Belanja Kita', 'Riwayat'], lainnya: ['Belanja Kita', 'Lainnya'], semua: ['Belanja Kita', 'Semua transaksi'] }[page] || ['', 'Belanja Kita'];
+  const T = { home: [greet, person() || 'Keluarga'], dompet: ['Belanja Kita', 'Dompet'], riwayat: ['Belanja Kita', 'Riwayat'], lainnya: ['Belanja Kita', 'Lainnya'], semua: ['Semua catatan', 'Transaksi'] }[page] || ['', 'Belanja Kita'];
   $('hello').textContent = T[0]; $('title').textContent = T[1];
+  const lg = $('logo'); lg.classList.toggle('back', page === 'semua'); lg.innerHTML = page === 'semua' ? svg('left', 2.6) : svg('basket'); lg.onclick = page === 'semua' ? () => go(SM.from || 'riwayat') : null; lg.setAttribute('aria-label', page === 'semua' ? 'Kembali' : 'Belanja Kita'); lg.setAttribute('role', page === 'semua' ? 'button' : 'img');
 }
 
 function renderHome() {
   const m = curMonth(), t = todayISO(), ws = weekStart(t), y = t.slice(0, 4);
-  const mon = inMonth(m), spent = total(mon), budget = S.config.budget, left = budget - spent, used = budget ? spent / budget : 0;
+  const mon = inMonth(m), spent = total(mon), budget = budgetFor(m), left = budget - spent, used = budget ? spent / budget : 0;
   const wk = total(inRange(ws, t)), wb = weekBudget(m), wdiff = wk - wb, daysLeft = daysIn(m) - Number(t.slice(8)) + 1, safe = Math.max(0, left) / daysLeft;
   const blocked = cloud.rulesBlocked || cloud.migrateError === 'rules';
   const ents = entriesOf(mon.length ? S.receipts : []).slice(0, 10), allN = entriesOf(mon).length;
@@ -765,23 +777,18 @@ function renderHome() {
   $('home').innerHTML = `
     ${blocked ? `<div class="alert">${svg('warn')}<span>Catatan belum bisa dibaca atau disimpan ke server: aturan Firestore belum mengizinkan koleksi <b>receipts</b>. Data lama tetap aman.</span></div>` : cloud.migrateError ? `<div class="alert">${svg('warn')}<span>Data lama belum selesai dipindahkan. Belanja Kita akan mencoba lagi otomatis.</span></div>` : ''}
     <div class="glass hero">
-      <div class="cap">Sisa anggaran ${BULAN[Number(m.slice(5)) - 1]}</div>
+      <div class="cap">Sisa anggaran ${BULAN[Number(m.slice(5)) - 1]}</div><div class="hint-w">dari anggaran belanja bulan ini, bukan saldo dompet</div>
       <div class="big num" style="${left < 0 ? 'color:#FFD5D5' : ''}"><small>${left < 0 ? '−Rp' : 'Rp'}</small>${fmt(left)}</div>
       <div class="track"><i style="width:${Math.min(100, used * 100)}%"></i></div>
       <button class="sub" data-act="budget">Terpakai Rp ${fmt(spent)} dari Rp ${fmt(budget)} ${svg('pen')}</button>
     </div>
     <div class="glass stats">
-      <div class="stat" data-act="weekbudget" role="button" tabindex="0"><small>Minggu ini</small><b class="num">${short(wk)}</b><em class="${wk > wb ? 'bad' : 'good'}">${wk > wb ? '+' : '−'}${Math.abs(Math.round((wk / (wb || 1) - 1) * 100))}% batas</em></div>
+      <div class="stat" data-act="weekbudget" role="button" tabindex="0"><small>Minggu ini</small><b class="num">${short(wk)}</b><em class="${wk > wb ? 'bad' : 'good'}">${wk > wb ? 'Lewat ' + short(wk - wb) : 'Sisa ' + short(wb - wk)}</em></div>
       <div class="stat"><small>Bulan ini</small><b class="num">${short(spent)}</b><em>${Math.round(used * 100)}% anggaran</em></div>
       <div class="stat"><small>Tahun ini</small><b class="num">${short(total(inYear(y)))}</b><em>${y}</em></div>
     </div>
-    <div class="quick">
-      <button data-act="money-in"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('plus', 2.2)}</span>Isi uang</button>
-      <button data-act="money-move"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('swap', 2.2)}</span>Pindah</button>
-      <button data-go="riwayat"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('chart', 2.2)}</span>Laporan</button>
-      <button data-act="mail-now"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('mail', 2.2)}</span>Email</button>
-    </div>
-    <div class="glass insight ${left < 0 || wdiff > 0 ? 'bad' : 'good'}"><span class="ib">${svg('alert', 2.2)}</span><p>${left < 0 ? `Anggaran bulan ini sudah lewat <b class="bad">Rp ${fmt(-left)}</b>. Tahan belanja yang tidak perlu ya.` : wdiff > 0 ? `Minggu ini lewat <b class="bad">Rp ${fmt(wdiff)}</b> dari batas mingguan. Aman <b>Rp ${fmt(Math.floor(safe / 100) * 100)}</b> per hari sampai akhir bulan.` : `Minggu ini masih aman, sisa <b>Rp ${fmt(-wdiff)}</b> dari batas mingguan. Aman <b>Rp ${fmt(Math.floor(safe / 100) * 100)}</b> per hari sampai akhir bulan.`}</p></div>
+    <div class="quick2"><button data-act="all">${svg('list', 2.2)}<span>Semua transaksi</span></button><button data-act="weekbudget">${svg('cal', 2.2)}<span>Batas mingguan</span></button></div>
+    <div class="glass insight ${left < 0 || wdiff > 0 ? 'bad' : 'good'}"><span class="ib">${svg(left < 0 || wdiff > 0 ? 'alert' : 'check', 2.2)}</span><p><b>${left < 0 ? 'Anggaran bulan ini terlewati' : wdiff > 0 ? 'Minggu ini lewat batas' : 'Minggu ini masih aman'}</b><span>${left < 0 ? 'Lewat Rp ' + fmt(-left) + '. Tahan belanja yang tidak perlu.' : wdiff > 0 ? 'Lewat Rp ' + fmt(wdiff) + '. Aman Rp ' + fmt(Math.floor(safe / 100) * 100) + ' per hari sampai akhir bulan.' : 'Sisa Rp ' + fmt(-wdiff) + ' minggu ini. Aman Rp ' + fmt(Math.floor(safe / 100) * 100) + ' per hari.'}</span></p></div>
     <div class="sec"><h2>Per kategori</h2><button data-act="cats">Atur anggaran</button></div>
     <div class="glass">${gauge(map, spent, short(spent), 'Terpakai', Math.round(used * 100) + '% anggaran')}<div style="margin-top:10px">${legendRows(map, spent, true)}</div></div>
     <div class="sec"><h2>Catatan terakhir</h2>${allN ? `<button data-act="all">Lihat semua (${allN})</button>` : ''}</div>
@@ -812,7 +819,7 @@ function renderRiwayat() {
   let h = `<div class="seg"><button aria-pressed="${rMode === 'month'}" data-rmode="month">Bulanan</button><button aria-pressed="${rMode === 'year'}" data-rmode="year">Tahunan</button></div>`;
   const wal = list => { const w = byWallet(list), adm = sum(list, r => r.admin), keys = Object.keys(w).sort((a, b) => w[b] - w[a]); return keys.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="glass tight">${keys.map((k, i) => `<div class="row"><span class="ico neutral sm">${svg('wallet')}</span><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">Rp ${fmt(w[k])}</span></div>`).join('')}${adm ? `<div class="row"><span class="ico sm" style="background:#8A8277">${svg('receipt')}</span><span class="grow"><span class="t1">Biaya admin</span><span class="t2">sudah termasuk di atas</span></span><span class="amt num">Rp ${fmt(adm)}</span></div>` : ''}</div>` : ''; };
   if (rMode === 'month') {
-    const m = rMonth, isNow = m === cm, list = inMonth(m), spent = total(list), b = S.config.budget;
+    const m = rMonth, isNow = m === cm, list = inMonth(m), spent = total(list), b = budgetFor(m);
     if (!isNow) chartMode = 'month';
     const ws = weekStart(todayISO()), lw = isoAdd(ws, -7);
     let pts, cap, val, tag = '';
@@ -959,7 +966,7 @@ function openEntry(init, back) {
     let body = '<div class="pad">';
     if (k === 'buy') {
       body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div><div class="cgrid">${cats().map(c => { const L = catLook(c.id), on = c.id === f.cat; return `<button type="button" data-cat="${c.id}" class="${on ? 'on' : ''}" aria-pressed="${on}"><span>${svg(L.icon, 2)}</span>${esc(c.name.split(' & ')[0])}</button>`; }).join('')}</div>`;
-      body += `<span class="lbl">Keterangan</span><input class="in" id="e-name" value="${esc(f.name)}" placeholder="Ketik nama barang, contoh: Telur" autocomplete="off" aria-label="Nama barang" enterkeyhint="done"><div id="e-sugg">${suggHtml()}</div>`;
+      body += `<span class="lbl">Keterangan</span><input class="in" id="e-name" value="${esc(f.name)}" placeholder="Opsional, contoh: Telur" autocomplete="off" aria-label="Nama barang" enterkeyhint="done"><div id="e-sugg">${suggHtml()}</div>`;
       if (S.config.wallets.length) {
         const dl = f.date === todayISO() ? 'Hari ini' : f.date === isoAdd(todayISO(), -1) ? 'Kemarin' : dShort(f.date);
         body += `<div class="tiles"><button type="button" class="tile" id="e-tw" aria-expanded="${f.panel === 'w'}"><small>Dibayar dari</small><b>${esc(walletName(f.wallet) || 'Tanpa dompet')}</b>${f.wallet ? `<em>Saldo ${short(walletBal(f.wallet))}</em>` : ''}</button><button type="button" class="tile" id="e-td" aria-expanded="${f.panel === 'd'}"><small>Tanggal</small><b>${dl}</b></button></div>`;
@@ -1017,7 +1024,7 @@ function openEntry(init, back) {
           else saved = putReceipt({ id: uid('r'), date: f.date, lines: [{ n: name, p: f.amount, c: f.cat }], admin: f.showAdmin ? f.admin : 0, wallet: f.wallet, note: '', by: person(), createdAt: new Date().toISOString() });
           if (f.wallet) rememberWallet(f.wallet); try { localStorage.setItem(CAT_KEY, f.cat); } catch (e) {}
           render();
-          const left = S.config.budget - total(inMonth(curMonth()));
+          const left = budgetFor(curMonth()) - total(inMonth(curMonth()));
           toast((ed ? 'Diperbarui' : name + ' Rp ' + fmt(saved.total) + ' tercatat') + '. Sisa anggaran ' + rp(left), () => { if (before) putReceipt(before); else delReceipt(saved.id); });
           return back ? back() : closeSheet();
         }
@@ -1124,16 +1131,16 @@ function openWeekBudget(back) {
   }, back);
 }
 function openBudget(back) {
-  const f = { v: S.config.budget };
+  const f = { v: budgetFor(curMonth()) };
   const sumCat = sum(cats(), c => c.budget);
-  openSheet('Anggaran bulanan', `${moneyIn('b-v', f.v, 'Anggaran bulanan')}<p class="hint">Dipakai untuk setiap bulan.${sumCat ? ' Jumlah anggaran per kategori: ' + rp(sumCat) + '.' : ''}</p><button class="save" id="b-save">Simpan</button>`, root => {
+  openSheet('Anggaran bulanan', `${moneyIn('b-v', f.v, 'Anggaran bulanan')}<p class="hint">Berlaku mulai bulan ini. Bulan-bulan sebelumnya tetap memakai anggarannya sendiri.${sumCat ? ' Jumlah anggaran per kategori: ' + rp(sumCat) + '.' : ''}</p><button class="save" id="b-save">Simpan</button>`, root => {
     bindMoney(root.querySelector('#b-v'), v => { f.v = v; });
-    root.querySelector('#b-save').onclick = () => { if (!f.v) return; const before = S.config.budget; putConfig({ budget: f.v }); render(); toast('Anggaran ' + rp(f.v), () => putConfig({ budget: before })); back ? back() : closeSheet(); };
+    root.querySelector('#b-save').onclick = () => { if (!f.v) return; const before = { budget: S.config.budget, budgets: clone(S.config.budgets || {}) }; const bs = clone(S.config.budgets || {}); if (!Object.keys(bs).length) bs[firstMonth()] = S.config.budget; bs[curMonth()] = f.v; putConfig({ budget: f.v, budgets: bs }); render(); toast('Anggaran ' + rp(f.v), () => putConfig(before)); back ? back() : closeSheet(); };
     setTimeout(() => root.querySelector('#b-v').focus(), 60);
   }, back);
 }
 function openCats(back) {
-  const sumCat = sum(cats(), c => c.budget), b = S.config.budget;
+  const sumCat = sum(cats(), c => c.budget), b = budgetFor(curMonth());
   openSheet('Kategori', `<p class="hint" style="margin-top:0">Anggaran per kategori boleh dikosongkan.</p>
     <div class="setg" style="margin-top:10px">${cats().map(c => `<button class="setr" data-cat="${c.id}"><span class="grow"><span class="t1">${esc(c.name)}</span><span class="t2">${c.budget ? 'Anggaran ' + rp(c.budget) + ' per bulan' : 'Tanpa anggaran'}</span></span>${svg('right', 2.4)}</button>`).join('')}</div>
     ${sumCat > b ? `<p class="err">Jumlah anggaran kategori (${rp(sumCat)}) lebih besar dari anggaran bulanan (${rp(b)}).</p>` : ''}
@@ -1181,7 +1188,7 @@ function renderLainnya() {
   el.innerHTML = `
     <div class="glass tight">${cloud.user ? row('s-out', 'user', esc(cloud.user.email), (person() || 'Keluarga') + ', tersinkron dengan keluarga', '<span class="link">Keluar</span>') : row('s-in', 'user', 'Mode lokal', 'Data hanya di HP ini', '<span class="link">Masuk</span>')}</div>
     <div class="sec"><h2>Anggaran</h2></div>
-    <div class="glass tight">${row('s-budget', 'wallet', 'Anggaran bulanan', rp(S.config.budget))}${row('s-week', 'cal', 'Batas belanja mingguan', S.config.weekBudget ? rp(S.config.weekBudget) + ' per minggu' : 'Otomatis, ' + rp(Math.round(autoWeekBudget(curMonth()))) + ' per minggu')}${row('s-cats', 'tag', 'Kategori &amp; anggaran kategori', cats().length + ' kategori, tambah, ubah, hapus')}</div>
+    <div class="glass tight">${row('s-budget', 'wallet', 'Anggaran bulanan', rp(budgetFor(curMonth())) + ', berlaku mulai bulan ini')}${row('s-week', 'cal', 'Batas belanja mingguan', S.config.weekBudget ? rp(S.config.weekBudget) + ' per minggu' : 'Otomatis, ' + rp(Math.round(autoWeekBudget(curMonth()))) + ' per minggu')}${row('s-cats', 'tag', 'Kategori &amp; anggaran kategori', cats().length + ' kategori, tambah, ubah, hapus')}</div>
     <div class="sec"><h2>Kunci di HP ini</h2></div>
     <div class="glass tight">${row('s-pin', 'lock', pinOn ? 'Ganti PIN' : 'Pasang PIN', pinOn ? 'Diminta saat Belanja Kita dibuka' : 'Kunci dengan 4 angka (opsional)')}
       <button class="setr" id="s-bio" role="switch" aria-checked="${bioOn}" ${!pinOn || !bioAvail ? 'disabled style="opacity:.55"' : ''}><span class="ic">${svg('finger', 1.8)}</span><span class="grow"><span class="t1">Buka dengan sidik jari</span><span class="t2">${!bioAvail ? 'Tidak tersedia di HP atau browser ini' : !pinOn ? 'Pasang PIN dulu sebagai cadangan' : bioOn ? 'Aktif' : 'Pakai sidik jari Android'}</span></span><span class="sw"><i></i></span></button>
@@ -1219,8 +1226,7 @@ function renderSemua() {
   const m = SM.month || curMonth(), isNow = m === curMonth(), weeks = monthWeeks(m), n = smCount();
   const actives = [].concat(SM.cats.map(c => ['cats', c, catName(c)]), SM.weeks.map(i => ['weeks', i, 'Tgl ' + (weeks[i] ? weeks[i].label : '')]), SM.wallets.map(w => ['wallets', w, w ? walletName(w) : 'Tanpa dompet']), SM.by.map(b => ['by', b, b || 'Tidak diketahui']), SM.price !== 'all' ? [['price', '', SM.price === 'lt' ? 'Di bawah Rp 50.000' : 'Rp 50.000 ke atas']] : []);
   el.innerHTML = `
-    <button class="link" data-go="${SM.from || 'riwayat'}" style="display:inline-flex;align-items:center;gap:4px">${svg('left', 2.6)} Kembali</button>
-    <div class="mnav"><button class="mbtn" data-sm="-1" aria-label="Bulan sebelumnya" ${m <= firstMonth() ? 'disabled' : ''}>${svg('left', 2.4)}</button><div class="mlabel">${mLabel(m)}${isNow ? '<span class="now">Bulan ini</span>' : ''}</div><button class="mbtn" data-sm="1" aria-label="Bulan berikutnya" ${isNow ? 'disabled' : ''}>${svg('right', 2.4)}</button></div>
+    <div class="mnav" style="margin-top:0"><button class="mbtn" data-sm="-1" aria-label="Bulan sebelumnya" ${m <= firstMonth() ? 'disabled' : ''}>${svg('left', 2.4)}</button><div class="mlabel">${mLabel(m)}${isNow ? '<span class="now">Bulan ini</span>' : ''}</div><button class="mbtn" data-sm="1" aria-label="Bulan berikutnya" ${isNow ? 'disabled' : ''}>${svg('right', 2.4)}</button></div>
     <label class="search"><span class="sr">Cari transaksi</span>${svg('search')}<input id="sm-q" value="${esc(SM.q)}" placeholder="Cari barang, contoh: telur" autocomplete="off"></label>
     <div class="fchips"><button class="${n ? 'on' : ''}" data-act="filter">${svg('filter')}Filter${n ? ' (' + n + ')' : ''}</button><button data-act="filter">${SORTS[SM.sort]} ${svg('chev', 2.4)}</button><button data-act="filter">Kategori</button><button data-act="filter">Minggu</button><button data-act="filter">Dompet</button></div>
     ${actives.length ? `<div class="chips">${actives.map(([k, v, t]) => `<button class="act" data-smx="${k}|${v}" aria-label="Hapus filter ${esc(t)}">${esc(t)} ${svg('x', 2.6)}</button>`).join('')}<button class="link" data-smx="all|">Hapus semua</button></div>` : ''}
@@ -1300,7 +1306,7 @@ function reportLines(list) {
   return { catsTxt, walTxt };
 }
 function monthText(m) {
-  const list = inMonth(m), spent = total(list), b = S.config.budget, R = reportLines(list);
+  const list = inMonth(m), spent = total(list), b = budgetFor(m), R = reportLines(list);
   return ['LAPORAN BELANJA KITA', mLabel(m), '', 'Terpakai : ' + rp(spent), 'Anggaran : ' + rp(b), (b - spent < 0 ? 'Lewat    : ' : 'Sisa     : ') + rp(Math.abs(b - spent)), '', 'PER KATEGORI'].concat(R.catsTxt.length ? R.catsTxt : ['- Belum ada']).concat(['', 'PER DOMPET']).concat(R.walTxt.length ? R.walTxt : ['- Belum ada']).join('\n');
 }
 function yearText(y) {
@@ -1308,7 +1314,7 @@ function yearText(y) {
   return ['LAPORAN BELANJA KITA TAHUN ' + y, '', 'Total : ' + rp(total(list)), '', 'PER BULAN'].concat(BULAN.map((n, i) => { const v = total(inMonth(y + '-' + pad2(i + 1))); return v ? '- ' + n + ': ' + rp(v) : null; }).filter(Boolean)).concat(['', 'PER KATEGORI']).concat(R.catsTxt).join('\n');
 }
 function monthHtml(m) {
-  const list = inMonth(m), spent = total(list), b = S.config.budget, cmap = byCategory(list), wal = byWallet(list);
+  const list = inMonth(m), spent = total(list), b = budgetFor(m), cmap = byCategory(list), wal = byWallet(list);
   const card = x => `<div style="margin-top:12px;background:#fff;border-radius:20px;padding:16px 18px">${x}</div>`;
   const row = (a, v, sub) => `<tr><td style="padding:8px 0;border-top:1px solid #ECE7DE;font-size:14px">${a}${sub ? `<br><span style="font-size:12px;color:#5C554C">${sub}</span>` : ''}</td><td align="right" style="padding:8px 0;border-top:1px solid #ECE7DE;font-size:14px;font-weight:800;white-space:nowrap">${v}</td></tr>`;
   const catRowsH = Object.keys(cmap).sort((x, y) => cmap[y] - cmap[x]).map(k => { const c = cats().find(x => x.id === k); return row(esc(catName(k)), rp(cmap[k]), c && c.budget ? (cmap[k] > c.budget ? '<b style="color:#B8392B">Lewat ' + rp(cmap[k] - c.budget) + '</b> dari ' + rp(c.budget) : 'Sisa ' + rp(c.budget - cmap[k]) + ' dari ' + rp(c.budget)) : ''); }).join('');
@@ -1517,6 +1523,10 @@ async function openNetCheck() {
   }
   run();
 }
+function addJajan() {
+  const list = cats().slice(); if (!list.some(c => c.id === 'jajan')) { const i = list.findIndex(c => c.id === 'lain'); list.splice(i < 0 ? list.length : i, 0, { id: 'jajan', name: 'Jajan & makan di luar', budget: 0 }); }
+  putConfig({ categories: list, catJajan: true });
+}
 function stopSync() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; }
 let migrating = false, migrationTried = false;
 function startSync() {
@@ -1528,6 +1538,7 @@ function startSync() {
   unsubs.push(db.collection('config').doc('main').onSnapshot({ includeMetadataChanges: true }, s => {
     const d = s.exists ? s.data() : {};
     if (s.exists || !s.metadata.fromCache) { S.config = normConfig(Object.assign({}, S.config, d)); overlayOutbox(); cache(); }
+    if (!s.metadata.fromCache && s.exists && !d.catJajan) addJajan();
     // Data lama (versi 2.x/3.x) belum dipindah: jalankan pemindahan. Juga dicoba saat data berasal dari cache HP.
     if (Number(d.schema) !== 4 && !migrating && !migrationTried) { migrating = true; migrationTried = true; migrateCloud(d).finally(() => { migrating = false; }); }
     gotCfg = true; ready(); if (cloud.ready) render();
@@ -1601,7 +1612,7 @@ render();
 try { const t = localStorage.getItem(TAB_KEY); if (t && $(t)) go(t); } catch (e) {}
 checkBio().then(() => { if (getPin() && !$('lock').hidden) { pinScreen(); autoBio(); } });
 if (getPin() && !takeRefresh()) showLock();
-if (cloud.mode === 'local') { migrateLocal(); render(); hideBoot(); }
+if (cloud.mode === 'local') { migrateLocal(); if (!S.config.catJajan) addJajan(); render(); hideBoot(); }
 if (cloud.available) {
   auth.onAuthStateChanged(u => {
     cloud.authKnown = true;
