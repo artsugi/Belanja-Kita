@@ -8,251 +8,298 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#F6F4F1">
+<meta name="theme-color" content="#F5F6F8">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Belanja Kita">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
 <style>
   :root {
-    --paper: #F6F4F1; --surface: #FFFFFF; --stone: #E4DED2; --line: #ECE7DE;
-    --ink: #151210; --muted: #5C554C; --coral: #F95C4B; --coral-dk: #D23A2C; --coral-ink: #B8392B; --coral-soft: #FFE3DF;
-    --dark: #3B3733; /* abu-abu gelap untuk latar yang dulu hitam */
-    --green: #0F7A5F; --amber: #B26A00;
-    --font: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    /* Warna utama biru kobalt; merah hanya untuk peringatan */
+    --paper: #F5F6F8; --surface: #FFFFFF; --stone: #DDE2EA; --line: #ECEEF2;
+    --ink: #111827; --muted: #5B6475; --coral: #2563EB; --coral-dk: #1D4FD8; --coral-ink: #1D4FD8; --coral-soft: #E8EFFF;
+    --dark: #1F2937; --green: #15803D; --amber: #B45309; --bad: #DC2626; --bad-ink: #B91C1C; --bad-soft: #FEE2E2;
+    --grad: linear-gradient(135deg, #3B7BFF 0%, #2563EB 60%, #1D4FD8 100%);
+    --glass: #FFFFFF;
+    --glass-b: 1px solid #ECEEF2;
+    --glass-sh: 0 4px 14px -10px rgba(16,24,40,0.16);
+    --font: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     color-scheme: only light;
     padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   *, *::before, *::after { box-sizing: border-box; }
   html { -webkit-tap-highlight-color: transparent; scroll-padding-top: env(safe-area-inset-top, 0px); }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
-  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: var(--paper); z-index: 30; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); background: #FFF1EC; z-index: 30; }
+  .glow { display: none; }
+  .glow i { position: absolute; border-radius: 50%; }
+  .glow i:nth-child(1) { left: -60px; top: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(255,138,107,0.55) 0%, rgba(255,138,107,0) 70%); }
+  .glow i:nth-child(2) { right: -70px; top: 30px; width: 270px; height: 270px; background: radial-gradient(circle, rgba(255,194,168,0.6) 0%, rgba(255,194,168,0) 70%); }
+  .glow i:nth-child(3) { left: -90px; top: 240px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(249,92,75,0.35) 0%, rgba(249,92,75,0) 70%); }
   button, input, select { font: inherit; color: inherit; }
   button { background: none; border: 0; padding: 0; cursor: pointer; }
-  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2.5px solid var(--coral-dk); outline-offset: 2px; }
+  button:focus-visible, input:focus-visible, a:focus-visible { outline: 2.5px solid var(--coral-dk); outline-offset: 2px; }
   [hidden] { display: none !important; }
   .num { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
   svg.i { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
-  .app { max-width: 448px; margin: 0 auto; padding: 14px 16px 124px; }
+  .app { position: relative; z-index: 1; max-width: 448px; margin: 0 auto; padding: 16px 18px 130px; }
 
-  .top { display: flex; align-items: center; gap: 10px; }
-  .logo { width: 42px; height: 42px; border-radius: 14px; background: var(--coral); color: #fff; display: grid; place-items: center; transform: rotate(-6deg); font-size: 20px; flex-shrink: 0; }
+  .top { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 44px; height: 44px; border-radius: 15px; background: var(--coral); color: #fff; display: grid; place-items: center; transform: rotate(-6deg); font-size: 22px; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.9); }
   .brand { flex: 1; min-width: 0; }
-  .brand b { display: block; font-size: 21px; font-weight: 900; letter-spacing: -0.03em; line-height: 1; }
-  .brand small { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 12.5px; color: var(--muted); font-weight: 500; }
-  .brand small i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .gear { width: 42px; height: 42px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; color: var(--muted); font-size: 18px; }
+  .brand small { display: block; font-size: 13px; color: var(--muted); font-weight: 600; }
+  .brand b { display: block; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+  .sync { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.8); border: var(--glass-b); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .sync i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .sync u { color: var(--coral-ink); }
 
-  .page { display: none; } .page.on { display: block; animation: fade .18s ease; }
+  .page { display: none; } .page.on { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; animation: fade .18s ease; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  h1.title { margin: 18px 2px 0; font-size: 26px; font-weight: 900; letter-spacing: -0.03em; }
-
-  .hero { margin-top: 14px; background: var(--coral); color: #fff; border-radius: 28px; padding: 18px 20px; position: relative; overflow: hidden; }
-  .hero::after { content: ""; position: absolute; right: -40px; top: -50px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,.1); pointer-events: none; }
-  .hero .cap { font-size: 13px; font-weight: 700; opacity: .92; display: flex; justify-content: space-between; gap: 8px; }
-  .hero .cap span { background: rgba(255,255,255,.2); border-radius: 999px; padding: 2px 10px; font-size: 12px; }
-  .hero .cap span.over { background: var(--dark); }
-  .hero .big { font-size: 34px; font-weight: 900; letter-spacing: -0.035em; line-height: 1.08; margin-top: 2px; }
-  .bar { height: 8px; border-radius: 4px; background: rgba(0,0,0,.15); overflow: hidden; margin-top: 10px; }
-  .bar i { display: block; height: 100%; background: #fff; border-radius: 4px; }
-  .hero .two { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; position: relative; z-index: 1; }
-  .hero .two > * { background: rgba(255,255,255,.16); border-radius: 18px; padding: 8px 12px; text-align: left; }
-  .hero .two small { display: block; font-size: 12px; opacity: .9; }
-  .hero .two b { font-size: 14.5px; font-weight: 800; }
-
-  .stats { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .stat { background: var(--surface); border-radius: 18px; padding: 10px 12px; }
+  .glass { background: var(--glass); border: var(--glass-b); box-shadow: var(--glass-sh); border-radius: 24px; padding: 16px; }
+  .glass.tight { padding: 6px 16px; }
+  .hero { text-align: center; padding: 18px 16px; border-radius: 26px; }
+  .hero .cap { font-size: 14px; font-weight: 700; }
+  .hero .big { font-size: 38px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.15; }
+  .hero .big small, .bignum small { font-size: 0.5em; font-weight: 700; margin-right: 4px; }
+  .track { margin: 12px auto 0; width: 86%; height: 8px; border-radius: 4px; background: #EEF1F5; overflow: hidden; }
+  .track i { display: block; height: 100%; border-radius: 4px; background: var(--grad); }
+  .hero .sub { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 13px; font-weight: 700; }
+  .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px; }
+  .stat { text-align: center; padding: 2px 0; }
   .stat small { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
-  .stat b { display: block; font-size: 15px; font-weight: 800; white-space: nowrap; }
-  .stat em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); }
+  .stat b { display: block; font-size: 17px; font-weight: 800; margin-top: 2px; white-space: nowrap; }
+  .stat em { display: block; font-style: normal; font-size: 11px; font-weight: 800; color: var(--muted); }
+  .stat em.bad { color: var(--bad); } .stat em.good { color: var(--green); }
+  .quick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .quick button { height: 78px; border-radius: 20px; background: var(--glass); border: var(--glass-b); box-shadow: var(--glass-sh); font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; }
+  .quick span { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 18px; }
+  .insight { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; }
+  .insight .ib { width: 36px; height: 36px; border-radius: 12px; background: var(--grad); color: #fff; display: grid; place-items: center; flex-shrink: 0; font-size: 18px; }
+  .insight p { margin: 0; flex: 1; font-size: 13.5px; font-weight: 600; line-height: 1.4; }
+  .insight b.bad { color: var(--bad); }
 
-  .sec { margin: 22px 4px 8px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .sec h2 { margin: 0; font-size: 16px; font-weight: 800; }
-  .sec span, .sec button { font-size: 13px; font-weight: 700; color: var(--muted); }
-  .sec button { color: var(--coral-ink); text-decoration: underline; text-underline-offset: 3px; }
-  .card { background: var(--surface); border-radius: 24px; padding: 6px 16px; }
-  .card.pad { padding: 16px; }
-  .row { display: flex; align-items: center; gap: 12px; padding: 12px 0; width: 100%; text-align: left; }
-  .row + .row { border-top: 1px solid var(--line); }
+  .sec { margin: 4px 4px -4px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .sec h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+  .sec span { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .sec button { font-size: 13px; font-weight: 700; color: var(--coral-ink); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 9px 0; width: 100%; text-align: left; }
   .grow { flex: 1; min-width: 0; }
   .t1 { display: block; font-weight: 700; font-size: 15px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .t2 { display: block; font-size: 12.5px; color: var(--muted); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .amt { font-weight: 800; font-size: 15px; white-space: nowrap; text-align: right; }
   .amt.pos { color: var(--green); }
-  .empty { padding: 20px 8px; text-align: center; color: var(--muted); font-size: 14px; }
-  .cat { padding: 11px 0; } .cat + .cat { border-top: 1px solid var(--line); }
-  .cat .head { display: flex; justify-content: space-between; gap: 10px; font-size: 14.5px; }
-  .cat .head span { font-weight: 700; } .cat .head b { white-space: nowrap; }
-  .cat .meter { margin-top: 7px; height: 7px; border-radius: 4px; background: var(--paper); overflow: hidden; }
-  .cat .meter i { display: block; height: 100%; border-radius: 4px; background: var(--coral); }
-  .cat .meter i.warn { background: var(--amber); } .cat .meter i.over { background: var(--dark); }
-  .cat small { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); }
-  .cat small.over { color: var(--coral-ink); font-weight: 700; }
-  .ico { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; background: var(--coral-soft); color: var(--coral-ink); font-size: 18px; }
-  .ico.dark { background: var(--paper); color: var(--ink); }
-  .ico.green { background: #DDF3EA; color: var(--green); }
+  .empty { padding: 18px 8px; text-align: center; color: var(--muted); font-size: 14px; }
+  .ico { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; color: #fff; font-size: 20px; }
+  .ico.sm { width: 36px; height: 36px; border-radius: 12px; font-size: 18px; }
+  .ico.dark { background: var(--coral-soft); color: var(--coral-ink); }
+  .more { display: block; width: 100%; text-align: center; padding: 10px 0 4px; font-size: 13px; font-weight: 700; color: var(--coral-ink); }
+  .day { margin: 8px 4px -6px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); }
 
-  .seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; background: #E9E3D9; padding: 4px; border-radius: 18px; }
-  .seg button { height: 42px; border-radius: 14px; font-weight: 700; font-size: 14.5px; color: var(--muted); }
-  .seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .mnav { margin-top: 12px; display: flex; align-items: center; gap: 8px; }
-  .mbtn { width: 44px; height: 44px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; color: var(--muted); flex-shrink: 0; font-size: 15px; }
-  .mbtn:disabled { opacity: .3; }
-  .mlabel { flex: 1; height: 44px; border-radius: 22px; background: var(--surface); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 15px; }
-  .now { font-size: 12px; font-weight: 800; color: var(--coral-ink); background: var(--coral-soft); border-radius: 10px; padding: 2px 8px; }
-  .note-bar { margin-top: 10px; background: var(--surface); border-radius: 18px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); font-weight: 600; }
-  .note-bar button { color: var(--coral-ink); font-weight: 800; }
-  .bars { display: grid; gap: 8px; align-items: end; height: 130px; margin-top: 12px; }
-  .bars .b { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
-  .bars .b i { display: block; width: 100%; border-radius: 8px; background: var(--coral); min-height: 4px; }
-  .bars .b i.dim { background: #F7B2A9; }
-  .bars .b span { font-size: 11px; font-weight: 700; color: var(--muted); }
-  .bars .b em { font-style: normal; font-size: 11px; font-weight: 800; }
-  .split { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; margin-top: 10px; }
-  .btns2 { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn { height: 50px; border-radius: 18px; font-weight: 800; font-size: 14.5px; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--surface); }
-  .btn.main { background: var(--coral-dk); color: #fff; }
-  .btn.dark { background: var(--dark); color: #fff; }
+  .gauge { position: relative; width: 100%; height: 200px; }
+  .gauge svg { display: block; width: 100%; height: 200px; }
+  .gauge .c { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
+  .gauge .c small { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .gauge .c b { font-size: 28px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .badge { margin-top: 4px; font-size: 11.5px; font-weight: 800; color: #fff; background: var(--grad); border-radius: 999px; padding: 2px 10px; box-shadow: 0 6px 14px -6px rgba(37,99,235,0.45); }
+  .lg { display: flex; align-items: center; gap: 12px; padding: 8px 0; width: 100%; text-align: left; }
+  .lg .bar { flex: 1; height: 7px; border-radius: 4px; background: rgba(22,18,15,0.06); overflow: hidden; }
+  .lg .bar i { display: block; height: 100%; border-radius: 4px; }
+  .lg .sub { margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+  .lg .sub span { font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+  .pills { display: flex; gap: 4px; background: rgba(255,255,255,0.85); border: var(--glass-b); border-radius: 999px; padding: 4px; box-shadow: 0 8px 20px -14px rgba(201,70,60,0.5); }
+  .pills button { flex: 1; height: 36px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+  .pills button[aria-pressed="true"] { background: var(--grad); color: #fff; font-weight: 800; box-shadow: 0 6px 14px -6px rgba(37,99,235,0.45); }
+  .area { margin: 12px -16px -6px; } .area svg { display: block; width: 100%; height: auto; }
+  .tag-bad { font-size: 12px; font-weight: 800; color: var(--bad-ink); background: var(--bad-soft); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+  .tag-good { font-size: 12px; font-weight: 800; color: #0B6B4C; background: #DDF3EA; border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+  .ybars { margin-top: 14px; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+  .ybars button { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 140px; }
+  .ybars i { display: block; width: 100%; border-radius: 999px; }
+  .ybars em { font-style: normal; font-size: 9.5px; font-weight: 800; }
+  .ybars span { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+  .seg, .seg3 { display: grid; gap: 4px; background: rgba(255,255,255,0.7); border: var(--glass-b); padding: 4px; border-radius: 16px; }
+  .seg { grid-template-columns: repeat(2, minmax(0, 1fr)); } .seg3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .seg button, .seg3 button { height: 40px; border-radius: 12px; font-weight: 700; font-size: 14px; color: var(--muted); }
+  .seg button[aria-pressed="true"], .seg3 button[aria-pressed="true"] { background: #fff; color: var(--ink); font-weight: 800; box-shadow: 0 2px 8px -2px rgba(16,24,40,0.2); }
+  .mnav { display: flex; align-items: center; gap: 8px; }
+  .mbtn { width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.85); border: var(--glass-b); display: grid; place-items: center; flex-shrink: 0; font-size: 15px; }
+  .mbtn:disabled { opacity: .35; }
+  .mlabel { flex: 1; height: 42px; border-radius: 21px; background: rgba(255,255,255,0.85); border: var(--glass-b); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 15px; }
+  .now { font-size: 11.5px; font-weight: 800; color: var(--coral-ink); background: var(--coral-soft); border-radius: 10px; padding: 2px 8px; }
+  .bignum { text-align: center; } .bignum small.cap { display: block; font-size: 14px; font-weight: 700; margin: 0; }
+  .bignum b { display: block; font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; }
+  .bignum span { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .btns2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn { height: 50px; border-radius: 18px; font-weight: 800; font-size: 14.5px; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--glass); border: var(--glass-b); box-shadow: var(--glass-sh); }
+  .btn.main { background: var(--grad); color: #fff; border: 0; box-shadow: 0 12px 24px -12px rgba(37,99,235,0.45); }
+  .btn.dark { background: var(--dark); color: #fff; border: 0; }
   .btn:disabled { opacity: .55; }
-  .tools { margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .tool { height: 66px; border-radius: 18px; background: var(--surface); font-weight: 800; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-  .tool svg { font-size: 18px; }
-  .tool.main { background: var(--coral-dk); color: #fff; }
-  .day { margin: 16px 4px 6px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); }
+  .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .tool { height: 70px; border-radius: 20px; background: var(--glass); border: var(--glass-b); box-shadow: var(--glass-sh); font-weight: 800; font-size: 13px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+  .tool svg { font-size: 20px; } .tool.main { background: var(--grad); color: #fff; border: 0; }
+  .search { height: 50px; border-radius: 18px; background: rgba(255,255,255,0.88); border: var(--glass-b); display: flex; align-items: center; gap: 10px; padding: 0 14px; box-shadow: var(--glass-sh); }
+  .search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 15px; }
+  .fchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .fchips button, .fchip { height: 38px; padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,0.85); border: var(--glass-b); font-size: 13px; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .fchips button.on { background: var(--grad); color: #fff; border: 0; }
+  .act { height: 32px; padding: 0 10px 0 12px; border-radius: 999px; background: var(--coral-soft); color: var(--coral-dk); font-size: 12.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
 
-  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 0 12px calc(env(safe-area-inset-bottom, 0px) + 10px); pointer-events: none; }
-  .nav-in { pointer-events: auto; max-width: 448px; margin: 0 auto; background: var(--surface); border-radius: 26px; padding: 6px; display: grid; grid-template-columns: 1fr 1fr 76px 1fr 1fr; align-items: center; gap: 2px; box-shadow: 0 10px 30px -8px rgba(0,0,0,.25); }
-  .tab { height: 56px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 12px; font-weight: 700; color: var(--muted); }
-  .tab svg { font-size: 19px; }
-  .tab[aria-current="page"] { background: var(--coral-soft); color: var(--coral-ink); }
-  .fab { justify-self: center; width: 62px; height: 62px; margin-top: -30px; border-radius: 50%; background: var(--coral-dk); color: #fff; border: 4px solid var(--surface); font-size: 24px; display: grid; place-items: center; box-shadow: 0 10px 22px -8px rgba(210,58,44,.6); }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 0 14px calc(env(safe-area-inset-bottom, 0px) + 12px); pointer-events: none; }
+  .nav-in { pointer-events: auto; max-width: 448px; margin: 0 auto; background: rgba(255,255,255,0.86); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border: var(--glass-b); border-radius: 26px; padding: 6px; display: grid; grid-template-columns: 1fr 1fr 74px 1fr 1fr; align-items: center; gap: 2px; box-shadow: 0 14px 34px -12px rgba(22,18,15,0.3); }
+  .tab { height: 54px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+  .tab svg { font-size: 21px; }
+  .tab[aria-current="page"] { background: var(--coral-soft); color: var(--coral-ink); font-weight: 800; }
+  .fab { justify-self: center; width: 60px; height: 60px; margin-top: -30px; border-radius: 50%; background: var(--grad); color: #fff; border: 4px solid #fff; font-size: 24px; display: grid; place-items: center; box-shadow: 0 12px 22px -8px rgba(249,92,75,0.65); }
 
-  .scrim { position: fixed; left: 0; right: 0; z-index: 40; background: rgba(21,18,16,.45); display: flex; align-items: flex-end; justify-content: center; padding: 10px; }
-  .sheet { width: 100%; max-width: 448px; overflow-y: auto; overscroll-behavior: contain; background: var(--surface); border-radius: 30px; padding: 10px 18px 18px; animation: up .22s cubic-bezier(.2,1.1,.4,1); }
+  .scrim { position: fixed; left: 0; right: 0; z-index: 40; background: rgba(22,18,15,0.4); display: flex; align-items: flex-end; justify-content: center; padding: 10px; }
+  .sheet { width: 100%; max-width: 448px; overflow-y: auto; overscroll-behavior: contain; background: #fff; border-radius: 30px; padding: 10px 18px 18px; animation: up .22s cubic-bezier(.2,1.1,.4,1); }
+  .sheet.flush { padding: 0 0 18px; } .sheet.flush > .pad { padding: 0 18px; }
   @keyframes up { from { transform: translateY(26px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .grip { width: 42px; height: 5px; border-radius: 3px; background: var(--stone); margin: 0 auto 12px; }
+  .grip { width: 42px; height: 5px; border-radius: 3px; background: rgba(22,18,15,0.18); margin: 0 auto 12px; }
   .sh-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .sh-head h3 { margin: 0; flex: 1; font-size: 20px; font-weight: 900; letter-spacing: -0.03em; }
-  .xbtn { width: 38px; height: 38px; border-radius: 50%; background: var(--paper); display: grid; place-items: center; font-size: 15px; }
-  .lbl { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); margin: 14px 2px 6px; }
-  .in, .sel { width: 100%; height: 48px; padding: 0 14px; border-radius: 16px; background: var(--paper); border: 2px solid transparent; font-size: 15px; font-weight: 600; outline: none; }
-  .in:focus, .sel:focus { border-color: var(--coral-dk); }
-  .sel { appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 19px) 50%, calc(100% - 13px) 50%; background-size: 6px 6px; background-repeat: no-repeat; }
+  .sh-head h3 { margin: 0; flex: 1; font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+  .xbtn { width: 38px; height: 38px; border-radius: 50%; background: var(--paper); display: grid; place-items: center; font-size: 15px; flex-shrink: 0; }
+  .ehead { background: linear-gradient(180deg, #FFF1EC 0%, #FBF7F4 100%); padding: 10px 18px 18px; position: relative; overflow: hidden; }
+  .ehead::before { content: ""; position: absolute; left: -60px; top: -70px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(255,138,107,0.45) 0%, rgba(255,138,107,0) 70%); }
+  .ehead > * { position: relative; }
+  .eamt { text-align: center; margin-top: 12px; } .eamt label { display: block; font-size: 13px; font-weight: 700; }
+  .eamt .money { max-width: 300px; margin: 0 auto; } .eamt .money .in { background: transparent; border: 0; height: 60px; text-align: center; font-size: 40px; font-weight: 800; padding: 0 0 0 30px; letter-spacing: -0.03em; }
+  .eamt .money > span { font-size: 20px; left: 18%; color: var(--ink); }
+  .cgrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .cgrid button { height: 82px; border-radius: 18px; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 4px; font-size: 11.5px; font-weight: 700; line-height: 1.2; text-align: center; }
+  .cgrid button svg { font-size: 22px; }
+  .cgrid button.on { color: #fff; box-shadow: 0 10px 20px -12px rgba(22,18,15,0.45); }
+  .cgrid button.add { background: transparent; border: 1.5px dashed #CBD2DC; color: var(--muted); }
+  .sug { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .sug button { height: 38px; padding: 0 12px; border-radius: 999px; border: 1.5px solid #EFE7E1; background: #fff; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .sug button small { font-weight: 600; opacity: .7; margin-left: 6px; font-size: 12px; }
+  .lbl { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin: 14px 2px 6px; }
+  .lblrow { display: flex; justify-content: space-between; align-items: baseline; } .lblrow .lbl { margin-bottom: 6px; }
+  .in { width: 100%; height: 50px; padding: 0 14px; border-radius: 16px; background: var(--paper); border: 2px solid transparent; font-size: 15px; font-weight: 600; outline: none; }
+  .in:focus { border-color: var(--coral-dk); background: #fff; }
   .money { position: relative; } .money > span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--muted); font-size: 14px; pointer-events: none; }
   .money .in { padding-left: 40px; font-weight: 800; font-size: 17px; }
   .chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip { height: 38px; padding: 0 14px; border-radius: 999px; background: var(--paper); font-weight: 700; font-size: 13.5px; color: var(--muted); }
-  .chip[aria-pressed="true"] { background: var(--dark); color: #fff; }
+  .chip[aria-pressed="true"] { background: var(--grad); color: #fff; }
   .link { font-size: 13.5px; font-weight: 800; color: var(--coral-ink); }
-  .err { margin: 10px 2px 0; font-size: 13px; font-weight: 700; color: var(--coral-ink); }
+  .err { margin: 10px 2px 0; font-size: 13px; font-weight: 700; color: var(--bad); }
   .hint { margin: 6px 2px 0; font-size: 12.5px; color: var(--muted); }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-
+  .sumrow { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 2px 0; margin-top: 10px; border-top: 1px solid var(--line); }
+  .sumrow span { font-size: 14px; font-weight: 700; color: var(--muted); } .sumrow b { font-size: 22px; font-weight: 800; }
+  .save { margin-top: 14px; width: 100%; height: 56px; border-radius: 20px; background: var(--grad); color: #fff; font-weight: 800; font-size: 16px; box-shadow: 0 12px 24px -12px rgba(37,99,235,0.45); }
+  .save:disabled { opacity: .6; }
+  .del { margin-top: 8px; width: 100%; height: 46px; border-radius: 16px; color: var(--bad); font-weight: 800; font-size: 14.5px; }
   .dd { position: relative; }
   .dd-btn { width: 100%; min-height: 54px; display: flex; align-items: center; gap: 12px; padding: 6px 12px 6px 8px; border-radius: 16px; background: var(--paper); text-align: left; border: 2px solid transparent; }
-  .dd-btn[aria-expanded="true"] { border-color: var(--coral-dk); }
-  .dd-ic { width: 36px; height: 36px; border-radius: 12px; background: var(--surface); display: grid; place-items: center; color: var(--coral-ink); font-size: 17px; flex-shrink: 0; }
-  .dd-chev { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; color: var(--muted); flex-shrink: 0; transition: transform .15s; }
+  .dd-btn[aria-expanded="true"] { border-color: var(--coral-dk); background: #fff; }
+  .dd-ic { width: 36px; height: 36px; border-radius: 12px; background: #fff; display: grid; place-items: center; color: var(--coral-ink); font-size: 17px; flex-shrink: 0; }
+  .dd-chev { width: 32px; height: 32px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--muted); flex-shrink: 0; transition: transform .15s; }
   .dd-btn[aria-expanded="true"] .dd-chev { transform: rotate(180deg); }
-  .dd-panel { margin-top: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; max-height: 300px; overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 12px 26px -16px rgba(0,0,0,.35); }
+  .dd-panel { margin-top: 6px; background: #fff; border: 1.5px solid #F1E8E2; border-radius: 16px; max-height: 300px; overflow-y: auto; overscroll-behavior: contain; box-shadow: 0 12px 26px -16px rgba(22,18,15,0.35); }
   .dd-opt { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px 9px 8px; text-align: left; min-height: 52px; }
   .dd-opt + .dd-opt { border-top: 1px solid var(--line); }
   .dd-opt .dd-ic { background: var(--paper); }
-  .dd-opt[aria-selected="true"] { background: #FFF4F2; }
+  .dd-opt[aria-selected="true"] { background: #FFF4F1; }
   .dd-ok { color: var(--coral-dk); font-size: 17px; }
-  .seg3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #E9E3D9; padding: 4px; border-radius: 18px; }
-  .seg3 button { height: 42px; border-radius: 14px; font-weight: 700; font-size: 14px; color: var(--muted); }
-  .seg3 button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 800; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
-  .money.big .in { height: 64px; font-size: 28px; font-weight: 900; padding-left: 48px; }
-  .money.big > span { font-size: 18px; left: 16px; }
-  .lblrow { display: flex; justify-content: space-between; align-items: baseline; } .lblrow .lbl { margin-bottom: 6px; } .lblrow .link { font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
-  .alert { margin-top: 12px; background: var(--coral-soft); color: #7A2419; border-radius: 18px; padding: 12px 14px; font-size: 13.5px; font-weight: 600; display: flex; gap: 10px; }
-  .alert svg { font-size: 18px; color: var(--coral-ink); margin-top: 1px; }
-  .line { border-radius: 18px; background: var(--paper); padding: 10px; margin-top: 8px; position: relative; }
-  .line .in, .line .sel { background: var(--surface); height: 44px; border-radius: 13px; }
-  .line .r2 { display: grid; grid-template-columns: minmax(0, 1fr) 118px 32px; gap: 6px; margin-top: 6px; align-items: center; }
-  .line .r2 .sel { font-size: 14px; padding-left: 10px; padding-right: 28px; text-overflow: ellipsis; }
-  .line .r2 .money .in { font-size: 15.5px; text-align: right; padding-right: 10px; }
-  .line .rm { width: 32px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--muted); font-size: 15px; }
-  .sugg { position: absolute; left: 10px; right: 10px; top: 56px; z-index: 5; background: var(--surface); border-radius: 14px; box-shadow: 0 12px 30px -10px rgba(0,0,0,.35); overflow: hidden; }
-  .sugg button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; text-align: left; font-size: 14.5px; font-weight: 700; }
-  .sugg button + button { border-top: 1px solid var(--line); }
-  .sugg small { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
-  .addline { margin-top: 8px; width: 100%; height: 44px; border-radius: 16px; border: 2px dashed var(--stone); font-weight: 800; font-size: 14px; color: var(--muted); }
-  .sumrow { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 2px 0; margin-top: 10px; border-top: 1px solid var(--line); }
-  .sumrow span { font-size: 14px; font-weight: 700; color: var(--muted); } .sumrow b { font-size: 23px; font-weight: 900; }
-  .save { margin-top: 12px; width: 100%; height: 54px; border-radius: 20px; background: var(--coral-dk); color: #fff; font-weight: 800; font-size: 16px; }
-  .del { margin-top: 8px; width: 100%; height: 46px; border-radius: 16px; color: var(--coral-ink); font-weight: 800; font-size: 14.5px; }
-  .setg { background: var(--paper); border-radius: 20px; overflow: hidden; }
-  .setr { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 13px 16px; min-height: 56px; }
-  .setr + .setr { border-top: 1px solid #E2DCD1; }
-  .setl { margin: 18px 4px 8px; font-size: 13px; font-weight: 800; color: var(--muted); }
-  .sw { width: 46px; height: 28px; border-radius: 14px; padding: 3px; background: #C9C1B4; flex-shrink: 0; transition: background .15s; }
+  .setg { background: var(--glass); border: var(--glass-b); box-shadow: var(--glass-sh); border-radius: 24px; overflow: hidden; padding: 2px 16px; }
+  .setr { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 11px 0; min-height: 60px; }
+  .setr + .setr { border-top: 1px solid var(--line); }
+  .setr .ic { width: 38px; height: 38px; border-radius: 13px; background: var(--coral-soft); color: var(--coral-ink); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+  .setl { margin: 4px 4px -6px; font-size: 13px; font-weight: 800; color: var(--muted); }
+  .sw { width: 46px; height: 28px; border-radius: 14px; padding: 3px; background: #D9CFC6; flex-shrink: 0; transition: background .15s; }
   .sw i { display: block; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .15s; }
-  [aria-checked="true"] .sw { background: var(--coral-dk); } [aria-checked="true"] .sw i { transform: translateX(18px); }
+  [aria-checked="true"] .sw { background: var(--grad); } [aria-checked="true"] .sw i { transform: translateX(18px); }
   .mp-year { display: flex; align-items: center; justify-content: space-between; background: var(--paper); border-radius: 999px; padding: 4px; }
-  .mp-year button { width: 40px; height: 40px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; color: var(--muted); }
-  .mp-year button:disabled { opacity: .3; }
-  .mp-year b { font-size: 18px; font-weight: 900; }
+  .mp-year button { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: var(--muted); }
+  .mp-year button:disabled { opacity: .3; } .mp-year b { font-size: 18px; font-weight: 800; }
   .mp-grid { margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .mp-grid button { position: relative; height: 48px; border-radius: 16px; background: var(--paper); font-weight: 700; font-size: 14px; }
   .mp-grid button.now { background: var(--coral-soft); color: var(--coral-ink); }
-  .mp-grid button.on { background: var(--coral-dk); color: #fff; }
+  .mp-grid button.on { background: var(--grad); color: #fff; }
   .mp-grid button:disabled { opacity: .3; }
   .mp-grid button i { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--coral-dk); }
-
+  .alert { background: var(--bad-soft); color: #7F1D1D; border-radius: 18px; padding: 12px 14px; font-size: 13.5px; font-weight: 600; display: flex; gap: 10px; }
+  .alert svg { font-size: 18px; color: var(--bad); margin-top: 1px; }
   .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 112px); z-index: 60; background: var(--dark); color: #fff; padding: 8px 8px 8px 16px; min-height: 48px; border-radius: 24px; font-weight: 700; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); width: max-content; max-width: calc(100% - 28px); }
-  .toast.solo { padding-right: 16px; } .toast.err { background: var(--coral-ink); }
+  .toast.solo { padding-right: 16px; } .toast.err { background: var(--bad-ink); }
   .toast button { height: 34px; padding: 0 13px; border-radius: 17px; background: rgba(255,255,255,.18); font-weight: 800; flex-shrink: 0; }
   .screen { position: fixed; inset: 0; z-index: 70; background: var(--paper); overflow-y: auto; }
   .screen-in { max-width: 400px; margin: 0 auto; min-height: 100%; padding: 40px 24px 32px; display: flex; flex-direction: column; justify-content: center; }
-  .screen h1 { margin: 18px 0 0; font-size: 32px; font-weight: 900; letter-spacing: -0.035em; }
+  .screen h1 { margin: 18px 0 0; font-size: 30px; font-weight: 800; letter-spacing: -0.03em; }
   .screen p { margin: 8px 0 0; color: var(--muted); font-size: 15px; }
+  .who { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .who button { height: 64px; border-radius: 20px; background: #fff; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .who button[aria-pressed="true"] { background: var(--dark); color: #fff; }
+  .who button i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 14px; background: var(--coral-soft); color: var(--coral-ink); }
+  .who button[aria-pressed="true"] i { background: rgba(255,255,255,.18); color: #fff; }
+  .pw { position: relative; } .pw .in { padding-right: 52px; background: #fff; height: 54px; font-size: 16px; }
+  .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; color: var(--muted); font-size: 13px; font-weight: 800; }
   .pin-dots { display: flex; gap: 16px; justify-content: center; margin: 24px 0; }
   .pin-dots i { width: 15px; height: 15px; border-radius: 50%; background: var(--stone); }
   .pin-dots i.on { background: var(--coral-dk); }
   .pin-dots.shake { animation: shake .4s; }
   @keyframes shake { 0%,100% { transform: none; } 25%,75% { transform: translateX(-10px); } 50% { transform: translateX(10px); } }
   .keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 300px; margin: 0 auto; width: 100%; }
-  .keys button { height: 64px; border-radius: 22px; background: var(--surface); font-size: 26px; font-weight: 700; }
+  .keys button { height: 64px; border-radius: 22px; background: #fff; font-size: 26px; font-weight: 700; }
   .keys button.plain { background: transparent; color: var(--muted); font-size: 20px; }
-  .who { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .who button { height: 64px; border-radius: 20px; background: var(--surface); font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid transparent; }
-  .who button[aria-pressed="true"] { background: var(--dark); color: #fff; }
-  .who button i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 14px; background: var(--coral-soft); color: var(--coral-ink); }
-  .who button[aria-pressed="true"] i { background: rgba(255,255,255,.18); color: #fff; }
-  .pw { position: relative; } .pw .in { padding-right: 52px; background: #fff; height: 54px; font-size: 16px; }
-  .pw button { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%; color: var(--muted); font-size: 13px; font-weight: 800; }
-  .bio-btn { margin: 16px auto 0; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 22px; border-radius: 25px; background: var(--coral-dk); color: #fff; font-weight: 800; font-size: 15px; }
+  .bio-btn { margin: 16px auto 0; display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 22px; border-radius: 25px; background: var(--grad); color: #fff; font-weight: 800; font-size: 15px; }
   .boot { position: fixed; inset: 0; z-index: 90; background: var(--paper); display: grid; place-items: center; transition: opacity .25s; }
   .boot.out { opacity: 0; pointer-events: none; }
   .boot .logo { width: 72px; height: 72px; border-radius: 22px; font-size: 34px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  .glass.hero { background: var(--grad); color: #fff; border: 0; box-shadow: 0 16px 32px -18px rgba(37,99,235,0.6); }
+  .glass.hero .track { background: rgba(255,255,255,0.28); } .glass.hero .track i { background: #fff; }
+  .glass.hero .sub { color: #fff; }
+  .insight.bad .ib { background: linear-gradient(135deg, #F87171, #DC2626); }
+  .insight.good .ib { background: linear-gradient(135deg, #34D399, #15803D); }
+  .etop { background: var(--grad); color: #fff; padding: 10px 18px 18px; border-radius: 30px 30px 0 0; }
+  .grip.light { background: rgba(255,255,255,0.5); }
+  .etop-h { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; } .etop-h h3 { margin: 0; flex: 1; font-size: 18px; font-weight: 800; }
+  .xbtn.light { background: rgba(255,255,255,0.2); color: #fff; }
+  .seg3.onblue { background: rgba(255,255,255,0.18); border: 0; } .seg3.onblue button { color: #fff; } .seg3.onblue button[aria-pressed="true"] { background: #fff; color: var(--coral-dk); }
+  .eamt { display: block; text-align: center; margin-top: 14px; } .eamt > span { font-size: 13px; font-weight: 700; opacity: .9; }
+  .eamt div { display: flex; align-items: baseline; justify-content: center; gap: 6px; } .eamt small { font-size: 20px; font-weight: 700; }
+  .eamt input { width: 70%; background: transparent; border: 0; outline: none; color: #fff; font-size: 40px; font-weight: 800; letter-spacing: -0.035em; text-align: left; caret-color: #fff; }
+  .eamt input::placeholder { color: rgba(255,255,255,0.6); }
+  .sheet.flush > .pad { padding: 4px 18px 0; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+  .tile { text-align: left; background: var(--paper); border-radius: 16px; padding: 10px 14px; border: 2px solid transparent; min-height: 62px; }
+  .tile[aria-expanded="true"] { border-color: var(--coral); background: #fff; }
+  .tile small { display: block; font-size: 11.5px; color: var(--muted); font-weight: 600; } .tile b { display: block; font-size: 14.5px; font-weight: 800; } .tile em { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); }
+  .chip.sg { background: #fff; border: 1.5px solid var(--line); color: var(--ink); height: 36px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  #semua > * + *, #lainnya > * + * { margin-top: 12px; } #semua .fchips, #semua .chips { margin-top: 10px; }
 </style>
 </head>
 <body>
 <div class="boot" id="boot"><div class="logo" id="boot-logo"></div></div>
+<div class="glow" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="app">
   <header class="top">
     <div class="logo" id="logo"></div>
-    <div class="brand"><b>Belanja Kita</b><small id="status"></small></div>
-    <button class="gear" id="btn-settings" aria-label="Pengaturan"></button>
+    <div class="brand"><small id="hello"></small><b id="title">Belanja Kita</b></div>
+    <button class="sync" id="status"></button>
   </header>
   <section class="page on" id="home" aria-label="Belanja"></section>
   <section class="page" id="dompet" aria-label="Dompet"></section>
   <section class="page" id="riwayat" aria-label="Riwayat"></section>
+  <section class="page" id="lainnya" aria-label="Lainnya"></section>
+  <section class="page" id="semua" aria-label="Semua transaksi"></section>
 </div>
 <nav class="nav" aria-label="Navigasi utama"><div class="nav-in">
   <button class="tab" data-go="home" aria-current="page"></button>
   <button class="tab" data-go="dompet"></button>
   <button class="fab" id="fab" aria-label="Catat"></button>
   <button class="tab" data-go="riwayat"></button>
-  <button class="tab" id="nav-more"></button>
+  <button class="tab" data-go="lainnya"></button>
 </div></nav>
 <div class="scrim" id="scrim" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -262,7 +309,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.4';
+const APP_VERSION = '4.5';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -556,118 +603,216 @@ function migrateLocal() {
   S.config.migratedAt = new Date().toISOString(); cache();
 }
 
-// ================= Tampilan =================
-function status() {
-  const el = $('status'); if (!el) return;
-  const n = getOutbox().length, noUser = cloud.mode !== 'local' && !cloud.user;
-  let dot = '#16B088', t = 'Tersinkron dengan keluarga';
-  if (cloud.mode === 'local') { dot = '#B9B0A2'; t = 'Mode lokal, tidak tersinkron'; }
-  else if (noUser) { dot = '#E0A100'; t = n ? n + ' catatan belum tersinkron' : (cloud.authKnown || !cloud.available ? 'Belum masuk' : 'Menyambungkan…'); }
-  else if (flushing) { dot = '#E0A100'; t = 'Mengirim ' + n + ' catatan…'; }
-  else if (!navigator.onLine) { dot = '#E0A100'; t = 'Offline, tersimpan di HP'; }
-  else if (n || pendingWrites || cloud.pending) { dot = '#E0A100'; t = 'Menyimpan…'; }
-  const tap = noUser && (cloud.authKnown || !cloud.available);
-  el.innerHTML = `<i style="background:${dot}"></i>${t}${tap ? ' <u style="color:var(--coral-ink);font-weight:700">Masuk</u>' : ''}`;
-  el.style.cursor = tap ? 'pointer' : ''; el.onclick = tap ? () => showLogin() : null;
+// ================= Tampilan (Frost) =================
+// Warna & ikon kategori: tanpa ungu, beda jelas satu sama lain
+const PALETTE = [['#F2674F', '#F7907D'], ['#E9A21B', '#F5C45E'], ['#0EA5A0', '#5AD5CB'], ['#E5488C', '#F28CBA'], ['#0EA5E9', '#6CCFF6'], ['#B7743F', '#DDA477'], ['#4E9F1A', '#93D158'], ['#0F766E', '#4FB3A9'], ['#C2410C', '#F08A5D'], ['#8A8F2E', '#C2C760']];
+const CAT_LOOK = { lain: [0, 'dots'], rumah: [1, 'house'], lauk: [2, 'fish'], buah: [3, 'apple'], bersih: [4, 'drop'], pokok: [5, 'bag'], bumbu: [6, 'chili'] };
+Object.assign(P, {
+  dots: '<circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/>',
+  house: '<path d="M4 10.5 12 4l8 6.5V20H4Z"/><path d="M10 20v-5h4v5"/>', fish: '<path d="M3 12c3-4 8-5 12-3l4-3v12l-4-3c-4 2-9 1-12-3Z"/>',
+  apple: '<path d="M12 7c-4-2-8 1-7 6 1 4 4 7 7 6 3 1 6-2 7-6 1-5-3-8-7-6Z"/><path d="M12 7c0-2 1-3 3-4"/>', drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/>',
+  bag: '<path d="M5 9h14l-1.5 10a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7Z"/><path d="M8 9c0-3 2-5 4-5s4 2 4 5"/>', chili: '<path d="M14 4c3 1 5 4 4 8-1 5-7 8-11 8 2-2 3-5 3-8"/>',
+  alert: '<path d="M12 8v5M12 16.5v.1"/><circle cx="12" cy="12" r="9"/>', search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/>', filter: '<path d="M4 6h16M7 12h10M10 18h4"/>'
+});
+function catLook(id) {
+  if (id === ADMIN_CAT) return { c1: '#8A8277', c2: '#B5ADA2', icon: 'receipt' };
+  const fixed = CAT_LOOK[id]; let i, icon = 'tag';
+  if (fixed) { i = fixed[0]; icon = fixed[1]; } else { const k = Math.max(0, cats().findIndex(c => c.id === id)); i = 7 + (k % 3); }
+  return { c1: PALETTE[i][0], c2: PALETTE[i][1], icon };
+}
+const catIco = (id, sm) => { const L = catLook(id); return `<span class="ico${sm ? ' sm' : ''}" style="background:linear-gradient(135deg,${L.c2},${L.c1});box-shadow:0 6px 14px -6px ${L.c1}AA">${svg(L.icon, 2.1)}</span>`; };
+// Satu baris per barang (nota lama berisi beberapa barang dipecah per barang)
+function entriesOf(list) {
+  const out = [];
+  list.forEach(r => r.lines.forEach((l, i) => out.push({ rid: r.id, li: i, n: l.n, c: l.c, p: l.p + (i === 0 ? r.admin : 0), date: r.date, wallet: r.wallet, by: r.by, at: r.createdAt || '', note: r.note })));
+  return out.sort((a, b) => (b.date + b.at).localeCompare(a.date + a.at) || a.li - b.li);
+}
+function entryRow(e) {
+  const sub = [catName(e.c), dLong(e.date), e.wallet ? walletName(e.wallet) : '', e.by].filter(Boolean).join(', ');
+  return `<button class="row" data-entry="${e.rid}:${e.li}">${catIco(e.c)}<span class="grow"><span class="t1">${esc(e.n)}</span><span class="t2">${esc(sub)}</span></span><span class="amt num">−${rp(e.p).slice(3) ? 'Rp ' + fmt(e.p) : ''}</span></button>`;
 }
 function receiptTitle(r) { if (r.note) return r.note; const n = r.lines.map(l => l.n); return n.length > 2 ? n.slice(0, 2).join(', ') + ' +' + (n.length - 2) : n.join(', ') || 'Belanja'; }
 function receiptSub(r) { return [dShort(r.date), r.lines.length > 1 ? r.lines.length + ' barang' : catName((r.lines[0] || {}).c), r.wallet ? walletName(r.wallet) : '', r.by].filter(Boolean).join(', '); }
-const receiptRow = r => `<button class="row" data-receipt="${r.id}"><span class="ico">${svg('receipt')}</span><span class="grow"><span class="t1">${esc(receiptTitle(r))}</span><span class="t2">${esc(receiptSub(r))}</span></span><span class="amt num">${rp(r.total)}</span></button>`;
-function catRows(map, budgeted) {
-  const list = cats().map(c => ({ id: c.id, name: c.name, v: map[c.id] || 0, b: budgeted ? c.budget : 0 })).filter(x => x.v > 0 || x.b > 0);
-  if (map[ADMIN_CAT]) list.push({ id: ADMIN_CAT, name: 'Biaya admin', v: map[ADMIN_CAT], b: 0 });
-  Object.keys(map).forEach(k => { if (k !== ADMIN_CAT && !cats().some(c => c.id === k)) list.push({ id: k, name: 'Kategori terhapus', v: map[k], b: 0 }); });
-  list.sort((a, b) => b.v - a.v);
-  if (!list.length) return '<div class="empty">Belum ada pengeluaran.</div>';
-  const max = Math.max(1, ...list.map(x => x.v));
-  return list.map(x => {
-    const pct = x.b ? x.v / x.b : x.v / max, cls = x.b && x.v > x.b ? 'over' : x.b && pct >= 0.85 ? 'warn' : '';
-    const note = x.b ? (x.v > x.b ? `<small class="over">Lewat ${rp(x.v - x.b)} dari anggaran ${rp(x.b)}</small>` : `<small>Sisa ${rp(x.b - x.v)} dari ${rp(x.b)}</small>`) : '';
-    return `<div class="cat"><div class="head"><span>${esc(x.name)}</span><b class="num">${rp(x.v)}</b></div><div class="meter"><i class="${cls}" style="width:${Math.min(100, pct * 100)}%"></i></div>${note}</div>`;
-  }).join('');
+const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
+
+// Setengah lingkaran: 100% = pengeluaran, persen di tiap bagian
+function gauge(map, tot, big, small, badge) {
+  const items = catList(map);
+  if (!tot || !items.length) return `<div class="empty">Belum ada pengeluaran.</div>`;
+  const W = 340, cx = W / 2, cy = 172, r = 116, sw = 30, rl = 154, gap = items.length > 1 ? 0.038 : 0;
+  let a0 = Math.PI, arcs = '', labels = '', defs = '';
+  items.forEach((x, k) => {
+    const L = catLook(x.id), span = Math.PI * x.v / tot, s = a0 + (k ? gap / 2 : 0), e = a0 + span - (k < items.length - 1 ? gap / 2 : 0);
+    if (e > s) {
+      const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s), x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+      defs += `<linearGradient id="gg${k}" x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${L.c2}"/><stop offset="1" stop-color="${L.c1}"/></linearGradient>`;
+      arcs += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="url(#gg${k})" stroke-width="${sw}"/>`;
+    }
+    const p = Math.round(x.v / tot * 100);
+    if (p >= 3) { const m = a0 + span / 2, lx = cx + rl * Math.cos(m), ly = cy + rl * Math.sin(m); labels += `<g transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})"><rect x="-19" y="-11" width="38" height="22" rx="11" fill="#fff" stroke="${L.c1}" stroke-width="1.5"/><text x="0" y="4.5" text-anchor="middle" font-size="11.5" font-weight="800" fill="${L.c1}" font-family="Plus Jakarta Sans, sans-serif">${p}%</text></g>`; }
+    a0 += span;
+  });
+  const f = catLook(items[0].id).c1, l = catLook(items[items.length - 1].id).c1;
+  return `<div class="gauge"><svg viewBox="0 0 ${W} 200" role="img" aria-label="Pengeluaran per kategori dalam persen"><defs>${defs}<filter id="gsh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#111827" flood-opacity="0.12"/></filter></defs>
+    <path d="M${cx - r},${cy} A${r},${r} 0 0 1 ${cx + r},${cy}" fill="none" stroke="#fff" stroke-width="${sw + 10}" stroke-linecap="round"/><g filter="url(#gsh)"><circle cx="${cx - r}" cy="${cy}" r="${sw / 2}" fill="${f}"/><circle cx="${cx + r}" cy="${cy}" r="${sw / 2}" fill="${l}"/>${arcs}</g>${labels}</svg>
+    <div class="c"><small>${small}</small><b class="num">${big}</b>${badge ? `<span class="badge">${badge}</span>` : ''}</div></div>`;
 }
+function catList(map) {
+  const list = Object.keys(map).filter(k => map[k] > 0).map(id => ({ id, v: map[id] }));
+  return list.sort((a, b) => b.v - a.v);
+}
+function legendRows(map, tot, withBudget, limit) {
+  const items = catList(map); if (!items.length) return '';
+  const mx = items[0].v; const shown = limit ? items.slice(0, limit) : items;
+  return shown.map(x => {
+    const L = catLook(x.id), c = cats().find(k => k.id === x.id), b = withBudget && c ? c.budget : 0;
+    const sub = b ? (x.v > b ? `Lewat ${short(x.v - b)} dari batas ${short(b)}` : `${pc(x.v, b)}% dari batas ${short(b)}`) : `${pc(x.v, tot)}% dari pengeluaran`;
+    return `<div class="lg">${catIco(x.id)}<div class="grow"><div style="display:flex;justify-content:space-between;gap:8px"><span class="t1" style="font-size:14px">${esc(catName(x.id) || 'Kategori terhapus')}</span><span class="amt num" style="font-size:14px">Rp ${fmt(x.v)}</span></div>
+      <div class="sub"><span class="bar"><i style="width:${Math.max(3, x.v / mx * 100)}%;background:linear-gradient(90deg,${L.c2},${L.c1})"></i></span><span style="color:${b && x.v > b ? '#DC2626' : L.c1}">${sub}</span></div></div></div>`;
+  }).join('') + (limit && items.length > limit ? `<button class="more" data-go="riwayat">${items.length - limit} kategori lainnya</button>` : '');
+}
+// Grafik area bergradasi (per hari)
+function areaChart(points, hiLabel) {
+  const W = 358, H = 210, n = points.length, vals = points.map(p => p.v);
+  const known = points.filter(p => p.v != null); if (!known.length || !known.some(p => p.v > 0)) return `<div class="empty">Belum ada pengeluaran di periode ini.</div>`;
+  const mx = Math.max(...known.map(p => p.v)) * 1.25 || 1, X = i => n > 1 ? i * W / (n - 1) : W / 2, Y = v => H - 30 - (v / mx) * (H - 64);
+  const pts = []; points.forEach((p, i) => { if (p.v != null) pts.push([X(i), Y(p.v), i]); });
+  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+  for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], c = (x1 - x0) * 0.45; d += ` C${(x0 + c).toFixed(1)},${y0.toFixed(1)} ${(x1 - c).toFixed(1)},${y1.toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}`; }
+  const last = pts[pts.length - 1], area = d + ` L${last[0].toFixed(1)},${H - 30} L${pts[0][0].toFixed(1)},${H - 30} Z`;
+  let hi = pts[0]; pts.forEach(p => { if (vals[p[2]] > vals[hi[2]]) hi = p; });
+  const step = n > 10 ? Math.ceil(n / 7) : 1;
+  const labels = points.map((p, i) => (i % step === 0 || i === n - 1 || i === hi[2]) && !(n > 10 && i !== hi[2] && Math.abs(i - hi[2]) < step / 2 && i !== 0) ? `<text x="${Math.min(Math.max(X(i), 14), W - 14).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" font-weight="${i === hi[2] ? 800 : 600}" fill="${i === hi[2] ? '#111827' : '#5B6475'}" font-family="Plus Jakarta Sans, sans-serif">${p.l}</text>` : '').join('');
+  const fut = last[2] < n - 1 ? `<line x1="${last[0].toFixed(1)}" y1="${H - 30}" x2="${W}" y2="${H - 30}" stroke="#C9D8FF" stroke-width="2" stroke-dasharray="4 6"/>` : '';
+  const tx = Math.min(Math.max(hi[0], 40), W - 40);
+  return `<div class="area"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pengeluaran per hari"><defs><linearGradient id="afill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563EB" stop-opacity="0.9"/><stop offset="0.55" stop-color="#7FA6FF" stop-opacity="0.45"/><stop offset="1" stop-color="#E3ECFF" stop-opacity="0.05"/></linearGradient><linearGradient id="aedge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4F86FF"/><stop offset="1" stop-color="#1D4FD8"/></linearGradient></defs>
+    <path d="${area}" fill="url(#afill)"/><path d="${d}" fill="none" stroke="url(#aedge)" stroke-width="2.5"/>${fut}
+    <line x1="${hi[0].toFixed(1)}" y1="${hi[1].toFixed(1)}" x2="${hi[0].toFixed(1)}" y2="${H - 30}" stroke="#fff" stroke-opacity="0.85" stroke-width="1.5" stroke-dasharray="3 4"/>
+    <circle cx="${hi[0].toFixed(1)}" cy="${hi[1].toFixed(1)}" r="9" fill="#2563EB" fill-opacity="0.22"/><circle cx="${hi[0].toFixed(1)}" cy="${hi[1].toFixed(1)}" r="5" fill="#fff" stroke="#1D4FD8" stroke-width="3"/>
+    <text x="${tx.toFixed(1)}" y="${(hi[1] - 16).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="800" fill="#111827" font-family="Plus Jakarta Sans, sans-serif">Rp ${fmt(vals[hi[2]])}</text>${labels}</svg></div>`;
+}
+const HARI3 = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
+function weekPoints(ws) { const t = todayISO(); return HARI3.map((l, i) => { const d = isoAdd(ws, i); return { l, v: d > t ? null : total(inRange(d, d)) }; }); }
+function monthPoints(m) { const t = todayISO(); return Array.from({ length: daysIn(m) }, (_, i) => { const d = m + '-' + pad2(i + 1); return { l: String(i + 1), v: d > t ? null : total(inRange(d, d)) }; }); }
+const weekBudget = (m) => S.config.budget / daysIn(m) * 7;
+
+function status() {
+  const el = $('status'); if (!el) return;
+  let dot = '#2BD38A', t = 'Tersinkron', tap = false;
+  if (cloud.mode === 'local') { dot = '#B9B0A2'; t = 'Lokal'; }
+  else if (!cloud.user) { dot = '#E0A100'; t = cloud.authKnown ? 'Belum masuk' : 'Menyambung…'; tap = cloud.authKnown; }
+  else if (!navigator.onLine) { dot = '#E0A100'; t = 'Offline'; }
+  else if (pendingWrites || cloud.pending) { dot = '#E0A100'; t = 'Menyimpan…'; }
+  el.innerHTML = `<i style="background:${dot}"></i>${t}${tap ? ' <u>Masuk</u>' : ''}`;
+  el.onclick = tap ? () => showLogin() : null;
+}
+function header(page) {
+  const h = new Date().getHours(), greet = h < 11 ? 'Selamat pagi,' : h < 15 ? 'Selamat siang,' : h < 18 ? 'Selamat sore,' : 'Selamat malam,';
+  const T = { home: [greet, person() || 'Keluarga'], dompet: ['Belanja Kita', 'Dompet'], riwayat: ['Belanja Kita', 'Riwayat'], lainnya: ['Belanja Kita', 'Lainnya'], semua: ['Belanja Kita', 'Semua transaksi'] }[page] || ['', 'Belanja Kita'];
+  $('hello').textContent = T[0]; $('title').textContent = T[1];
+}
+
 function renderHome() {
   const m = curMonth(), t = todayISO(), ws = weekStart(t), y = t.slice(0, 4);
   const mon = inMonth(m), spent = total(mon), budget = S.config.budget, left = budget - spent, used = budget ? spent / budget : 0;
-  const recent = S.receipts.slice().sort((a, b) => (b.date + b.createdAt).localeCompare(a.date + a.createdAt)).slice(0, 6);
+  const wk = total(inRange(ws, t)), wb = weekBudget(m), wdiff = wk - wb, daysLeft = daysIn(m) - Number(t.slice(8)) + 1, safe = Math.max(0, left) / daysLeft;
   const blocked = cloud.rulesBlocked || cloud.migrateError === 'rules';
+  const ents = entriesOf(mon.length ? S.receipts : []).slice(0, 10), allN = entriesOf(mon).length;
+  const map = byCategory(mon);
   $('home').innerHTML = `
-    ${blocked ? `<div class="alert">${svg('warn')}<span>Catatan belum bisa dibaca atau disimpan ke server: aturan Firestore belum mengizinkan koleksi <b>receipts</b>. Data lama tetap aman. Ikuti langkah "Aturan Firestore" di petunjuk pembaruan.</span></div>` : cloud.migrateError ? `<div class="alert">${svg('warn')}<span>Data lama belum selesai dipindahkan. Belanja Kita akan mencoba lagi otomatis.</span></div>` : ''}
-    <div class="hero">
-      <div class="cap">Sisa anggaran ${mLabel(m)}<span class="${left < 0 ? 'over' : ''}">${left < 0 ? 'Melebihi anggaran' : Math.round(used * 100) + '% terpakai'}</span></div>
-      <div class="big num">${rp(left)}</div>
-      <div class="bar"><i style="width:${Math.min(100, used * 100)}%"></i></div>
-      <div class="two"><button data-act="budget"><small>Anggaran ${svg('pen')}</small><b class="num">${rp(budget)}</b></button><div><small>Terpakai</small><b class="num">${rp(spent)}</b></div></div>
+    ${blocked ? `<div class="alert">${svg('warn')}<span>Catatan belum bisa dibaca atau disimpan ke server: aturan Firestore belum mengizinkan koleksi <b>receipts</b>. Data lama tetap aman.</span></div>` : cloud.migrateError ? `<div class="alert">${svg('warn')}<span>Data lama belum selesai dipindahkan. Belanja Kita akan mencoba lagi otomatis.</span></div>` : ''}
+    <div class="glass hero">
+      <div class="cap">Sisa anggaran ${BULAN[Number(m.slice(5)) - 1]}</div>
+      <div class="big num" style="${left < 0 ? 'color:#FFD5D5' : ''}"><small>${left < 0 ? '−Rp' : 'Rp'}</small>${fmt(left)}</div>
+      <div class="track"><i style="width:${Math.min(100, used * 100)}%"></i></div>
+      <button class="sub" data-act="budget">Terpakai Rp ${fmt(spent)} dari Rp ${fmt(budget)} ${svg('pen')}</button>
     </div>
-    <div class="stats">
-      <div class="stat"><small>Minggu ini</small><b class="num">${short(total(inRange(ws, t)))}</b><em>sejak ${dShort(ws)}</em></div>
-      <div class="stat"><small>Bulan ini</small><b class="num">${short(spent)}</b><em>${BULAN[Number(m.slice(5)) - 1]}</em></div>
+    <div class="glass stats">
+      <div class="stat"><small>Minggu ini</small><b class="num">${short(wk)}</b><em class="${wk > wb ? 'bad' : 'good'}">${wk > wb ? '+' : '−'}${Math.abs(Math.round((wk / (wb || 1) - 1) * 100))}% batas</em></div>
+      <div class="stat"><small>Bulan ini</small><b class="num">${short(spent)}</b><em>${Math.round(used * 100)}% anggaran</em></div>
       <div class="stat"><small>Tahun ini</small><b class="num">${short(total(inYear(y)))}</b><em>${y}</em></div>
     </div>
+    <div class="quick">
+      <button data-act="money-in"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('plus', 2.2)}</span>Isi uang</button>
+      <button data-act="money-move"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('swap', 2.2)}</span>Pindah</button>
+      <button data-go="riwayat"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('chart', 2.2)}</span>Laporan</button>
+      <button data-act="mail-now"><span style="background:radial-gradient(circle at 35% 30%,#fff,#2563EB26 70%);color:#2563EB">${svg('mail', 2.2)}</span>Email</button>
+    </div>
+    <div class="glass insight ${left < 0 || wdiff > 0 ? 'bad' : 'good'}"><span class="ib">${svg('alert', 2.2)}</span><p>${left < 0 ? `Anggaran bulan ini sudah lewat <b class="bad">Rp ${fmt(-left)}</b>. Tahan belanja yang tidak perlu ya.` : wdiff > 0 ? `Minggu ini lewat <b class="bad">Rp ${fmt(wdiff)}</b> dari batas mingguan. Aman <b>Rp ${fmt(Math.floor(safe / 100) * 100)}</b> per hari sampai akhir bulan.` : `Minggu ini masih aman, sisa <b>Rp ${fmt(-wdiff)}</b> dari batas mingguan. Aman <b>Rp ${fmt(Math.floor(safe / 100) * 100)}</b> per hari sampai akhir bulan.`}</p></div>
     <div class="sec"><h2>Per kategori</h2><button data-act="cats">Atur anggaran</button></div>
-    <div class="card">${catRows(byCategory(mon), true)}</div>
-    <div class="sec"><h2>Catatan terakhir</h2><button data-go="riwayat">Riwayat</button></div>
-    <div class="card">${recent.length ? recent.map(receiptRow).join('') : '<div class="empty">Belum ada catatan. Tekan tombol + untuk mencatat dari nota.</div>'}</div>`;
+    <div class="glass">${gauge(map, spent, short(spent), 'Terpakai', Math.round(used * 100) + '% anggaran')}<div style="margin-top:10px">${legendRows(map, spent, true)}</div></div>
+    <div class="sec"><h2>Catatan terakhir</h2>${allN ? `<button data-act="all">Lihat semua (${allN})</button>` : ''}</div>
+    <div class="glass tight">${ents.length ? ents.map(entryRow).join('') : '<div class="empty">Belum ada catatan. Tekan tombol + untuk mencatat.</div>'}</div>`;
 }
 function renderDompet() {
   const W = S.config.wallets, moves = S.config.moves.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 30);
-  $('dompet').innerHTML = `<h1 class="title">Dompet</h1>
-    <div class="card pad" style="margin-top:12px"><small style="font-size:12.5px;color:var(--muted);font-weight:600">Uang di dompet</small><div style="font-size:28px;font-weight:900;letter-spacing:-0.03em" class="num">${rp(walletsTotal())}</div><div class="hint" style="margin:2px 0 0">Uang yang benar-benar ada. Berbeda dengan sisa anggaran, yang dihitung dari anggaran bulan ini.</div></div>
-    <div class="card" style="margin-top:10px">${W.length ? W.map(w => `<button class="row" data-wallet="${w.id}"><span class="ico">${svg('wallet')}</span><span class="grow"><span class="t1">${esc(w.name)}</span><span class="t2">Terpakai bulan ini ${rp(total(inMonth(curMonth()).filter(r => r.wallet === w.id)))}</span></span><span class="amt num">${rp(walletBal(w.id))}</span></button>`).join('') : '<div class="empty">Belum ada dompet. Contoh: Tunai, BCA, GoPay.</div>'}</div>
-    <div class="tools">
-      <button class="tool main" data-act="money-in">${svg('plus', 2.4)}Isi uang</button>
-      <button class="tool" data-act="money-move">${svg('swap')}Pindah</button>
-      <button class="tool" data-act="adjust">${svg('scale')}Sesuaikan</button>
-    </div>
-    <button class="btn" style="width:100%;margin-top:10px" data-act="wallet-new">${svg('wallet')} Tambah dompet</button>
-    ${moves.length ? `<div class="sec"><h2>Uang masuk, pindah &amp; penyesuaian</h2></div><div class="card">${moves.map(mv => `<div class="row"><span class="grow"><span class="t1">${esc(mv.note || (mv.type === 'in' ? 'Uang belanja masuk' : mv.type === 'adjust' ? 'Penyesuaian saldo' : 'Pindah uang'))}</span><span class="t2">${esc([mv.type === 'transfer' ? walletName(mv.wallet) + ' ke ' + walletName(mv.to) : walletName(mv.wallet), dShort(mv.date), mv.admin ? 'admin ' + rp(mv.admin) : '', mv.by].filter(Boolean).join(', '))}</span></span><span class="amt num ${mv.type === 'in' || (mv.type === 'adjust' && mv.amount > 0) ? 'pos' : ''}">${mv.type === 'in' || (mv.type === 'adjust' && mv.amount > 0) ? '+' : ''}${rp(mv.amount)}</span><button class="xbtn" data-delmove="${mv.id}" aria-label="Hapus catatan uang">${svg('trash')}</button></div>`).join('')}</div>` : ''}`;
+  const wic = (col, ic) => `<span class="ico sm" style="background:${col}">${svg(ic)}</span>`;
+  const WC = ['#F59E0B', '#3B7BF6', '#0EA5A0', '#E8448F', '#5E9E12', '#B7743F'];
+  $('dompet').innerHTML = `
+    <div class="bignum" style="margin-top:6px"><small class="cap">Uang di dompet</small><b class="num"><small>Rp</small>${fmt(walletsTotal())}</b><span>Uang yang benar-benar ada, beda dengan sisa anggaran</span></div>
+    <div class="tools"><button class="tool main" data-act="money-in">${svg('plus', 2.4)}Isi uang</button><button class="tool" data-act="money-move">${svg('swap')}Pindah</button><button class="tool" data-act="adjust">${svg('scale')}Sesuaikan</button></div>
+    <div class="sec"><h2>Dompet</h2><button data-act="wallet-new">+ Tambah dompet</button></div>
+    <div class="glass tight">${W.length ? W.map((w, i) => `<button class="row" data-wallet="${w.id}">${wic(WC[i % WC.length], 'wallet')}<span class="grow"><span class="t1">${esc(w.name)}</span><span class="t2">Terpakai bulan ini Rp ${fmt(total(inMonth(curMonth()).filter(r => r.wallet === w.id)))}</span></span><span class="amt num">Rp ${fmt(walletBal(w.id))}</span></button>`).join('') : '<div class="empty">Belum ada dompet. Contoh: Tunai, BCA, GoPay.</div>'}</div>
+    ${W.length ? '<p class="hint" style="margin:-4px 4px 0">Ketuk dompet untuk riwayat, ubah, atau sesuaikan saldo.</p>' : ''}
+    ${moves.length ? `<div class="sec"><h2>Uang masuk, pindah &amp; penyesuaian</h2></div><div class="glass tight">${moves.map(mv => { const pos = mv.type === 'in' || (mv.type === 'adjust' && mv.amount > 0); return `<div class="row">${wic(mv.type === 'in' ? '#0F8A62' : mv.type === 'adjust' ? '#F59E0B' : '#6B6259', mv.type === 'in' ? 'plus' : mv.type === 'adjust' ? 'scale' : 'swap')}<span class="grow"><span class="t1">${esc(mv.note || (mv.type === 'in' ? 'Uang belanja masuk' : mv.type === 'adjust' ? 'Penyesuaian saldo' : 'Pindah uang'))}</span><span class="t2">${esc([mv.type === 'transfer' ? walletName(mv.wallet) + ' ke ' + walletName(mv.to) : walletName(mv.wallet), dShort(mv.date), mv.admin ? 'admin Rp ' + fmt(mv.admin) : '', mv.by].filter(Boolean).join(', '))}</span></span><span class="amt num ${pos ? 'pos' : ''}">${pos ? '+' : mv.type === 'adjust' ? '−' : ''}Rp ${fmt(mv.amount)}</span><button class="xbtn" data-delmove="${mv.id}" aria-label="Hapus catatan uang">${svg('trash')}</button></div>`; }).join('')}</div>` : ''}`;
 }
-let rMode = 'month', rMonth = null, rYear = null;
+let rMode = 'month', rMonth = null, rYear = null, chartMode = 'week';
+const firstMonth = () => { const ms = S.receipts.map(r => r.month).sort(); return ms[0] || curMonth(); };
 function monthWeeks(m) {
   const first = m + '-01', last = m + '-' + pad2(daysIn(m)); let s = weekStart(first); const out = [];
   while (s <= last) { const e = isoAdd(s, 6); const a = s < first ? first : s, b = e > last ? last : e; out.push({ a, b, label: a === b ? String(Number(a.slice(8))) : Number(a.slice(8)) + '–' + Number(b.slice(8)) }); s = isoAdd(s, 7); }
   return out;
 }
-const firstMonth = () => { const ms = S.receipts.map(r => r.month).sort(); return ms[0] || curMonth(); };
 function renderRiwayat() {
   const cm = curMonth(), cy = cm.slice(0, 4);
   if (!rMonth || rMonth > cm) rMonth = cm; if (!rYear || rYear > cy) rYear = cy;
-  let h = `<h1 class="title">Riwayat</h1><div class="seg" style="margin-top:12px"><button aria-pressed="${rMode === 'month'}" data-rmode="month">Bulanan</button><button aria-pressed="${rMode === 'year'}" data-rmode="year">Tahunan</button></div>`;
+  let h = `<div class="seg"><button aria-pressed="${rMode === 'month'}" data-rmode="month">Bulanan</button><button aria-pressed="${rMode === 'year'}" data-rmode="year">Tahunan</button></div>`;
+  const wal = list => { const w = byWallet(list), adm = sum(list, r => r.admin), keys = Object.keys(w).sort((a, b) => w[b] - w[a]); return keys.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="glass tight">${keys.map((k, i) => `<div class="row"><span class="ico sm" style="background:${['#F59E0B', '#3B7BF6', '#0EA5A0', '#E8448F', '#5E9E12'][i % 5]}">${svg('wallet')}</span><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">Rp ${fmt(w[k])}</span></div>`).join('')}${adm ? `<div class="row"><span class="ico sm" style="background:#8A8277">${svg('receipt')}</span><span class="grow"><span class="t1">Biaya admin</span><span class="t2">sudah termasuk di atas</span></span><span class="amt num">Rp ${fmt(adm)}</span></div>` : ''}</div>` : ''; };
   if (rMode === 'month') {
     const m = rMonth, isNow = m === cm, list = inMonth(m), spent = total(list), b = S.config.budget;
-    const weeks = monthWeeks(m).map(w => ({ ...w, v: total(inRange(w.a, w.b)) })), wmax = Math.max(1, ...weeks.map(w => w.v));
-    const wal = byWallet(list), walRows = Object.keys(wal).sort((x, y) => wal[y] - wal[x]);
-    const groups = {}; list.slice().sort((x, y) => (y.date + y.createdAt).localeCompare(x.date + x.createdAt)).forEach(r => { (groups[r.date] = groups[r.date] || []).push(r); });
+    if (!isNow) chartMode = 'month';
+    const ws = weekStart(todayISO()), lw = isoAdd(ws, -7);
+    let pts, cap, val, tag = '';
+    if (chartMode === 'week') { pts = weekPoints(ws); cap = dShort(ws) + ' – ' + dShort(isoAdd(ws, 6)); val = total(inRange(ws, isoAdd(ws, 6))); }
+    else if (chartMode === 'lastweek') { pts = HARI3.map((l, i) => { const d = isoAdd(lw, i); return { l, v: total(inRange(d, d)) }; }); cap = dShort(lw) + ' – ' + dShort(isoAdd(lw, 6)); val = total(inRange(lw, isoAdd(lw, 6))); }
+    else { pts = monthPoints(m); cap = mLabel(m); val = spent; }
+    if (chartMode !== 'month') { const wb = weekBudget(m), d = Math.round((val / (wb || 1) - 1) * 100); tag = `<span class="${d > 0 ? 'tag-bad' : 'tag-good'}">${d > 0 ? '+' : '−'}${Math.abs(d)}% dari batas</span>`; }
+    else { const d = Math.round(spent / (b || 1) * 100); tag = `<span class="${spent > b ? 'tag-bad' : 'tag-good'}">${d}% anggaran</span>`; }
+    const top = topItems(list, 5), ents = entriesOf(list);
     h += `<div class="mnav"><button class="mbtn" data-rm="-1" aria-label="Bulan sebelumnya" ${m <= firstMonth() ? 'disabled' : ''}>${svg('left', 2.4)}</button><button class="mlabel" data-pick="month">${mLabel(m)}${isNow ? '<span class="now">Bulan ini</span>' : ''}</button><button class="mbtn" data-rm="1" aria-label="Bulan berikutnya" ${isNow ? 'disabled' : ''}>${svg('right', 2.4)}</button></div>
-      ${isNow ? '' : `<div class="note-bar"><span>Melihat bulan lalu</span><button data-rm="now">Kembali ke bulan ini</button></div>`}
-      <div class="card pad" style="margin-top:10px"><div class="stats" style="margin-top:0"><div class="stat" style="background:var(--paper)"><small>Terpakai</small><b class="num">${short(spent)}</b></div><div class="stat" style="background:var(--paper)"><small>Anggaran</small><b class="num">${short(b)}</b></div><div class="stat" style="background:${b - spent < 0 ? 'var(--coral-soft)' : 'var(--paper)'}"><small>${b - spent < 0 ? 'Lewat' : 'Sisa'}</small><b class="num">${short(b - spent)}</b></div></div>
-        <div style="margin-top:12px;display:flex;justify-content:space-between;font-size:14.5px"><span style="font-weight:700">Total ${mLabel(m)}</span><b class="num">${rp(spent)}</b></div></div>
-      <div class="sec"><h2>Per minggu</h2><span>Senin–Minggu</span></div>
-      <div class="card pad"><div class="bars" style="grid-template-columns:repeat(${weeks.length},minmax(0,1fr))">${weeks.map(w => `<div class="b"><em class="num">${w.v ? short(w.v) : '–'}</em><i style="height:${Math.round(w.v / wmax * 86)}px"></i><span>${w.label}</span></div>`).join('')}</div></div>
-      <div class="sec"><h2>Per kategori</h2></div><div class="card">${catRows(byCategory(list), true)}</div>
-      ${walRows.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="card">${walRows.map(k => `<div class="row"><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">${rp(wal[k])}</span></div>`).join('')}</div>` : ''}
-      ${list.length ? `<div class="sec"><h2>Paling banyak</h2><span>${list.length} nota</span></div><div class="card">${topItems(list, 8).map(x => `<div class="row"><span class="grow"><span class="t1">${esc(x.n)}</span><span class="t2">${esc(catName(x.c))}${x.k > 1 ? ', ' + x.k + ' kali' : ''}</span></span><span class="amt num">${rp(x.v)}</span></div>`).join('')}</div>` : ''}
+      <div class="bignum"><small class="cap">Terpakai ${BULAN[Number(m.slice(5)) - 1]}</small><b class="num"><small>Rp</small>${fmt(spent)}</b></div>
+      <div class="glass stats"><div class="stat"><small>Anggaran</small><b class="num">${short(b)}</b></div><div class="stat"><small>Terpakai</small><b class="num">${pc(spent, b)}%</b></div><div class="stat"><small>${b - spent < 0 ? 'Lewat' : 'Sisa'}</small><b class="num" style="color:${b - spent < 0 ? '#DC2626' : '#0F8A62'}">${short(b - spent)}</b></div></div>
+      <div class="glass">${isNow ? `<div class="pills">${[['week', 'Minggu ini'], ['lastweek', 'Minggu lalu'], ['month', 'Bulan ini']].map(([k, n]) => `<button aria-pressed="${chartMode === k}" data-chart="${k}">${n}</button>`).join('')}</div>` : ''}
+        <div style="margin-top:${isNow ? 14 : 0}px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px"><div><div class="t2" style="font-weight:600">${cap}</div><div style="font-size:26px;font-weight:800;letter-spacing:-0.02em" class="num">Rp ${fmt(val)}</div></div>${tag}</div>
+        ${areaChart(pts)}</div>
+      <div class="sec"><h2>Per kategori</h2></div><div class="glass">${gauge(byCategory(list), spent, short(spent), 'Terpakai', '')}<div style="margin-top:10px">${legendRows(byCategory(list), spent, true)}</div></div>
+      ${wal(list)}
+      ${top.length ? `<div class="sec"><h2>Paling banyak</h2><span>${ents.length} transaksi</span></div><div class="glass tight">${top.map(x => `<div class="row">${catIco(x.c, true)}<span class="grow"><span class="t1">${esc(x.n)}</span><span class="t2">${esc(catName(x.c))}, ${x.k} kali</span></span><span class="amt num">Rp ${fmt(x.v)}</span></div>`).join('')}</div>` : ''}
       <div class="btns2"><button class="btn main" data-act="mail">${svg('mail')} Kirim ke email</button><button class="btn" data-act="share">${svg('share')} Bagikan</button></div>
-      ${Object.keys(groups).length ? Object.keys(groups).map(d => `<div class="day"><span>${dLong(d)}</span><span class="num">${rp(total(groups[d]))}</span></div><div class="card">${groups[d].map(receiptRow).join('')}</div>`).join('') : '<div class="card" style="margin-top:14px"><div class="empty">Belum ada catatan di bulan ini.</div></div>'}`;
+      <div class="sec"><h2>Transaksi</h2>${ents.length ? `<button data-act="all-month">Lihat semua &amp; filter</button>` : ''}</div>
+      <div class="glass tight">${ents.length ? ents.slice(0, 10).map(entryRow).join('') : '<div class="empty">Belum ada catatan di bulan ini.</div>'}</div>`;
   } else {
     const y = rYear, list = inYear(y), spent = total(list);
     const months = Array.from({ length: 12 }, (_, i) => { const m = y + '-' + pad2(i + 1); return { m, v: total(inMonth(m)) }; });
-    const mmax = Math.max(1, ...months.map(x => x.v)), active = months.filter(x => x.v > 0).length;
-    const wal = byWallet(list), walRows = Object.keys(wal).sort((a, b) => wal[b] - wal[a]);
+    const mx = Math.max(1, ...months.map(x => x.v)), active = months.filter(x => x.v > 0).length;
     h += `<div class="mnav"><button class="mbtn" data-ry="-1" aria-label="Tahun sebelumnya" ${y <= firstMonth().slice(0, 4) ? 'disabled' : ''}>${svg('left', 2.4)}</button><button class="mlabel" data-pick="year">${y}${y === cy ? '<span class="now">Tahun ini</span>' : ''}</button><button class="mbtn" data-ry="1" aria-label="Tahun berikutnya" ${y === cy ? 'disabled' : ''}>${svg('right', 2.4)}</button></div>
-      <div class="card pad" style="margin-top:10px"><small style="font-size:12.5px;color:var(--muted);font-weight:600">Total belanja ${y}</small><div style="font-size:28px;font-weight:900;letter-spacing:-0.03em" class="num">${rp(spent)}</div><div class="hint" style="margin:0">Rata-rata ${rp(active ? spent / active : 0)} per bulan</div>
-        <div class="bars" style="grid-template-columns:repeat(12,minmax(0,1fr));gap:4px">${months.map((x, i) => `<button class="b" data-openm="${x.m}" aria-label="${BULAN[i]} ${y}"><i class="${x.m === curMonth() ? '' : 'dim'}" style="height:${Math.round(x.v / mmax * 86)}px"></i><span>${BULAN[i].slice(0, 1)}</span></button>`).join('')}</div></div>
-      <div class="sec"><h2>Per kategori</h2></div><div class="card">${catRows(byCategory(list), false)}</div>
-      ${walRows.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="card">${walRows.map(k => `<div class="row"><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">${rp(wal[k])}</span></div>`).join('')}</div>` : ''}
+      <div class="bignum"><small class="cap">Total belanja ${y}</small><b class="num"><small>Rp</small>${fmt(spent)}</b><span>Rata-rata Rp ${fmt(active ? spent / active : 0)} per bulan</span></div>
+      <div class="glass"><div style="display:flex;justify-content:space-between;align-items:baseline"><b style="font-size:15px">Per bulan</b><span class="t2">Ketuk bulan untuk detail</span></div>
+        <div class="ybars">${months.map((x, i) => `<button data-openm="${x.m}" aria-label="${BULAN[i]} ${y}"><em class="num">${x.v ? short(x.v) : ''}</em><i style="height:${Math.max(6, x.v / mx * 96)}px;background:${x.m === cm ? 'var(--grad)' : x.v ? 'linear-gradient(180deg,#A9C3FF,#DCE6FF)' : 'rgba(22,18,15,0.06)'}"></i><span>${BULAN[i].slice(0, 1)}</span></button>`).join('')}</div></div>
+      <div class="sec"><h2>Per kategori</h2></div><div class="glass">${gauge(byCategory(list), spent, short(spent), 'Total ' + y, '')}<div style="margin-top:10px">${legendRows(byCategory(list), spent, false)}</div></div>
+      ${wal(list)}
       <div class="btns2"><button class="btn main" data-act="mail-year">${svg('mail')} Kirim ke email</button><button class="btn" data-act="share-year">${svg('share')} Bagikan</button></div>`;
   }
   $('riwayat').innerHTML = h;
 }
-function render() { invalidate(); status(); renderHome(); renderDompet(); renderRiwayat(); }
+function render() { invalidate(); status(); header(curPage); renderHome(); renderDompet(); renderRiwayat(); renderLainnya(); if (curPage === 'semua') renderSemua(); }
+let curPage = 'home';
 function go(id) {
+  curPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.toggle('on', p.id === id));
-  document.querySelectorAll('.nav .tab[data-go]').forEach(b => b.dataset.go === id ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
-  try { localStorage.setItem(TAB_KEY, id); } catch (e) {}
+  document.querySelectorAll('.nav .tab[data-go]').forEach(b => b.dataset.go === (id === 'semua' ? 'riwayat' : id) ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  if (id !== 'semua') { try { localStorage.setItem(TAB_KEY, id); } catch (e) {} }
+  header(id); if (id === 'semua') renderSemua();
   window.scrollTo({ top: 0 });
 }
 let toastT, undoFn = null;
@@ -681,19 +826,18 @@ $('toast').addEventListener('click', e => { if (e.target.id === 't-undo' && undo
 // ================= Lembar (sheet) =================
 function fitScrim() { const v = window.visualViewport, s = $('scrim'); const h = v ? v.height : innerHeight, top = v ? v.offsetTop : 0; s.style.top = top + 'px'; s.style.height = h + 'px'; $('sheet').style.maxHeight = (h - 20) + 'px'; }
 if (window.visualViewport) { visualViewport.addEventListener('resize', fitScrim); visualViewport.addEventListener('scroll', fitScrim); }
-function openSheet(title, body, mount, back) {
-  $('sheet').innerHTML = `<div class="grip" aria-hidden="true"></div><div class="sh-head">${back ? `<button class="xbtn" id="sh-back" aria-label="Kembali">${svg('left', 2.6)}</button>` : ''}<h3>${esc(title)}</h3><button class="xbtn" id="sh-x" aria-label="Tutup">${svg('x', 2.6)}</button></div>${body}`;
+function openSheet(title, body, mount, back, flush) {
+  const sh = $('sheet'); sh.className = 'sheet' + (flush ? ' flush' : '');
+  sh.innerHTML = flush ? body : `<div class="grip" aria-hidden="true"></div><div class="sh-head">${back ? `<button class="xbtn" id="sh-back" aria-label="Kembali">${svg('left', 2.6)}</button>` : ''}<h3>${esc(title)}</h3><button class="xbtn" id="sh-x" aria-label="Tutup">${svg('x', 2.6)}</button></div>${body}`;
   $('scrim').hidden = false; fitScrim();
-  $('sh-x').onclick = closeSheet; if (back) $('sh-back').onclick = back;
-  if (mount) mount($('sheet'));
+  const x = $('sh-x'); if (x) x.onclick = closeSheet; const bk = $('sh-back'); if (bk && back) bk.onclick = back;
+  if (mount) mount(sh);
 }
 const closeSheet = () => { $('scrim').hidden = true; $('sheet').innerHTML = ''; };
 $('scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeSheet(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('scrim').hidden) closeSheet(); });
 function bindMoney(input, cb) { input.addEventListener('input', () => { const d = input.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 12); input.value = d ? nf.format(Number(d)) : ''; cb && cb(Number(d) || 0); }); }
 const moneyIn = (id, val, label) => `<div class="money"><span>Rp</span><input class="in num" id="${id}" inputmode="numeric" autocomplete="off" placeholder="0" value="${val ? nf.format(val) : ''}" ${label ? `aria-label="${label}"` : ''}></div>`;
-const walletOptions = (sel, none) => (none ? `<option value="">Tanpa dompet</option>` : '') + S.config.wallets.map(w => `<option value="${w.id}" ${w.id === sel ? 'selected' : ''}>${esc(w.name)}, saldo ${rp(walletBal(w.id))}</option>`).join('');
-const catOptions = sel => cats().map(c => `<option value="${c.id}" ${c.id === sel ? 'selected' : ''}>${esc(c.name)}</option>`).join('');
 function dateChips(cur) {
   const t = todayISO(), y = isoAdd(t, -1), v = cur === t ? 't' : cur === y ? 'y' : 'o';
   return `<div class="chips" data-dates>${[['t', 'Hari ini'], ['y', 'Kemarin'], ['o', 'Tanggal lain']].map(([k, n]) => `<button class="chip" aria-pressed="${k === v}" data-d="${k}">${n}</button>`).join('')}</div><input type="date" class="in" id="f-date" style="margin-top:8px" max="${t}" value="${cur}" ${v === 'o' ? '' : 'hidden'} aria-label="Tanggal">`;
@@ -748,47 +892,70 @@ function openReceipt(id) {
   });
 }
 function openEntry(init, back) {
-  const ed = init.rid ? S.receipts.find(x => x.id === init.rid) : null, line = ed ? ed.lines[init.li || 0] : null;
+  const ed = init.rid ? S.receipts.find(x => x.id === init.rid) : null, line = ed ? ed.lines[init.li || 0] : null, multi = ed && ed.lines.length > 1;
   const f = {
-    kind: init.kind || 'buy', amount: line ? line.p : 0, cat: line ? line.c : lastCat(), name: line ? line.n : '', manual: true,
-    wallet: ed ? ed.wallet : lastWallet(), to: '', date: ed ? ed.date : todayISO(), admin: ed && ed.lines.length === 1 ? ed.admin : 0, note: ''
+    kind: init.kind || 'buy', amount: line ? line.p : 0, cat: line ? line.c : lastCat(), name: line ? line.n : '',
+    wallet: ed ? ed.wallet : lastWallet(), to: '', date: ed ? ed.date : todayISO(), admin: ed && !multi ? ed.admin : 0, note: '', panel: ''
   };
   f.showAdmin = !!f.admin;
   f.to = (S.config.wallets.find(w => w.id !== f.wallet) || {}).id || '';
-  if (line) f.manual = !nameItems(f.cat).some(x => x.v === f.name);
   let focusAmt = !ed;
+  const suggs = () => {
+    if (!sIdx) sIdx = suggestIndex();
+    const q = nameKey(f.name || '');
+    let list = Object.values(sIdx);
+    list = q ? list.filter(x => nameKey(x.n).includes(q) && nameKey(x.n) !== q) : list.filter(x => x.c === f.cat);
+    return list.sort((a, b) => (q ? (nameKey(b.n).startsWith(q) - nameKey(a.n).startsWith(q)) : 0) || (b.cnt || 0) - (a.cnt || 0) || (b.d || '').localeCompare(a.d || '')).slice(0, 8);
+  };
+  const suggHtml = () => { const l = suggs(); return l.length ? `<div class="t2" style="margin-top:10px;font-weight:700">${f.name ? 'Saran' : 'Rekomendasi ' + esc(catName(f.cat))}</div><div class="chips" style="margin-top:6px">${l.map((x, i) => `<button type="button" class="chip sg" data-sg="${i}">${esc(x.n)}${x.p ? `<span style="opacity:.7;font-weight:600;margin-left:6px">${short(x.p)}</span>` : ''}</button>`).join('')}</div>` : ''; };
   const draw = () => {
-    const k = f.kind, noW = !S.config.wallets.length;
-    let body = ed ? '' : `<div class="seg3" role="group" aria-label="Jenis catatan">${[['buy', 'Belanja'], ['in', 'Isi uang'], ['transfer', 'Pindah']].map(([id, n]) => `<button type="button" aria-pressed="${k === id}" data-kind="${id}">${n}</button>`).join('')}</div>`;
-    body += `<span class="lbl">Jumlah</span><div class="money big"><span>Rp</span><input class="in num" id="e-amt" inputmode="numeric" autocomplete="off" placeholder="0" value="${f.amount ? nf.format(f.amount) : ''}" aria-label="Jumlah"></div>`;
+    const k = f.kind, noW = !S.config.wallets.length, tot0 = (f.amount || 0) + (k === 'buy' && f.showAdmin ? f.admin || 0 : 0);
+    let top = `<div class="etop"><div class="grip light" aria-hidden="true"></div><div class="etop-h">${back ? `<button class="xbtn light" id="e-back" aria-label="Kembali">${svg('left', 2.6)}</button>` : ''}<h3>${ed ? 'Ubah catatan' : 'Catat'}</h3><button class="xbtn light" id="e-x" aria-label="Tutup">${svg('x', 2.6)}</button></div>`;
+    if (!ed) top += `<div class="seg3 onblue" role="group" aria-label="Jenis catatan">${[['buy', 'Belanja'], ['in', 'Isi uang'], ['transfer', 'Pindah']].map(([id, n]) => `<button type="button" aria-pressed="${k === id}" data-kind="${id}">${n}</button>`).join('')}</div>`;
+    top += `<label class="eamt"><span>Jumlah</span><div><small>Rp</small><input class="num" id="e-amt" inputmode="numeric" autocomplete="off" placeholder="0" value="${f.amount ? nf.format(f.amount) : ''}" aria-label="Jumlah"></div></label></div>`;
+    let body = '<div class="pad">';
     if (k === 'buy') {
-      body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div>${dd('cat', catItems(), f.cat)}`;
-      const ni = nameItems(f.cat);
-      body += `<span class="lbl">Keterangan</span>${dd('name', ni, f.manual ? '__manual' : f.name)}`;
-      if (f.manual) body += `<input class="in" id="e-name" style="margin-top:8px" value="${esc(f.name)}" placeholder="Contoh: Telur, Sabun cuci" autocomplete="off" aria-label="Nama barang" enterkeyhint="done">`;
-      body += S.config.wallets.length ? `<span class="lbl">Dibayar dari</span>${dd('wallet', walletItems(true), f.wallet)}` : '';
-      body += f.showAdmin || ed && ed.lines.length > 1 ? (ed && ed.lines.length > 1 ? '' : `<span class="lbl">Biaya admin (transfer, QRIS, ongkir)</span><div class="money"><span>Rp</span><input class="in num" id="e-admin" inputmode="numeric" placeholder="0" value="${f.admin ? nf.format(f.admin) : ''}" aria-label="Biaya admin"></div>`) : `<button type="button" class="link" id="e-showadmin" style="margin-top:12px">+ Biaya admin</button>`;
+      body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div><div class="cgrid">${cats().map(c => { const L = catLook(c.id), on = c.id === f.cat; return `<button type="button" data-cat="${c.id}" class="${on ? 'on' : ''}" aria-pressed="${on}" style="${on ? `background:linear-gradient(135deg,${L.c2},${L.c1})` : ''}"><span style="color:${on ? '#fff' : L.c1}">${svg(L.icon, 2.1)}</span>${esc(c.name.split(' & ')[0])}</button>`; }).join('')}</div>`;
+      body += `<span class="lbl">Keterangan</span><input class="in" id="e-name" value="${esc(f.name)}" placeholder="Ketik nama barang, contoh: Telur" autocomplete="off" aria-label="Nama barang" enterkeyhint="done"><div id="e-sugg">${suggHtml()}</div>`;
+      if (S.config.wallets.length) {
+        const dl = f.date === todayISO() ? 'Hari ini' : f.date === isoAdd(todayISO(), -1) ? 'Kemarin' : dShort(f.date);
+        body += `<div class="tiles"><button type="button" class="tile" id="e-tw" aria-expanded="${f.panel === 'w'}"><small>Dibayar dari</small><b>${esc(walletName(f.wallet) || 'Tanpa dompet')}</b>${f.wallet ? `<em>Saldo ${short(walletBal(f.wallet))}</em>` : ''}</button><button type="button" class="tile" id="e-td" aria-expanded="${f.panel === 'd'}"><small>Tanggal</small><b>${dl}</b></button></div>`;
+        if (f.panel === 'w') body += `<div class="dd-panel" style="margin-top:8px">${walletItems(true).map(w => `<button type="button" class="dd-opt" data-w="${w.v}" aria-selected="${w.v === f.wallet}"><span class="dd-ic">${svg('wallet')}</span><span class="grow"><span class="t1">${esc(w.t)}</span>${w.s ? `<span class="t2">${esc(w.s)}</span>` : ''}</span>${w.v === f.wallet ? `<span class="dd-ok">${svg('check', 2.6)}</span>` : ''}</button>`).join('')}</div>`;
+        if (f.panel === 'd') body += `<div style="margin-top:10px">${dateChips(f.date)}</div>`;
+      } else body += `<span class="lbl">Tanggal</span>${dateChips(f.date)}`;
+      body += multi ? '' : f.showAdmin ? `<span class="lbl">Biaya admin (transfer, QRIS, ongkir)</span><div class="money"><span>Rp</span><input class="in num" id="e-admin" inputmode="numeric" placeholder="0" value="${f.admin ? nf.format(f.admin) : ''}" aria-label="Biaya admin"></div>` : `<button type="button" class="link" id="e-showadmin" style="margin-top:12px">+ Biaya admin</button>`;
     } else if (noW) {
-      body += `<div class="card pad" style="margin-top:14px;background:var(--paper);text-align:center"><b>Belum ada dompet</b><p class="hint">Tambahkan dompet dulu, contoh: Tunai, BCA, GoPay.</p><button class="btn main" style="width:100%;margin-top:8px" id="e-newwallet">Tambah dompet</button></div>`;
+      body += `<div class="glass" style="margin-top:14px;text-align:center"><b>Belum ada dompet</b><p class="hint">Tambahkan dompet dulu, contoh: Tunai, BCA, GoPay.</p><button class="btn main" style="width:100%;margin-top:8px" id="e-newwallet">Tambah dompet</button></div>`;
     } else if (k === 'in') {
-      body += `<span class="lbl">Masuk ke</span>${dd('wallet', walletItems(false), f.wallet)}<span class="lbl">Keterangan (boleh kosong)</span><input class="in" id="e-note" value="${esc(f.note)}" placeholder="Contoh: uang belanja bulan ini">`;
+      body += `<span class="lbl">Masuk ke</span>${dd('wallet', walletItems(false), f.wallet)}<span class="lbl">Keterangan (boleh kosong)</span><input class="in" id="e-note" value="${esc(f.note)}" placeholder="Contoh: uang belanja bulan ini"><span class="lbl">Tanggal</span>${dateChips(f.date)}`;
     } else {
       body += `<span class="lbl">Dari</span>${dd('wallet', walletItems(false), f.wallet)}<span class="lbl">Ke</span>${dd('to', walletItems(false), f.to)}
         <span class="lbl">Biaya admin (kalau ada)</span><div class="money"><span>Rp</span><input class="in num" id="e-admin" inputmode="numeric" placeholder="0" value="${f.admin ? nf.format(f.admin) : ''}" aria-label="Biaya admin"></div>
-        <span class="lbl">Keterangan (boleh kosong)</span><input class="in" id="e-note" value="${esc(f.note)}" placeholder="Contoh: tarik tunai">`;
+        <span class="lbl">Keterangan (boleh kosong)</span><input class="in" id="e-note" value="${esc(f.note)}" placeholder="Contoh: tarik tunai"><span class="lbl">Tanggal</span>${dateChips(f.date)}`;
     }
     if (!(k !== 'buy' && noW)) {
-      body += `<span class="lbl">Tanggal</span>${dateChips(f.date)}<p class="err" id="e-err" hidden></p>`;
-      body += ed ? `<button class="save" id="e-save">Simpan perubahan</button><button class="del" id="e-del">${ed.lines.length > 1 ? 'Hapus barang ini' : 'Hapus catatan'}</button>`
-        : `<button class="save" id="e-save">Simpan</button>`;
+      body += `<p class="err" id="e-err" hidden></p><button class="save" id="e-save">${ed ? 'Simpan perubahan' : 'Simpan'}<span id="e-tot">${tot0 ? ' Rp ' + fmt(tot0) : ''}</span></button>`;
+      if (ed) body += `<button class="del" id="e-del">${multi ? 'Hapus barang ini' : 'Hapus catatan'}</button>`;
     }
-    openSheet(ed ? 'Ubah catatan' : 'Catat', body, root => {
+    body += '</div>';
+    openSheet('', top + body, root => {
       const keep = () => { const n = root.querySelector('#e-name'); if (n) f.name = n.value; const nt = root.querySelector('#e-note'); if (nt) f.note = nt.value; };
-      root.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => { keep(); f.kind = b.dataset.kind; if (f.kind === 'transfer' && f.to === f.wallet) f.to = (S.config.wallets.find(w => w.id !== f.wallet) || {}).id || ''; draw(); });
-      bindMoney(root.querySelector('#e-amt'), v => { f.amount = v; });
-      const ad = root.querySelector('#e-admin'); if (ad) bindMoney(ad, v => { f.admin = v; });
-      bindDD(root, 'cat', v => { keep(); f.cat = v; try { localStorage.setItem(CAT_KEY, v); } catch (e) {} if (!f.manual) { f.manual = true; f.name = ''; } draw(); });
-      bindDD(root, 'name', v => { keep(); if (v === '__manual') { f.manual = true; draw(); setTimeout(() => { const n = root.querySelector('#e-name'); n && n.focus(); }, 40); return; } f.manual = false; f.name = v; const last = lastFor(v); if (!f.amount && last && last.p) f.amount = last.p; draw(); });
+      const updTot = () => { const t = (f.amount || 0) + (f.kind === 'buy' && f.showAdmin ? f.admin || 0 : 0); const el = root.querySelector('#e-tot'); if (el) el.textContent = t ? ' Rp ' + fmt(t) : ''; };
+      root.querySelector('#e-x').onclick = closeSheet; const bk = root.querySelector('#e-back'); if (bk) bk.onclick = back;
+      root.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => { keep(); f.kind = b.dataset.kind; f.panel = ''; if (f.kind === 'transfer' && f.to === f.wallet) f.to = (S.config.wallets.find(w => w.id !== f.wallet) || {}).id || ''; draw(); });
+      bindMoney(root.querySelector('#e-amt'), v => { f.amount = v; updTot(); });
+      const ad = root.querySelector('#e-admin'); if (ad) bindMoney(ad, v => { f.admin = v; updTot(); });
+      root.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { keep(); f.cat = b.dataset.cat; try { localStorage.setItem(CAT_KEY, f.cat); } catch (e) {} draw(); });
+      const nIn = root.querySelector('#e-name');
+      if (nIn) {
+        nIn.addEventListener('input', () => { f.name = nIn.value; root.querySelector('#e-sugg').innerHTML = suggHtml(); bindSugg(); });
+        nIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nIn.blur(); } });
+      }
+      const bindSugg = () => { const l = suggs(); root.querySelectorAll('[data-sg]').forEach(b => b.onclick = () => { const x = l[Number(b.dataset.sg)]; keep(); f.name = x.n; f.cat = x.c; if (!f.amount && x.p) f.amount = x.p; draw(); }); };
+      bindSugg();
+      const tw = root.querySelector('#e-tw'); if (tw) tw.onclick = () => { keep(); f.panel = f.panel === 'w' ? '' : 'w'; draw(); };
+      const td = root.querySelector('#e-td'); if (td) td.onclick = () => { keep(); f.panel = f.panel === 'd' ? '' : 'd'; draw(); };
+      root.querySelectorAll('[data-w]').forEach(b => b.onclick = () => { keep(); f.wallet = b.dataset.w; f.panel = ''; draw(); });
       bindDD(root, 'wallet', v => { keep(); f.wallet = v; if (f.kind === 'transfer' && f.to === v) f.to = (S.config.wallets.find(w => w.id !== v) || {}).id || ''; draw(); });
       bindDD(root, 'to', v => { keep(); f.to = v; draw(); });
       const sa = root.querySelector('#e-showadmin'); if (sa) sa.onclick = () => { keep(); f.showAdmin = true; draw(); };
@@ -796,39 +963,33 @@ function openEntry(init, back) {
       const nw = root.querySelector('#e-newwallet'); if (nw) nw.onclick = () => { keep(); openWalletForm(null, () => { f.wallet = lastWallet(); f.to = (S.config.wallets.find(w => w.id !== f.wallet) || {}).id || ''; draw(); }); };
       if (root.querySelector('[data-dates]')) bindDates(root, f);
       const err = m => { const e = root.querySelector('#e-err'); e.textContent = m; e.hidden = false; };
-      const save = again => {
+      const sv = root.querySelector('#e-save');
+      if (sv) sv.onclick = () => {
         keep();
         if (!f.amount) return err('Isi jumlahnya dulu.');
         if (f.kind === 'buy') {
           const name = cleanName((f.name || '').trim()) || catName(f.cat);
-          let saved, before = ed ? clone(ed) : null;
-          if (ed) {
-            const lines = clone(ed.lines); lines[init.li || 0] = { n: name, p: f.amount, c: f.cat };
-            saved = putReceipt(Object.assign({}, ed, { lines, date: f.date, wallet: f.wallet, admin: ed.lines.length > 1 ? ed.admin : (f.showAdmin ? f.admin : 0) }));
-          } else saved = putReceipt({ id: uid('r'), date: f.date, lines: [{ n: name, p: f.amount, c: f.cat }], admin: f.showAdmin ? f.admin : 0, wallet: f.wallet, note: '', by: person(), createdAt: new Date().toISOString() });
+          let saved; const before = ed ? clone(ed) : null;
+          if (ed) { const lines = clone(ed.lines); lines[init.li || 0] = { n: name, p: f.amount, c: f.cat }; saved = putReceipt(Object.assign({}, ed, { lines, date: f.date, wallet: f.wallet, admin: multi ? ed.admin : (f.showAdmin ? f.admin : 0) })); }
+          else saved = putReceipt({ id: uid('r'), date: f.date, lines: [{ n: name, p: f.amount, c: f.cat }], admin: f.showAdmin ? f.admin : 0, wallet: f.wallet, note: '', by: person(), createdAt: new Date().toISOString() });
           if (f.wallet) rememberWallet(f.wallet); try { localStorage.setItem(CAT_KEY, f.cat); } catch (e) {}
           render();
           const left = S.config.budget - total(inMonth(curMonth()));
-          toast((ed ? 'Diperbarui' : name + ' ' + rp(saved.total) + ' tercatat') + '. Sisa anggaran ' + rp(left), () => { if (before) putReceipt(before); else delReceipt(saved.id); });
-          if (again) { f.amount = 0; f.name = ''; f.manual = true; f.admin = 0; f.showAdmin = false; focusAmt = true; draw(); return; }
-          if (back) return back();
-          return closeSheet();
+          toast((ed ? 'Diperbarui' : name + ' Rp ' + fmt(saved.total) + ' tercatat') + '. Sisa anggaran ' + rp(left), () => { if (before) putReceipt(before); else delReceipt(saved.id); });
+          return back ? back() : closeSheet();
         }
         if (f.kind === 'transfer' && f.wallet === f.to) return err('Pilih dompet tujuan yang berbeda.');
         const mv = { id: uid('m'), type: f.kind, amount: f.amount, admin: f.kind === 'transfer' ? f.admin : 0, wallet: f.wallet, to: f.kind === 'transfer' ? f.to : '', date: f.date, note: (f.note || '').trim(), by: person() };
         S.config.moves.push(mv); saveWallets(); rememberWallet(f.wallet); closeSheet(); render();
         toast(f.kind === 'in' ? rp(f.amount) + ' masuk ke ' + walletName(f.wallet) : rp(f.amount) + ' dipindah ke ' + walletName(f.to), () => { S.config.moves = S.config.moves.filter(x => x.id !== mv.id); saveWallets(); });
       };
-      const sv = root.querySelector('#e-save'); if (sv) sv.onclick = () => save(false);
-      const n = root.querySelector('#e-name'); if (n) n.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); n.blur(); } });
       if (ed) root.querySelector('#e-del').onclick = () => {
         const s = clone(ed);
-        if (ed.lines.length > 1) { const lines = ed.lines.filter((_, i) => i !== (init.li || 0)); putReceipt(Object.assign({}, ed, { lines })); }
-        else delReceipt(ed.id);
+        if (multi) putReceipt(Object.assign({}, ed, { lines: ed.lines.filter((_, i) => i !== (init.li || 0)) })); else delReceipt(ed.id);
         render(); toast('Dihapus', () => putReceipt(s)); back ? back() : closeSheet();
       };
-      if (focusAmt) { focusAmt = false; setTimeout(() => { const a = root.querySelector('#e-amt'); a && a.focus(); }, 60); }
-    }, back);
+      if (focusAmt) { focusAmt = false; setTimeout(() => { const a = root.querySelector('#e-amt'); a && a.focus(); }, 80); }
+    }, null, true);
   };
   draw();
 }
@@ -947,29 +1108,98 @@ function openCatForm(id, back) {
 }
 
 // ================= Pengaturan =================
-function openSettings() {
+function openSettings() { go('lainnya'); }
+function renderLainnya() {
+  const el = $('lainnya'); if (!el) return;
   const pinOn = !!getPin(), bioOn = !!(pinOn && getBio());
-  openSheet('Lainnya', `
-    <div class="setg"><div class="setr"><span class="ico dark">${svg('user')}</span><span class="grow"><span class="t1">${cloud.user ? esc(cloud.user.email) : 'Mode lokal'}</span><span class="t2">${cloud.user ? (person() || 'Keluarga') + ', tersinkron' : 'Data hanya di HP ini'}</span></span>${cloud.user ? '<button class="link" id="s-out">Keluar</button>' : '<button class="link" id="s-in">Masuk</button>'}</div></div>
-    <div class="setl">Anggaran</div><div class="setg">
-      <button class="setr" id="s-budget"><span class="grow"><span class="t1">Anggaran bulanan</span><span class="t2">${rp(S.config.budget)}</span></span>${svg('right', 2.4)}</button>
-      <button class="setr" id="s-cats"><span class="grow"><span class="t1">Kategori &amp; anggaran kategori</span><span class="t2">${cats().length} kategori</span></span>${svg('right', 2.4)}</button></div>
-    <div class="setl">Kunci di HP ini</div><div class="setg">
-      <button class="setr" id="s-pin"><span class="grow"><span class="t1">${pinOn ? 'Ganti PIN' : 'Pasang PIN'}</span><span class="t2">${pinOn ? 'Diminta saat Belanja Kita dibuka' : 'Kunci dengan 4 angka (opsional)'}</span></span>${svg('right', 2.4)}</button>
-      <button class="setr" id="s-bio" role="switch" aria-checked="${bioOn}" ${!pinOn || !bioAvail ? 'disabled style="opacity:.55"' : ''}><span class="grow"><span class="t1">Buka dengan sidik jari</span><span class="t2">${!bioAvail ? 'Tidak tersedia di HP atau browser ini' : !pinOn ? 'Pasang PIN dulu sebagai cadangan' : bioOn ? 'Aktif' : 'Pakai sidik jari Android'}</span></span><span class="sw"><i></i></span></button>
-      ${pinOn ? '<button class="setr" id="s-pinoff"><span class="grow t1">Matikan PIN</span></button>' : ''}</div>
-    <div class="setl">Data</div><div class="setg"><button class="setr" id="s-backup"><span class="ico">${svg('dl')}</span><span class="grow"><span class="t1">Unduh cadangan</span><span class="t2">Simpan semua catatan sebagai file</span></span></button></div>
-    <p class="hint" style="text-align:center;margin-top:16px">Belanja Kita versi ${APP_VERSION}</p>`, root => {
-    const back = () => openSettings();
-    const o = root.querySelector('#s-out'); if (o) o.onclick = () => { closeSheet(); signOut(); };
-    const i = root.querySelector('#s-in'); if (i) i.onclick = () => { closeSheet(); setMode('cloud'); showLogin(); };
-    root.querySelector('#s-budget').onclick = () => openBudget(back);
-    root.querySelector('#s-cats').onclick = () => openCats(back);
-    root.querySelector('#s-pin').onclick = () => { closeSheet(); startPin(pinOn ? 'change' : 'new'); };
-    root.querySelector('#s-bio').onclick = async () => { if (!pinOn || !bioAvail) return; if (getBio()) disableBio(); else await enableBio(); openSettings(); };
-    const off = root.querySelector('#s-pinoff'); if (off) off.onclick = () => { closeSheet(); startPin('off'); };
-    root.querySelector('#s-backup').onclick = downloadBackup;
-  });
+  const row = (id, ic, t, s, right) => `<button class="setr" id="${id}"><span class="ic">${svg(ic)}</span><span class="grow"><span class="t1">${t}</span>${s ? `<span class="t2">${s}</span>` : ''}</span>${right || svg('right', 2.4)}</button>`;
+  el.innerHTML = `
+    <div class="glass tight">${cloud.user ? row('s-out', 'user', esc(cloud.user.email), (person() || 'Keluarga') + ', tersinkron dengan keluarga', '<span class="link">Keluar</span>') : row('s-in', 'user', 'Mode lokal', 'Data hanya di HP ini', '<span class="link">Masuk</span>')}</div>
+    <div class="sec"><h2>Anggaran</h2></div>
+    <div class="glass tight">${row('s-budget', 'wallet', 'Anggaran bulanan', rp(S.config.budget))}${row('s-cats', 'tag', 'Kategori &amp; anggaran kategori', cats().length + ' kategori, tambah, ubah, hapus')}</div>
+    <div class="sec"><h2>Kunci di HP ini</h2></div>
+    <div class="glass tight">${row('s-pin', 'lock', pinOn ? 'Ganti PIN' : 'Pasang PIN', pinOn ? 'Diminta saat Belanja Kita dibuka' : 'Kunci dengan 4 angka (opsional)')}
+      <button class="setr" id="s-bio" role="switch" aria-checked="${bioOn}" ${!pinOn || !bioAvail ? 'disabled style="opacity:.55"' : ''}><span class="ic">${svg('finger', 1.8)}</span><span class="grow"><span class="t1">Buka dengan sidik jari</span><span class="t2">${!bioAvail ? 'Tidak tersedia di HP atau browser ini' : !pinOn ? 'Pasang PIN dulu sebagai cadangan' : bioOn ? 'Aktif' : 'Pakai sidik jari Android'}</span></span><span class="sw"><i></i></span></button>
+      ${pinOn ? row('s-pinoff', 'x', 'Matikan PIN', '') : ''}</div>
+    <div class="sec"><h2>Email &amp; data</h2></div>
+    <div class="glass tight"><div class="setr"><span class="ic">${svg('mail')}</span><span class="grow"><span class="t1">Laporan email otomatis</span><span class="t2">Setiap Jumat 16.00 dan tanggal 1, ke Sugi dan Syifa</span></span></div>${row('s-backup', 'dl', 'Unduh cadangan', 'Simpan semua catatan sebagai file')}</div>
+    <p class="hint" style="text-align:center;margin-top:16px">Belanja Kita versi ${APP_VERSION}</p>`;
+  const b = (id, fn) => { const x = el.querySelector('#' + id); if (x) x.onclick = fn; };
+  b('s-out', () => signOut()); b('s-in', () => { setMode('cloud'); showLogin(); });
+  b('s-budget', () => openBudget()); b('s-cats', () => openCats());
+  b('s-pin', () => startPin(pinOn ? 'change' : 'new'));
+  b('s-bio', async () => { if (!pinOn || !bioAvail) return; if (getBio()) disableBio(); else await enableBio(); renderLainnya(); });
+  b('s-pinoff', () => startPin('off')); b('s-backup', downloadBackup);
+}
+
+// ================= Semua transaksi: cari, urutkan, filter =================
+const SM = { month: null, q: '', sort: 'new', cats: [], weeks: [], wallets: [], by: [], price: 'all' };
+const smCount = () => SM.cats.length + SM.weeks.length + SM.wallets.length + SM.by.length + (SM.price !== 'all' ? 1 : 0);
+function smFiltered(st) {
+  st = st || SM; const m = st.month || curMonth(), weeks = monthWeeks(m), q = nameKey(st.q || '');
+  let list = entriesOf(inMonth(m)).filter(e =>
+    (!st.cats.length || st.cats.includes(e.c)) &&
+    (!st.weeks.length || st.weeks.some(i => weeks[i] && e.date >= weeks[i].a && e.date <= weeks[i].b)) &&
+    (!st.wallets.length || st.wallets.includes(e.wallet || '')) &&
+    (!st.by.length || st.by.includes(e.by || '')) &&
+    (st.price === 'all' || (st.price === 'lt' ? e.p < 50000 : e.p >= 50000)) &&
+    (!q || nameKey(e.n).includes(q) || nameKey(catName(e.c)).includes(q) || nameKey(e.note || '').includes(q)));
+  const by = { new: (a, b) => (b.date + b.at).localeCompare(a.date + a.at), old: (a, b) => (a.date + a.at).localeCompare(b.date + b.at), high: (a, b) => b.p - a.p, low: (a, b) => a.p - b.p }[st.sort];
+  return list.sort(by);
+}
+const SORTS = { new: 'Terbaru', old: 'Terlama', high: 'Harga tertinggi', low: 'Harga terendah' };
+function openAll(month, from) { SM.month = month || curMonth(); SM.from = from || 'riwayat'; go('semua'); }
+function renderSemua() {
+  const el = $('semua'); if (!el) return;
+  const m = SM.month || curMonth(), isNow = m === curMonth(), weeks = monthWeeks(m), n = smCount();
+  const actives = [].concat(SM.cats.map(c => ['cats', c, catName(c)]), SM.weeks.map(i => ['weeks', i, 'Tgl ' + (weeks[i] ? weeks[i].label : '')]), SM.wallets.map(w => ['wallets', w, w ? walletName(w) : 'Tanpa dompet']), SM.by.map(b => ['by', b, b || 'Tidak diketahui']), SM.price !== 'all' ? [['price', '', SM.price === 'lt' ? 'Di bawah Rp 50.000' : 'Rp 50.000 ke atas']] : []);
+  el.innerHTML = `
+    <button class="link" data-go="${SM.from || 'riwayat'}" style="display:inline-flex;align-items:center;gap:4px">${svg('left', 2.6)} Kembali</button>
+    <div class="mnav"><button class="mbtn" data-sm="-1" aria-label="Bulan sebelumnya" ${m <= firstMonth() ? 'disabled' : ''}>${svg('left', 2.4)}</button><div class="mlabel">${mLabel(m)}${isNow ? '<span class="now">Bulan ini</span>' : ''}</div><button class="mbtn" data-sm="1" aria-label="Bulan berikutnya" ${isNow ? 'disabled' : ''}>${svg('right', 2.4)}</button></div>
+    <label class="search"><span class="sr">Cari transaksi</span>${svg('search')}<input id="sm-q" value="${esc(SM.q)}" placeholder="Cari barang, contoh: telur" autocomplete="off"></label>
+    <div class="fchips"><button class="${n ? 'on' : ''}" data-act="filter">${svg('filter')}Filter${n ? ' (' + n + ')' : ''}</button><button data-act="filter">${SORTS[SM.sort]} ${svg('chev', 2.4)}</button><button data-act="filter">Kategori</button><button data-act="filter">Minggu</button><button data-act="filter">Dompet</button></div>
+    ${actives.length ? `<div class="chips">${actives.map(([k, v, t]) => `<button class="act" data-smx="${k}|${v}" aria-label="Hapus filter ${esc(t)}">${esc(t)} ${svg('x', 2.6)}</button>`).join('')}<button class="link" data-smx="all|">Hapus semua</button></div>` : ''}
+    <div id="sm-list"></div>`;
+  const q = el.querySelector('#sm-q'); q.oninput = () => { SM.q = q.value; smList(); };
+  smList();
+}
+function smList() {
+  const box = $('sm-list'); if (!box) return;
+  const list = smFiltered(), tot = sum(list, e => e.p);
+  let h = `<div class="glass" style="display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px"><span class="t2" style="font-weight:700;font-size:13.5px">${smCount() || SM.q ? 'Hasil' : 'Semua'}: ${list.length} transaksi</span><b class="num" style="font-size:20px">Rp ${fmt(tot)}</b></div>`;
+  if (!list.length) h += '<div class="glass" style="margin-top:12px"><div class="empty">Tidak ada transaksi yang cocok.</div></div>';
+  else if (SM.sort === 'new' || SM.sort === 'old') {
+    const g = {}; list.forEach(e => { (g[e.date] = g[e.date] || []).push(e); });
+    h += Object.keys(g).map(d => `<div class="day"><span>${dLong(d)}</span><span class="num">Rp ${fmt(sum(g[d], e => e.p))}</span></div><div class="glass tight">${g[d].map(entryRow).join('')}</div>`).join('');
+  } else h += `<div class="glass tight" style="margin-top:12px">${list.map(entryRow).join('')}</div>`;
+  box.innerHTML = h;
+}
+function openFilter() {
+  const st = clone(SM), m = st.month || curMonth(), weeks = monthWeeks(m);
+  const people = [...new Set(entriesOf(inMonth(m)).map(e => e.by || ''))].filter(Boolean);
+  const wallets = [''].concat(S.config.wallets.map(w => w.id));
+  const tog = (arr, v) => { const i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); };
+  const draw = () => {
+    const chip = (key, v, t, on) => `<button class="chip" aria-pressed="${on}" data-f="${key}|${v}">${t}</button>`;
+    const n = smFiltered(st).length;
+    openSheet('Urutkan & filter', `
+      <span class="lbl" style="margin-top:0">Urutkan</span><div class="chips">${Object.keys(SORTS).map(k => chip('sort', k, SORTS[k], st.sort === k)).join('')}</div>
+      <span class="lbl">Kategori</span><div class="chips">${cats().map(c => { const L = catLook(c.id); return `<button class="chip" aria-pressed="${st.cats.includes(c.id)}" data-f="cats|${c.id}"><i style="display:inline-block;width:9px;height:9px;border-radius:3px;background:${L.c1};margin-right:6px"></i>${esc(c.name)}</button>`; }).join('')}</div>
+      <span class="lbl">Minggu (tanggal)</span><div class="chips">${weeks.map((w, i) => chip('weeks', i, w.label, st.weeks.includes(i))).join('')}</div>
+      <span class="lbl">Dibayar dari</span><div class="chips">${wallets.map(w => chip('wallets', w, w ? esc(walletName(w)) : 'Tanpa dompet', st.wallets.includes(w))).join('')}</div>
+      ${people.length ? `<span class="lbl">Dicatat oleh</span><div class="chips">${people.map(p => chip('by', p, esc(p), st.by.includes(p))).join('')}</div>` : ''}
+      <span class="lbl">Harga</span><div class="chips">${[['all', 'Semua'], ['lt', 'Di bawah Rp 50.000'], ['ge', 'Rp 50.000 ke atas']].map(([k, t]) => chip('price', k, t, st.price === k)).join('')}</div>
+      <div class="btns2" style="grid-template-columns:1fr 1.6fr"><button class="btn" id="f-reset" style="background:var(--paper)">Reset</button><button class="btn main" id="f-go">Tampilkan ${n} transaksi</button></div>`, root => {
+      root.querySelectorAll('[data-f]').forEach(b => b.onclick = () => {
+        const [k, raw] = b.dataset.f.split('|'); const v = k === 'weeks' ? Number(raw) : raw;
+        if (k === 'sort' || k === 'price') st[k] = v; else tog(st[k], v);
+        draw();
+      });
+      root.querySelector('#f-reset').onclick = () => { Object.assign(st, { sort: 'new', cats: [], weeks: [], wallets: [], by: [], price: 'all' }); draw(); };
+      root.querySelector('#f-go').onclick = () => { Object.assign(SM, st); closeSheet(); renderSemua(); };
+    });
+  };
+  draw();
 }
 function downloadBackup() {
   let old = null; try { old = JSON.parse(localStorage.getItem(BACKUP_KEY) || 'null'); } catch (e) {}
@@ -1251,10 +1481,14 @@ document.addEventListener('click', e => {
     const rb = e.target.closest('#scrim [data-receipt]'); if (rb && !rb.onclick) openReceipt(rb.dataset.receipt);
     return;
   }
-  const t = e.target.closest('[data-go],[data-act],[data-receipt],[data-wallet],[data-delmove],[data-rmode],[data-rm],[data-ry],[data-pick],[data-openm]'); if (!t) return;
+  const t = e.target.closest('[data-go],[data-act],[data-receipt],[data-entry],[data-wallet],[data-delmove],[data-rmode],[data-rm],[data-ry],[data-pick],[data-openm],[data-chart],[data-sm],[data-smx]'); if (!t) return;
   const d = t.dataset;
   if (d.go) go(d.go);
   else if (d.receipt) openReceipt(d.receipt);
+  else if (d.entry) { const [rid, li] = d.entry.split(':'); openEntry({ kind: 'buy', rid, li: Number(li) }); }
+  else if (d.chart) { chartMode = d.chart; renderRiwayat(); }
+  else if (d.sm) { SM.month = shiftM(SM.month || curMonth(), Number(d.sm)); SM.weeks = []; renderSemua(); }
+  else if (d.smx) { const [k, v] = d.smx.split('|'); if (k === 'all') Object.assign(SM, { cats: [], weeks: [], wallets: [], by: [], price: 'all', q: '' }); else if (k === 'price') SM.price = 'all'; else SM[k] = SM[k].filter(x => String(x) !== v); renderSemua(); }
   else if (d.wallet) openWalletInfo(d.wallet);
   else if (d.delmove) { const before = clone(S.config.moves); S.config.moves = S.config.moves.filter(x => x.id !== d.delmove); saveWallets(); render(); toast('Catatan uang dihapus', () => { S.config.moves = before; saveWallets(); }); }
   else if (d.rmode) { rMode = d.rmode; renderRiwayat(); }
@@ -1264,6 +1498,10 @@ document.addEventListener('click', e => {
   else if (d.openm) { rMonth = d.openm; rMode = 'month'; renderRiwayat(); window.scrollTo({ top: 0 }); }
   else if (d.act === 'login') showLogin();
   else if (d.act === 'netcheck') openNetCheck();
+  else if (d.act === 'all') openAll(curMonth(), 'home');
+  else if (d.act === 'all-month') openAll(rMonth, 'riwayat');
+  else if (d.act === 'filter') openFilter();
+  else if (d.act === 'mail-now') sendMail('Laporan Belanja Kita ' + mLabel(curMonth()), monthText(curMonth()), monthHtml(curMonth()));
   else if (d.act === 'budget') openBudget();
   else if (d.act === 'cats') openCats();
   else if (d.act === 'money-in') openMoney('in');
@@ -1281,11 +1519,10 @@ let booted = false;
 function hideBoot() { if (booted) return; booted = true; const b = $('boot'); if (!b) return; b.classList.add('out'); setTimeout(() => b.remove(), 300); }
 setTimeout(hideBoot, 8000);
 $('logo').innerHTML = svg('basket'); $('boot-logo').innerHTML = svg('basket');
-$('btn-settings').innerHTML = svg('gear'); $('btn-settings').onclick = openSettings;
 $('fab').innerHTML = svg('plus', 2.6); $('fab').onclick = () => openPlus();
-const NAV = { home: ['basket', 'Belanja'], dompet: ['wallet', 'Dompet'], riwayat: ['chart', 'Riwayat'] };
+const NAV = { home: ['basket', 'Belanja'], dompet: ['wallet', 'Dompet'], riwayat: ['chart', 'Riwayat'], lainnya: ['dots', 'Lainnya'] };
 document.querySelectorAll('.nav .tab[data-go]').forEach(b => { const [ic, n] = NAV[b.dataset.go]; b.innerHTML = svg(ic) + n; });
-$('nav-more').innerHTML = svg('dots') + 'Lainnya'; $('nav-more').onclick = openSettings;
+
 window.addEventListener('online', () => { status(); flushOutbox(); }); window.addEventListener('offline', status);
 try {
   if (window.firebase && firebase.initializeApp) {
