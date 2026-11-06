@@ -277,6 +277,10 @@
   .chip.sg { background: #fff; border: 1.5px solid var(--line); color: var(--ink); height: 36px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   #semua > * + *, #lainnya > * + * { margin-top: 12px; } #semua .fchips, #semua .chips { margin-top: 10px; }
+  .area { position: relative; }
+  .atip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: #111827; color: #fff; border-radius: 12px; padding: 5px 10px; text-align: center; pointer-events: none; white-space: nowrap; box-shadow: 0 8px 18px -8px rgba(16,24,40,0.5); }
+  .atip small { display: block; font-size: 11px; opacity: .8; font-weight: 600; } .atip b { font-size: 13px; font-weight: 800; }
+  .stat[data-act] { cursor: pointer; }
 </style>
 </head>
 <body>
@@ -309,7 +313,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.5';
+const APP_VERSION = '4.6';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -398,6 +402,7 @@ function normConfig(c) {
   if (!c.categories.some(x => x.id === 'lain')) c.categories.push({ id: 'lain', name: 'Lain-lain', budget: 0 });
   c.wallets = Array.isArray(c.wallets) ? c.wallets.filter(w => w && w.id).map(w => ({ id: String(w.id), name: String(w.name || 'Dompet'), initial: Number(w.initial) || 0, createdAt: String(w.createdAt || '') })) : [];
   c.moves = Array.isArray(c.moves) ? c.moves.filter(m => m && m.id).map(m => ({ id: String(m.id), type: ['in', 'transfer', 'adjust'].includes(m.type) ? m.type : 'in', amount: m.type === 'adjust' ? (Number(m.amount) || 0) : Math.max(0, Number(m.amount) || 0), admin: Math.max(0, Number(m.admin) || 0), wallet: String(m.wallet || ''), to: String(m.to || ''), date: validDate(m.date) ? m.date : '', note: String(m.note || ''), by: String(m.by || '') })) : [];
+  c.weekBudget = Math.max(0, Number(c.weekBudget) || 0);
   c.suggest = Array.isArray(c.suggest) ? c.suggest.filter(x => x && x.n).map(x => ({ n: String(x.n), c: String(x.c || 'lain') })) : [];
   return c;
 }
@@ -636,8 +641,9 @@ function receiptSub(r) { return [dShort(r.date), r.lines.length > 1 ? r.lines.le
 const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
 
 // Setengah lingkaran: 100% = pengeluaran, persen di tiap bagian
+let gid = 0;
 function gauge(map, tot, big, small, badge) {
-  const items = catList(map);
+  const items = catList(map), G = 'g' + (++gid) + '_';
   if (!tot || !items.length) return `<div class="empty">Belum ada pengeluaran.</div>`;
   const W = 340, cx = W / 2, cy = 172, r = 116, sw = 30, rl = 154, gap = items.length > 1 ? 0.038 : 0;
   let a0 = Math.PI, arcs = '', labels = '', defs = '';
@@ -645,16 +651,16 @@ function gauge(map, tot, big, small, badge) {
     const L = catLook(x.id), span = Math.PI * x.v / tot, s = a0 + (k ? gap / 2 : 0), e = a0 + span - (k < items.length - 1 ? gap / 2 : 0);
     if (e > s) {
       const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s), x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
-      defs += `<linearGradient id="gg${k}" x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${L.c2}"/><stop offset="1" stop-color="${L.c1}"/></linearGradient>`;
-      arcs += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="url(#gg${k})" stroke-width="${sw}"/>`;
+      defs += `<linearGradient id="${G}${k}" x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${L.c2}"/><stop offset="1" stop-color="${L.c1}"/></linearGradient>`;
+      arcs += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="url(#${G}${k})" stroke-width="${sw}"/>`;
     }
     const p = Math.round(x.v / tot * 100);
     if (p >= 3) { const m = a0 + span / 2, lx = cx + rl * Math.cos(m), ly = cy + rl * Math.sin(m); labels += `<g transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})"><rect x="-19" y="-11" width="38" height="22" rx="11" fill="#fff" stroke="${L.c1}" stroke-width="1.5"/><text x="0" y="4.5" text-anchor="middle" font-size="11.5" font-weight="800" fill="${L.c1}" font-family="Plus Jakarta Sans, sans-serif">${p}%</text></g>`; }
     a0 += span;
   });
   const f = catLook(items[0].id).c1, l = catLook(items[items.length - 1].id).c1;
-  return `<div class="gauge"><svg viewBox="0 0 ${W} 200" role="img" aria-label="Pengeluaran per kategori dalam persen"><defs>${defs}<filter id="gsh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#111827" flood-opacity="0.12"/></filter></defs>
-    <path d="M${cx - r},${cy} A${r},${r} 0 0 1 ${cx + r},${cy}" fill="none" stroke="#fff" stroke-width="${sw + 10}" stroke-linecap="round"/><g filter="url(#gsh)"><circle cx="${cx - r}" cy="${cy}" r="${sw / 2}" fill="${f}"/><circle cx="${cx + r}" cy="${cy}" r="${sw / 2}" fill="${l}"/>${arcs}</g>${labels}</svg>
+  return `<div class="gauge"><svg viewBox="0 0 ${W} 200" role="img" aria-label="Pengeluaran per kategori dalam persen"><defs>${defs}<filter id="${G}sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#111827" flood-opacity="0.12"/></filter></defs>
+    <path d="M${cx - r},${cy} A${r},${r} 0 0 1 ${cx + r},${cy}" fill="none" stroke="#fff" stroke-width="${sw + 10}" stroke-linecap="round"/><g filter="url(#${G}sh)"><circle cx="${cx - r}" cy="${cy}" r="${sw / 2}" fill="${f}"/><circle cx="${cx + r}" cy="${cy}" r="${sw / 2}" fill="${l}"/>${arcs}</g>${labels}</svg>
     <div class="c"><small>${small}</small><b class="num">${big}</b>${badge ? `<span class="badge">${badge}</span>` : ''}</div></div>`;
 }
 function catList(map) {
@@ -671,30 +677,58 @@ function legendRows(map, tot, withBudget, limit) {
       <div class="sub"><span class="bar"><i style="width:${Math.max(3, x.v / mx * 100)}%;background:linear-gradient(90deg,${L.c2},${L.c1})"></i></span><span style="color:${b && x.v > b ? '#DC2626' : L.c1}">${sub}</span></div></div></div>`;
   }).join('') + (limit && items.length > limit ? `<button class="more" data-go="riwayat">${items.length - limit} kategori lainnya</button>` : '');
 }
-// Grafik area bergradasi (per hari)
-function areaChart(points, hiLabel) {
-  const W = 358, H = 210, n = points.length, vals = points.map(p => p.v);
+// Grafik area bergradasi (per hari), bisa diketuk atau digeser
+let chartPts = [], chartSel = null;
+function areaChart(points) {
+  const W = 358, H = 220, n = points.length;
   const known = points.filter(p => p.v != null); if (!known.length || !known.some(p => p.v > 0)) return `<div class="empty">Belum ada pengeluaran di periode ini.</div>`;
-  const mx = Math.max(...known.map(p => p.v)) * 1.25 || 1, X = i => n > 1 ? i * W / (n - 1) : W / 2, Y = v => H - 30 - (v / mx) * (H - 64);
+  const mx = Math.max(...known.map(p => p.v)) * 1.3 || 1, X = i => n > 1 ? i * W / (n - 1) : W / 2, Y = v => H - 30 - (v / mx) * (H - 70);
   const pts = []; points.forEach((p, i) => { if (p.v != null) pts.push([X(i), Y(p.v), i]); });
   let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
   for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], c = (x1 - x0) * 0.45; d += ` C${(x0 + c).toFixed(1)},${y0.toFixed(1)} ${(x1 - c).toFixed(1)},${y1.toFixed(1)} ${x1.toFixed(1)},${y1.toFixed(1)}`; }
   const last = pts[pts.length - 1], area = d + ` L${last[0].toFixed(1)},${H - 30} L${pts[0][0].toFixed(1)},${H - 30} Z`;
-  let hi = pts[0]; pts.forEach(p => { if (vals[p[2]] > vals[hi[2]]) hi = p; });
+  let hi = pts[0]; pts.forEach(p => { if (points[p[2]].v > points[hi[2]].v) hi = p; });
+  chartPts = points.map((p, i) => ({ ...p, x: X(i), y: p.v == null ? null : Y(p.v) }));
+  const sel = chartSel != null && chartPts[chartSel] && chartPts[chartSel].v != null ? chartSel : hi[2];
   const step = n > 10 ? Math.ceil(n / 7) : 1;
-  const labels = points.map((p, i) => (i % step === 0 || i === n - 1 || i === hi[2]) && !(n > 10 && i !== hi[2] && Math.abs(i - hi[2]) < step / 2 && i !== 0) ? `<text x="${Math.min(Math.max(X(i), 14), W - 14).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" font-weight="${i === hi[2] ? 800 : 600}" fill="${i === hi[2] ? '#111827' : '#5B6475'}" font-family="Plus Jakarta Sans, sans-serif">${p.l}</text>` : '').join('');
+  const labels = points.map((p, i) => (i % step === 0 || i === n - 1) ? `<text data-lb="${i}" x="${Math.min(Math.max(X(i), 14), W - 14).toFixed(1)}" y="${H - 8}" text-anchor="middle" font-size="11" font-weight="600" fill="#5B6475" font-family="Plus Jakarta Sans, sans-serif">${p.l}</text>` : '').join('');
   const fut = last[2] < n - 1 ? `<line x1="${last[0].toFixed(1)}" y1="${H - 30}" x2="${W}" y2="${H - 30}" stroke="#C9D8FF" stroke-width="2" stroke-dasharray="4 6"/>` : '';
-  const tx = Math.min(Math.max(hi[0], 40), W - 40);
-  return `<div class="area"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pengeluaran per hari"><defs><linearGradient id="afill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563EB" stop-opacity="0.9"/><stop offset="0.55" stop-color="#7FA6FF" stop-opacity="0.45"/><stop offset="1" stop-color="#E3ECFF" stop-opacity="0.05"/></linearGradient><linearGradient id="aedge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4F86FF"/><stop offset="1" stop-color="#1D4FD8"/></linearGradient></defs>
-    <path d="${area}" fill="url(#afill)"/><path d="${d}" fill="none" stroke="url(#aedge)" stroke-width="2.5"/>${fut}
-    <line x1="${hi[0].toFixed(1)}" y1="${hi[1].toFixed(1)}" x2="${hi[0].toFixed(1)}" y2="${H - 30}" stroke="#fff" stroke-opacity="0.85" stroke-width="1.5" stroke-dasharray="3 4"/>
-    <circle cx="${hi[0].toFixed(1)}" cy="${hi[1].toFixed(1)}" r="9" fill="#2563EB" fill-opacity="0.22"/><circle cx="${hi[0].toFixed(1)}" cy="${hi[1].toFixed(1)}" r="5" fill="#fff" stroke="#1D4FD8" stroke-width="3"/>
-    <text x="${tx.toFixed(1)}" y="${(hi[1] - 16).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="800" fill="#111827" font-family="Plus Jakarta Sans, sans-serif">Rp ${fmt(vals[hi[2]])}</text>${labels}</svg></div>`;
+  return `<div class="area" id="area"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Pengeluaran per hari. Ketuk atau geser untuk melihat tanggal tertentu."><defs><linearGradient id="afill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563EB" stop-opacity="0.9"/><stop offset="0.55" stop-color="#7FA6FF" stop-opacity="0.45"/><stop offset="1" stop-color="#E3ECFF" stop-opacity="0.05"/></linearGradient><linearGradient id="aedge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4F86FF"/><stop offset="1" stop-color="#1D4FD8"/></linearGradient></defs>
+    <path d="${area}" fill="url(#afill)"/><path d="${d}" fill="none" stroke="url(#aedge)" stroke-width="2.5"/>${fut}${labels}
+    <g id="amark"><line id="am-l" x1="0" x2="0" y2="${H - 30}" stroke="#fff" stroke-opacity="0.9" stroke-width="1.5" stroke-dasharray="3 4"/><circle id="am-h" r="10" fill="#2563EB" fill-opacity="0.22"/><circle id="am-c" r="5.5" fill="#fff" stroke="#1D4FD8" stroke-width="3"/></g>
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent" style="touch-action:pan-y;cursor:pointer" id="am-hit"/></svg>
+    <div class="atip" id="am-tip"></div></div>${chartReady(sel)}`;
+}
+function chartReady(sel) { setTimeout(() => bindArea(sel), 0); return ''; }
+function bindArea(sel) {
+  const box = $('area'); if (!box) return;
+  const svgEl = box.querySelector('svg'), W = 358, H = 220;
+  const show = i => {
+    const p = chartPts[i]; if (!p || p.v == null) return;
+    chartSel = i;
+    box.querySelector('#am-l').setAttribute('x1', p.x); box.querySelector('#am-l').setAttribute('x2', p.x); box.querySelector('#am-l').setAttribute('y1', p.y);
+    ['#am-h', '#am-c'].forEach(s => { const c = box.querySelector(s); c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); });
+    box.querySelectorAll('[data-lb]').forEach(t => { const on = Number(t.dataset.lb) === i; t.setAttribute('font-weight', on ? 800 : 600); t.setAttribute('fill', on ? '#111827' : '#5B6475'); });
+    const tip = box.querySelector('#am-tip'), pct = p.x / W * 100;
+    tip.innerHTML = `<small>${p.d ? dLong(p.d) : p.l}</small><b>Rp ${fmt(p.v)}</b>`;
+    tip.style.left = Math.min(Math.max(pct, 16), 84) + '%'; tip.style.top = (p.y / H * 100) + '%';
+  };
+  const pick = ev => {
+    const r = svgEl.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * W;
+    let best = null, bd = 1e9; chartPts.forEach((p, i) => { if (p.v != null && Math.abs(p.x - x) < bd) { bd = Math.abs(p.x - x); best = i; } });
+    if (best != null) show(best);
+  };
+  const hit = box.querySelector('#am-hit'); let down = false;
+  hit.addEventListener('pointerdown', e => { down = true; pick(e); });
+  hit.addEventListener('pointermove', e => { if (down || e.pointerType === 'mouse') pick(e); });
+  window.addEventListener('pointerup', () => { down = false; });
+  show(sel);
 }
 const HARI3 = ['SEN', 'SEL', 'RAB', 'KAM', 'JUM', 'SAB', 'MIN'];
-function weekPoints(ws) { const t = todayISO(); return HARI3.map((l, i) => { const d = isoAdd(ws, i); return { l, v: d > t ? null : total(inRange(d, d)) }; }); }
-function monthPoints(m) { const t = todayISO(); return Array.from({ length: daysIn(m) }, (_, i) => { const d = m + '-' + pad2(i + 1); return { l: String(i + 1), v: d > t ? null : total(inRange(d, d)) }; }); }
-const weekBudget = (m) => S.config.budget / daysIn(m) * 7;
+function weekPoints(ws) { const t = todayISO(); return HARI3.map((l, i) => { const d = isoAdd(ws, i); return { l, d, v: d > t ? null : total(inRange(d, d)) }; }); }
+function monthPoints(m) { const t = todayISO(); return Array.from({ length: daysIn(m) }, (_, i) => { const d = m + '-' + pad2(i + 1); return { l: String(i + 1), d, v: d > t ? null : total(inRange(d, d)) }; }); }
+const autoWeekBudget = (m) => S.config.budget / daysIn(m) * 7;
+const weekBudget = (m) => S.config.weekBudget || autoWeekBudget(m);
 
 function status() {
   const el = $('status'); if (!el) return;
@@ -728,7 +762,7 @@ function renderHome() {
       <button class="sub" data-act="budget">Terpakai Rp ${fmt(spent)} dari Rp ${fmt(budget)} ${svg('pen')}</button>
     </div>
     <div class="glass stats">
-      <div class="stat"><small>Minggu ini</small><b class="num">${short(wk)}</b><em class="${wk > wb ? 'bad' : 'good'}">${wk > wb ? '+' : '−'}${Math.abs(Math.round((wk / (wb || 1) - 1) * 100))}% batas</em></div>
+      <div class="stat" data-act="weekbudget" role="button" tabindex="0"><small>Minggu ini</small><b class="num">${short(wk)}</b><em class="${wk > wb ? 'bad' : 'good'}">${wk > wb ? '+' : '−'}${Math.abs(Math.round((wk / (wb || 1) - 1) * 100))}% batas</em></div>
       <div class="stat"><small>Bulan ini</small><b class="num">${short(spent)}</b><em>${Math.round(used * 100)}% anggaran</em></div>
       <div class="stat"><small>Tahun ini</small><b class="num">${short(total(inYear(y)))}</b><em>${y}</em></div>
     </div>
@@ -774,7 +808,7 @@ function renderRiwayat() {
     const ws = weekStart(todayISO()), lw = isoAdd(ws, -7);
     let pts, cap, val, tag = '';
     if (chartMode === 'week') { pts = weekPoints(ws); cap = dShort(ws) + ' – ' + dShort(isoAdd(ws, 6)); val = total(inRange(ws, isoAdd(ws, 6))); }
-    else if (chartMode === 'lastweek') { pts = HARI3.map((l, i) => { const d = isoAdd(lw, i); return { l, v: total(inRange(d, d)) }; }); cap = dShort(lw) + ' – ' + dShort(isoAdd(lw, 6)); val = total(inRange(lw, isoAdd(lw, 6))); }
+    else if (chartMode === 'lastweek') { pts = HARI3.map((l, i) => { const d = isoAdd(lw, i); return { l, d, v: total(inRange(d, d)) }; }); cap = dShort(lw) + ' – ' + dShort(isoAdd(lw, 6)); val = total(inRange(lw, isoAdd(lw, 6))); }
     else { pts = monthPoints(m); cap = mLabel(m); val = spent; }
     if (chartMode !== 'month') { const wb = weekBudget(m), d = Math.round((val / (wb || 1) - 1) * 100); tag = `<span class="${d > 0 ? 'tag-bad' : 'tag-good'}">${d > 0 ? '+' : '−'}${Math.abs(d)}% dari batas</span>`; }
     else { const d = Math.round(spent / (b || 1) * 100); tag = `<span class="${spent > b ? 'tag-bad' : 'tag-good'}">${d}% anggaran</span>`; }
@@ -1058,6 +1092,28 @@ function openAdjust(id) {
 }
 
 // ================= Anggaran & kategori =================
+function openWeekBudget(back) {
+  const m = curMonth(), auto = Math.round(autoWeekBudget(m)), f = { v: S.config.weekBudget || 0 };
+  openSheet('Batas belanja mingguan', `<p class="hint" style="margin-top:0">Dipakai untuk "Minggu ini", peringatan di Beranda dan grafik Riwayat.</p>
+    <div class="chips" style="margin-top:10px"><button class="chip" id="wb-auto" aria-pressed="${!f.v}">Otomatis</button><button class="chip" id="wb-man" aria-pressed="${!!f.v}">Atur sendiri</button></div>
+    <div id="wb-box"></div><button class="save" id="wb-save">Simpan</button>`, root => {
+    let manual = !!f.v;
+    const drawBox = () => {
+      root.querySelector('#wb-auto').setAttribute('aria-pressed', !manual); root.querySelector('#wb-man').setAttribute('aria-pressed', manual);
+      root.querySelector('#wb-box').innerHTML = manual ? `<span class="lbl">Batas per minggu</span>${moneyIn('wb-v', f.v || auto, 'Batas per minggu')}<p class="hint">Senin sampai Minggu.</p>` : `<div class="glass" style="margin-top:12px"><b class="num">Rp ${fmt(auto)} per minggu</b><p class="hint" style="margin:4px 0 0">Dihitung dari anggaran bulanan ${rp(S.config.budget)} dibagi ${daysIn(m)} hari, dikali 7.</p></div>`;
+      const v = root.querySelector('#wb-v'); if (v) { if (!f.v) f.v = auto; bindMoney(v, x => { f.v = x; }); setTimeout(() => v.focus(), 50); }
+    };
+    root.querySelector('#wb-auto').onclick = () => { manual = false; drawBox(); };
+    root.querySelector('#wb-man').onclick = () => { manual = true; drawBox(); };
+    drawBox();
+    root.querySelector('#wb-save').onclick = () => {
+      const before = S.config.weekBudget || 0, val = manual ? f.v : 0;
+      if (manual && !val) return;
+      putConfig({ weekBudget: val }); render(); toast(val ? 'Batas mingguan Rp ' + fmt(val) : 'Batas mingguan otomatis', () => putConfig({ weekBudget: before }));
+      back ? back() : closeSheet();
+    };
+  }, back);
+}
 function openBudget(back) {
   const f = { v: S.config.budget };
   const sumCat = sum(cats(), c => c.budget);
@@ -1116,7 +1172,7 @@ function renderLainnya() {
   el.innerHTML = `
     <div class="glass tight">${cloud.user ? row('s-out', 'user', esc(cloud.user.email), (person() || 'Keluarga') + ', tersinkron dengan keluarga', '<span class="link">Keluar</span>') : row('s-in', 'user', 'Mode lokal', 'Data hanya di HP ini', '<span class="link">Masuk</span>')}</div>
     <div class="sec"><h2>Anggaran</h2></div>
-    <div class="glass tight">${row('s-budget', 'wallet', 'Anggaran bulanan', rp(S.config.budget))}${row('s-cats', 'tag', 'Kategori &amp; anggaran kategori', cats().length + ' kategori, tambah, ubah, hapus')}</div>
+    <div class="glass tight">${row('s-budget', 'wallet', 'Anggaran bulanan', rp(S.config.budget))}${row('s-week', 'cal', 'Batas belanja mingguan', S.config.weekBudget ? rp(S.config.weekBudget) + ' per minggu' : 'Otomatis, ' + rp(Math.round(autoWeekBudget(curMonth()))) + ' per minggu')}${row('s-cats', 'tag', 'Kategori &amp; anggaran kategori', cats().length + ' kategori, tambah, ubah, hapus')}</div>
     <div class="sec"><h2>Kunci di HP ini</h2></div>
     <div class="glass tight">${row('s-pin', 'lock', pinOn ? 'Ganti PIN' : 'Pasang PIN', pinOn ? 'Diminta saat Belanja Kita dibuka' : 'Kunci dengan 4 angka (opsional)')}
       <button class="setr" id="s-bio" role="switch" aria-checked="${bioOn}" ${!pinOn || !bioAvail ? 'disabled style="opacity:.55"' : ''}><span class="ic">${svg('finger', 1.8)}</span><span class="grow"><span class="t1">Buka dengan sidik jari</span><span class="t2">${!bioAvail ? 'Tidak tersedia di HP atau browser ini' : !pinOn ? 'Pasang PIN dulu sebagai cadangan' : bioOn ? 'Aktif' : 'Pakai sidik jari Android'}</span></span><span class="sw"><i></i></span></button>
@@ -1126,7 +1182,7 @@ function renderLainnya() {
     <p class="hint" style="text-align:center;margin-top:16px">Belanja Kita versi ${APP_VERSION}</p>`;
   const b = (id, fn) => { const x = el.querySelector('#' + id); if (x) x.onclick = fn; };
   b('s-out', () => signOut()); b('s-in', () => { setMode('cloud'); showLogin(); });
-  b('s-budget', () => openBudget()); b('s-cats', () => openCats());
+  b('s-budget', () => openBudget()); b('s-week', () => openWeekBudget()); b('s-cats', () => openCats());
   b('s-pin', () => startPin(pinOn ? 'change' : 'new'));
   b('s-bio', async () => { if (!pinOn || !bioAvail) return; if (getBio()) disableBio(); else await enableBio(); renderLainnya(); });
   b('s-pinoff', () => startPin('off')); b('s-backup', downloadBackup);
@@ -1486,13 +1542,13 @@ document.addEventListener('click', e => {
   if (d.go) go(d.go);
   else if (d.receipt) openReceipt(d.receipt);
   else if (d.entry) { const [rid, li] = d.entry.split(':'); openEntry({ kind: 'buy', rid, li: Number(li) }); }
-  else if (d.chart) { chartMode = d.chart; renderRiwayat(); }
+  else if (d.chart) { chartMode = d.chart; chartSel = null; renderRiwayat(); }
   else if (d.sm) { SM.month = shiftM(SM.month || curMonth(), Number(d.sm)); SM.weeks = []; renderSemua(); }
   else if (d.smx) { const [k, v] = d.smx.split('|'); if (k === 'all') Object.assign(SM, { cats: [], weeks: [], wallets: [], by: [], price: 'all', q: '' }); else if (k === 'price') SM.price = 'all'; else SM[k] = SM[k].filter(x => String(x) !== v); renderSemua(); }
   else if (d.wallet) openWalletInfo(d.wallet);
   else if (d.delmove) { const before = clone(S.config.moves); S.config.moves = S.config.moves.filter(x => x.id !== d.delmove); saveWallets(); render(); toast('Catatan uang dihapus', () => { S.config.moves = before; saveWallets(); }); }
   else if (d.rmode) { rMode = d.rmode; renderRiwayat(); }
-  else if (d.rm) { rMonth = d.rm === 'now' ? curMonth() : shiftM(rMonth, Number(d.rm)); renderRiwayat(); }
+  else if (d.rm) { rMonth = d.rm === 'now' ? curMonth() : shiftM(rMonth, Number(d.rm)); chartSel = null; renderRiwayat(); }
   else if (d.ry) { rYear = String(Number(rYear) + Number(d.ry)); renderRiwayat(); }
   else if (d.pick) openPicker(d.pick);
   else if (d.openm) { rMonth = d.openm; rMode = 'month'; renderRiwayat(); window.scrollTo({ top: 0 }); }
@@ -1502,6 +1558,7 @@ document.addEventListener('click', e => {
   else if (d.act === 'all-month') openAll(rMonth, 'riwayat');
   else if (d.act === 'filter') openFilter();
   else if (d.act === 'mail-now') sendMail('Laporan Belanja Kita ' + mLabel(curMonth()), monthText(curMonth()), monthHtml(curMonth()));
+  else if (d.act === 'weekbudget') openWeekBudget();
   else if (d.act === 'budget') openBudget();
   else if (d.act === 'cats') openCats();
   else if (d.act === 'money-in') openMoney('in');
