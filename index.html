@@ -281,6 +281,16 @@
   .atip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: #111827; color: #fff; border-radius: 12px; padding: 5px 10px; text-align: center; pointer-events: none; white-space: nowrap; box-shadow: 0 8px 18px -8px rgba(16,24,40,0.5); }
   .atip small { display: block; font-size: 11px; opacity: .8; font-weight: 600; } .atip b { font-size: 13px; font-weight: 800; }
   .stat[data-act] { cursor: pointer; }
+  .ico.neutral { background: #F1F3F6; color: #374151; box-shadow: none; }
+  .lg2 { padding: 9px 0; } .lg2 + .lg2 { border-top: 1px solid var(--line); }
+  .lg2 .r1 { display: flex; align-items: center; gap: 8px; }
+  .lg2 .r1 i { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .lg2 .nm { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lg2 .pc { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; } .lg2 .pc.bad { color: var(--bad); font-weight: 700; }
+  .lg2 b { font-size: 14px; font-weight: 800; white-space: nowrap; margin-left: 6px; }
+  .lg2 .bar { display: block; margin: 7px 0 0 17px; height: 5px; border-radius: 3px; background: #EEF1F5; overflow: hidden; } .lg2 .bar i { display: block; height: 100%; border-radius: 3px; }
+  .cgrid button { color: var(--ink); } .cgrid button span { color: #4B5563; }
+  .cgrid button.on { background: var(--coral); color: #fff; box-shadow: 0 10px 20px -12px rgba(37,99,235,0.6); } .cgrid button.on span { color: #fff; }
 </style>
 </head>
 <body>
@@ -313,7 +323,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.6';
+const APP_VERSION = '4.7';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -610,7 +620,7 @@ function migrateLocal() {
 
 // ================= Tampilan (Frost) =================
 // Warna & ikon kategori: tanpa ungu, beda jelas satu sama lain
-const PALETTE = [['#F2674F', '#F7907D'], ['#E9A21B', '#F5C45E'], ['#0EA5A0', '#5AD5CB'], ['#E5488C', '#F28CBA'], ['#0EA5E9', '#6CCFF6'], ['#B7743F', '#DDA477'], ['#4E9F1A', '#93D158'], ['#0F766E', '#4FB3A9'], ['#C2410C', '#F08A5D'], ['#8A8F2E', '#C2C760']];
+const PALETTE = [['#E8806E', '#F0A496'], ['#DDA640', '#EBC57A'], ['#3FAEA2', '#79CDC4'], ['#DC7BA6', '#EAA6C5'], ['#4CA8D6', '#86C6E6'], ['#B98A62', '#D4B192'], ['#7DAA4E', '#A8C982'], ['#5E9C96', '#92C0BB'], ['#D08A5E', '#E3B190'], ['#A2A65A', '#C4C78E']];
 const CAT_LOOK = { lain: [0, 'dots'], rumah: [1, 'house'], lauk: [2, 'fish'], buah: [3, 'apple'], bersih: [4, 'drop'], pokok: [5, 'bag'], bumbu: [6, 'chili'] };
 Object.assign(P, {
   dots: '<circle cx="5.5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18.5" cy="12" r="1.4"/>',
@@ -625,7 +635,7 @@ function catLook(id) {
   if (fixed) { i = fixed[0]; icon = fixed[1]; } else { const k = Math.max(0, cats().findIndex(c => c.id === id)); i = 7 + (k % 3); }
   return { c1: PALETTE[i][0], c2: PALETTE[i][1], icon };
 }
-const catIco = (id, sm) => { const L = catLook(id); return `<span class="ico${sm ? ' sm' : ''}" style="background:linear-gradient(135deg,${L.c2},${L.c1});box-shadow:0 6px 14px -6px ${L.c1}AA">${svg(L.icon, 2.1)}</span>`; };
+const catIco = (id, sm) => { const L = catLook(id); return `<span class="ico neutral${sm ? ' sm' : ''}">${svg(L.icon, 2)}</span>`; };
 // Satu baris per barang (nota lama berisi beberapa barang dipecah per barang)
 function entriesOf(list) {
   const out = [];
@@ -655,11 +665,11 @@ function gauge(map, tot, big, small, badge) {
       arcs += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${e - s > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)}" fill="none" stroke="url(#${G}${k})" stroke-width="${sw}"/>`;
     }
     const p = Math.round(x.v / tot * 100);
-    if (p >= 3) { const m = a0 + span / 2, lx = cx + rl * Math.cos(m), ly = cy + rl * Math.sin(m); labels += `<g transform="translate(${lx.toFixed(1)},${ly.toFixed(1)})"><rect x="-19" y="-11" width="38" height="22" rx="11" fill="#fff" stroke="${L.c1}" stroke-width="1.5"/><text x="0" y="4.5" text-anchor="middle" font-size="11.5" font-weight="800" fill="${L.c1}" font-family="Plus Jakarta Sans, sans-serif">${p}%</text></g>`; }
+    if (p >= 3) { const m = a0 + span / 2, lx = cx + rl * Math.cos(m), ly = cy + rl * Math.sin(m); labels += `<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#5B6475" font-family="Plus Jakarta Sans, sans-serif">${p}%</text>`; }
     a0 += span;
   });
   const f = catLook(items[0].id).c1, l = catLook(items[items.length - 1].id).c1;
-  return `<div class="gauge"><svg viewBox="0 0 ${W} 200" role="img" aria-label="Pengeluaran per kategori dalam persen"><defs>${defs}<filter id="${G}sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#111827" flood-opacity="0.12"/></filter></defs>
+  return `<div class="gauge"><svg viewBox="0 0 ${W} 200" role="img" aria-label="Pengeluaran per kategori dalam persen"><defs>${defs}<filter id="${G}sh" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#111827" flood-opacity="0.06"/></filter></defs>
     <path d="M${cx - r},${cy} A${r},${r} 0 0 1 ${cx + r},${cy}" fill="none" stroke="#fff" stroke-width="${sw + 10}" stroke-linecap="round"/><g filter="url(#${G}sh)"><circle cx="${cx - r}" cy="${cy}" r="${sw / 2}" fill="${f}"/><circle cx="${cx + r}" cy="${cy}" r="${sw / 2}" fill="${l}"/>${arcs}</g>${labels}</svg>
     <div class="c"><small>${small}</small><b class="num">${big}</b>${badge ? `<span class="badge">${badge}</span>` : ''}</div></div>`;
 }
@@ -671,10 +681,9 @@ function legendRows(map, tot, withBudget, limit) {
   const items = catList(map); if (!items.length) return '';
   const mx = items[0].v; const shown = limit ? items.slice(0, limit) : items;
   return shown.map(x => {
-    const L = catLook(x.id), c = cats().find(k => k.id === x.id), b = withBudget && c ? c.budget : 0;
-    const sub = b ? (x.v > b ? `Lewat ${short(x.v - b)} dari batas ${short(b)}` : `${pc(x.v, b)}% dari batas ${short(b)}`) : `${pc(x.v, tot)}% dari pengeluaran`;
-    return `<div class="lg">${catIco(x.id)}<div class="grow"><div style="display:flex;justify-content:space-between;gap:8px"><span class="t1" style="font-size:14px">${esc(catName(x.id) || 'Kategori terhapus')}</span><span class="amt num" style="font-size:14px">Rp ${fmt(x.v)}</span></div>
-      <div class="sub"><span class="bar"><i style="width:${Math.max(3, x.v / mx * 100)}%;background:linear-gradient(90deg,${L.c2},${L.c1})"></i></span><span style="color:${b && x.v > b ? '#DC2626' : L.c1}">${sub}</span></div></div></div>`;
+    const L = catLook(x.id), c = cats().find(k => k.id === x.id), b = withBudget && c ? c.budget : 0, over = b && x.v > b;
+    const sub = b ? (over ? `Lewat ${short(x.v - b)} dari batas ${short(b)}` : `${pc(x.v, b)}% dari batas ${short(b)}`) : `${pc(x.v, tot)}%`;
+    return `<div class="lg2"><div class="r1"><i style="background:${L.c1}"></i><span class="nm">${esc(catName(x.id) || 'Kategori terhapus')}</span><span class="pc${over ? ' bad' : ''}">${sub}</span><b class="num">Rp ${fmt(x.v)}</b></div><span class="bar"><i style="width:${Math.max(2, x.v / mx * 100)}%;background:${L.c1}"></i></span></div>`;
   }).join('') + (limit && items.length > limit ? `<button class="more" data-go="riwayat">${items.length - limit} kategori lainnya</button>` : '');
 }
 // Grafik area bergradasi (per hari), bisa diketuk atau digeser
@@ -780,7 +789,7 @@ function renderHome() {
 }
 function renderDompet() {
   const W = S.config.wallets, moves = S.config.moves.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 30);
-  const wic = (col, ic) => `<span class="ico sm" style="background:${col}">${svg(ic)}</span>`;
+  const wic = (col, ic) => `<span class="ico neutral sm">${svg(ic)}</span>`;
   const WC = ['#F59E0B', '#3B7BF6', '#0EA5A0', '#E8448F', '#5E9E12', '#B7743F'];
   $('dompet').innerHTML = `
     <div class="bignum" style="margin-top:6px"><small class="cap">Uang di dompet</small><b class="num"><small>Rp</small>${fmt(walletsTotal())}</b><span>Uang yang benar-benar ada, beda dengan sisa anggaran</span></div>
@@ -801,7 +810,7 @@ function renderRiwayat() {
   const cm = curMonth(), cy = cm.slice(0, 4);
   if (!rMonth || rMonth > cm) rMonth = cm; if (!rYear || rYear > cy) rYear = cy;
   let h = `<div class="seg"><button aria-pressed="${rMode === 'month'}" data-rmode="month">Bulanan</button><button aria-pressed="${rMode === 'year'}" data-rmode="year">Tahunan</button></div>`;
-  const wal = list => { const w = byWallet(list), adm = sum(list, r => r.admin), keys = Object.keys(w).sort((a, b) => w[b] - w[a]); return keys.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="glass tight">${keys.map((k, i) => `<div class="row"><span class="ico sm" style="background:${['#F59E0B', '#3B7BF6', '#0EA5A0', '#E8448F', '#5E9E12'][i % 5]}">${svg('wallet')}</span><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">Rp ${fmt(w[k])}</span></div>`).join('')}${adm ? `<div class="row"><span class="ico sm" style="background:#8A8277">${svg('receipt')}</span><span class="grow"><span class="t1">Biaya admin</span><span class="t2">sudah termasuk di atas</span></span><span class="amt num">Rp ${fmt(adm)}</span></div>` : ''}</div>` : ''; };
+  const wal = list => { const w = byWallet(list), adm = sum(list, r => r.admin), keys = Object.keys(w).sort((a, b) => w[b] - w[a]); return keys.length ? `<div class="sec"><h2>Per dompet</h2></div><div class="glass tight">${keys.map((k, i) => `<div class="row"><span class="ico neutral sm">${svg('wallet')}</span><span class="grow t1">${esc(k ? walletName(k) || 'Dompet terhapus' : 'Tanpa dompet')}</span><span class="amt num">Rp ${fmt(w[k])}</span></div>`).join('')}${adm ? `<div class="row"><span class="ico sm" style="background:#8A8277">${svg('receipt')}</span><span class="grow"><span class="t1">Biaya admin</span><span class="t2">sudah termasuk di atas</span></span><span class="amt num">Rp ${fmt(adm)}</span></div>` : ''}</div>` : ''; };
   if (rMode === 'month') {
     const m = rMonth, isNow = m === cm, list = inMonth(m), spent = total(list), b = S.config.budget;
     if (!isNow) chartMode = 'month';
@@ -949,7 +958,7 @@ function openEntry(init, back) {
     top += `<label class="eamt"><span>Jumlah</span><div><small>Rp</small><input class="num" id="e-amt" inputmode="numeric" autocomplete="off" placeholder="0" value="${f.amount ? nf.format(f.amount) : ''}" aria-label="Jumlah"></div></label></div>`;
     let body = '<div class="pad">';
     if (k === 'buy') {
-      body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div><div class="cgrid">${cats().map(c => { const L = catLook(c.id), on = c.id === f.cat; return `<button type="button" data-cat="${c.id}" class="${on ? 'on' : ''}" aria-pressed="${on}" style="${on ? `background:linear-gradient(135deg,${L.c2},${L.c1})` : ''}"><span style="color:${on ? '#fff' : L.c1}">${svg(L.icon, 2.1)}</span>${esc(c.name.split(' & ')[0])}</button>`; }).join('')}</div>`;
+      body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div><div class="cgrid">${cats().map(c => { const L = catLook(c.id), on = c.id === f.cat; return `<button type="button" data-cat="${c.id}" class="${on ? 'on' : ''}" aria-pressed="${on}"><span>${svg(L.icon, 2)}</span>${esc(c.name.split(' & ')[0])}</button>`; }).join('')}</div>`;
       body += `<span class="lbl">Keterangan</span><input class="in" id="e-name" value="${esc(f.name)}" placeholder="Ketik nama barang, contoh: Telur" autocomplete="off" aria-label="Nama barang" enterkeyhint="done"><div id="e-sugg">${suggHtml()}</div>`;
       if (S.config.wallets.length) {
         const dl = f.date === todayISO() ? 'Hari ini' : f.date === isoAdd(todayISO(), -1) ? 'Kemarin' : dShort(f.date);
