@@ -298,6 +298,22 @@
   .insight p { margin: 0; } .insight p b { display: block; font-size: 14.5px; font-weight: 800; color: var(--ink); } .insight p span { display: block; font-size: 13px; color: var(--muted); font-weight: 500; margin-top: 2px; }
   .logo.back { transform: none; background: #fff; color: var(--ink); border: var(--glass-b); cursor: pointer; }
   .stat small, .t2, .ybars span { font-size: 12px; }
+  /* Lembar catat ringkas: muat satu layar tanpa gulir */
+  .etop { padding: 8px 16px 14px; }
+  .etop-h { margin: 6px 0 4px; gap: 8px; } .etop-h .seg3 { flex: 1; } .etop-h .seg3 button { height: 36px; font-size: 13.5px; }
+  .eamt { margin-top: 10px; } .eamt > span { display: block; font-size: 12.5px; }
+  .eamt-f { display: flex; align-items: baseline; justify-content: center; gap: 6px; margin: 2px auto 0; width: fit-content; max-width: 100%; padding: 0 8px 2px; border-bottom: 2px dashed rgba(255,255,255,0.55); }
+  .eamt input { width: 2ch; min-width: 1.6ch; max-width: 78vw; text-align: center; font-size: 38px; }
+  .sheet.flush > .pad { padding: 2px 16px 0; }
+  .sheet.flush .lbl { margin: 12px 2px 6px; }
+  .sheet.flush .lblrow .lbl { margin-bottom: 6px; }
+  .cgrid { gap: 6px; } .cgrid button { height: 60px; border-radius: 16px; gap: 4px; font-size: 11px; line-height: 1.15; } .cgrid button svg { font-size: 19px; }
+  .tiles { margin-top: 10px; } .tile { min-height: 52px; padding: 8px 12px; }
+  .sheet.flush .save { margin-top: 12px; height: 52px; }
+  .sheet.flush #e-showadmin { margin-top: 10px !important; }
+  .sgl { margin-top: 6px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 10px 24px -16px rgba(16,24,40,0.35); overflow: hidden; }
+  .sgl button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; text-align: left; } .sgl button + button { border-top: 1px solid var(--line); }
+  .sgl .t1 { font-size: 14px; } .sgl .t2 { font-size: 12px; } .sgl b { font-size: 13px; font-weight: 800; color: var(--muted); white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -330,7 +346,7 @@
 (function () {
 'use strict';
 // ================= Pengaturan =================
-const APP_VERSION = '4.8';
+const APP_VERSION = '4.9';
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBoXp2-ADD5QLm1dbXW-pczF2sdblu-6uQ",
   authDomain: "belanja-kita-c4c0f.firebaseapp.com",
@@ -957,12 +973,11 @@ function openEntry(init, back) {
     list = q ? list.filter(x => nameKey(x.n).includes(q) && nameKey(x.n) !== q) : list.filter(x => x.c === f.cat);
     return list.sort((a, b) => (q ? (nameKey(b.n).startsWith(q) - nameKey(a.n).startsWith(q)) : 0) || (b.cnt || 0) - (a.cnt || 0) || (b.d || '').localeCompare(a.d || '')).slice(0, 8);
   };
-  const suggHtml = () => { const l = suggs(); return l.length ? `<div class="t2" style="margin-top:10px;font-weight:700">${f.name ? 'Saran' : 'Rekomendasi ' + esc(catName(f.cat))}</div><div class="chips" style="margin-top:6px">${l.map((x, i) => `<button type="button" class="chip sg" data-sg="${i}">${esc(x.n)}${x.p ? `<span style="opacity:.7;font-weight:600;margin-left:6px">${short(x.p)}</span>` : ''}</button>`).join('')}</div>` : ''; };
+  const suggHtml = () => { if (!(f.name || '').trim()) return ''; const l = suggs().slice(0, 4); return l.length ? `<div class="sgl">${l.map((x, i) => `<button type="button" data-sg="${i}"><span class="grow"><span class="t1">${esc(x.n)}</span><span class="t2">${esc(catName(x.c))}</span></span>${x.p ? `<b class="num">Rp ${fmt(x.p)}</b>` : ''}</button>`).join('')}</div>` : ''; };
   const draw = () => {
     const k = f.kind, noW = !S.config.wallets.length, tot0 = (f.amount || 0) + (k === 'buy' && f.showAdmin ? f.admin || 0 : 0);
-    let top = `<div class="etop"><div class="grip light" aria-hidden="true"></div><div class="etop-h">${back ? `<button class="xbtn light" id="e-back" aria-label="Kembali">${svg('left', 2.6)}</button>` : ''}<h3>${ed ? 'Ubah catatan' : 'Catat'}</h3><button class="xbtn light" id="e-x" aria-label="Tutup">${svg('x', 2.6)}</button></div>`;
-    if (!ed) top += `<div class="seg3 onblue" role="group" aria-label="Jenis catatan">${[['buy', 'Belanja'], ['in', 'Isi uang'], ['transfer', 'Pindah']].map(([id, n]) => `<button type="button" aria-pressed="${k === id}" data-kind="${id}">${n}</button>`).join('')}</div>`;
-    top += `<label class="eamt"><span>Jumlah</span><div><small>Rp</small><input class="num" id="e-amt" inputmode="numeric" autocomplete="off" placeholder="0" value="${f.amount ? nf.format(f.amount) : ''}" aria-label="Jumlah"></div></label></div>`;
+    let top = `<div class="etop"><div class="grip light" aria-hidden="true"></div><div class="etop-h">${back ? `<button class="xbtn light" id="e-back" aria-label="Kembali">${svg('left', 2.6)}</button>` : ''}${ed ? '<h3>Ubah catatan</h3>' : `<div class="seg3 onblue" role="group" aria-label="Jenis catatan">${[['buy', 'Belanja'], ['in', 'Isi uang'], ['transfer', 'Pindah']].map(([id, n]) => `<button type="button" aria-pressed="${k === id}" data-kind="${id}">${n}</button>`).join('')}</div>`}<button class="xbtn light" id="e-x" aria-label="Tutup">${svg('x', 2.6)}</button></div>`;
+    top += `<label class="eamt" for="e-amt"><span>Masukkan jumlah</span><div class="eamt-f"><small>Rp</small><input class="num" id="e-amt" inputmode="numeric" autocomplete="off" placeholder="0" value="${f.amount ? nf.format(f.amount) : ''}" aria-label="Jumlah"></div></label></div>`;
     let body = '<div class="pad">';
     if (k === 'buy') {
       body += `<div class="lblrow"><span class="lbl">Kategori</span><button type="button" class="link" id="e-addcat">+ Tambah</button></div><div class="cgrid">${cats().map(c => { const L = catLook(c.id), on = c.id === f.cat; return `<button type="button" data-cat="${c.id}" class="${on ? 'on' : ''}" aria-pressed="${on}"><span>${svg(L.icon, 2)}</span>${esc(c.name.split(' & ')[0])}</button>`; }).join('')}</div>`;
@@ -993,15 +1008,17 @@ function openEntry(init, back) {
       const updTot = () => { const t = (f.amount || 0) + (f.kind === 'buy' && f.showAdmin ? f.admin || 0 : 0); const el = root.querySelector('#e-tot'); if (el) el.textContent = t ? ' Rp ' + fmt(t) : ''; };
       root.querySelector('#e-x').onclick = closeSheet; const bk = root.querySelector('#e-back'); if (bk) bk.onclick = back;
       root.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => { keep(); f.kind = b.dataset.kind; f.panel = ''; if (f.kind === 'transfer' && f.to === f.wallet) f.to = (S.config.wallets.find(w => w.id !== f.wallet) || {}).id || ''; draw(); });
-      bindMoney(root.querySelector('#e-amt'), v => { f.amount = v; updTot(); });
+      const amt = root.querySelector('#e-amt'), fitAmt = () => { amt.style.width = Math.max(1, (amt.value || '0').length) + 0.6 + 'ch'; };
+      bindMoney(amt, v => { f.amount = v; updTot(); fitAmt(); }); fitAmt();
       const ad = root.querySelector('#e-admin'); if (ad) bindMoney(ad, v => { f.admin = v; updTot(); });
       root.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => { keep(); f.cat = b.dataset.cat; try { localStorage.setItem(CAT_KEY, f.cat); } catch (e) {} draw(); });
       const nIn = root.querySelector('#e-name');
       if (nIn) {
         nIn.addEventListener('input', () => { f.name = nIn.value; root.querySelector('#e-sugg').innerHTML = suggHtml(); bindSugg(); });
+        nIn.addEventListener('focus', () => setTimeout(() => nIn.scrollIntoView({ block: 'start', behavior: 'smooth' }), 250));
         nIn.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nIn.blur(); } });
       }
-      const bindSugg = () => { const l = suggs(); root.querySelectorAll('[data-sg]').forEach(b => b.onclick = () => { const x = l[Number(b.dataset.sg)]; keep(); f.name = x.n; f.cat = x.c; if (!f.amount && x.p) f.amount = x.p; draw(); }); };
+      const bindSugg = () => { const l = suggs().slice(0, 4); root.querySelectorAll('[data-sg]').forEach(b => b.onclick = () => { const x = l[Number(b.dataset.sg)]; keep(); f.name = x.n; f.cat = x.c; if (!f.amount && x.p) f.amount = x.p; draw(); }); };
       bindSugg();
       const tw = root.querySelector('#e-tw'); if (tw) tw.onclick = () => { keep(); f.panel = f.panel === 'w' ? '' : 'w'; draw(); };
       const td = root.querySelector('#e-td'); if (td) td.onclick = () => { keep(); f.panel = f.panel === 'd' ? '' : 'd'; draw(); };
